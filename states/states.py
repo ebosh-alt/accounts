@@ -1,5 +1,4 @@
-from aiogram.fsm.state import StatesGroup, State
-from pydantic import BaseModel
+from aiogram.fsm.state import StatesGroup
 
 
 class UserStates(StatesGroup):
@@ -7,4 +6,8 @@ class UserStates(StatesGroup):
 
 
 class AdminStates(StatesGroup):
+    ...
+
+
+class ManageStates(StatesGroup):
     ...

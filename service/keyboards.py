@@ -52,5 +52,3 @@ start_menu_admin_kb = create_keyboard(["Редактирование предс�
 
 edit_before_start_message_button = ["Изменить видимость", "Медиа", "Клавиатура"]
 edit_before_start_message_kb = create_keyboard(edit_before_start_message_button)
-
-
