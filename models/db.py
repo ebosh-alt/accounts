@@ -3,6 +3,7 @@ from os import environ
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 import sqlalchemy.ext.declarative as dec
 from sqlalchemy.orm import sessionmaker
+# from sqlalchemy.dialects
 
 # from .config import postgres
 SqlAlchemyBase = dec.declarative_base()
@@ -13,8 +14,7 @@ __factory = None
 
 
 def get_database_url() -> str:
-    pass
-    # return f'postgresql+asyncpg://{postgres["user"]}:{postgres["password"]}@{postgres["host"]}/{postgres["database"]}'
+    return f'sqlite+aiosqlite:///metanit.db'
 
 
 async def global_init():
@@ -24,7 +24,7 @@ async def global_init():
         return
     conn_str = get_database_url()
 
-    engine = create_async_engine(conn_str, pool_pre_ping=True, pool_size=50, max_overflow=10)
+    engine = create_async_engine(conn_str)#, pool_pre_ping=True, pool_size=50, max_overflow=10)
 
     async with engine.begin() as conn:
         await conn.run_sync(SqlAlchemyBase.metadata.create_all)

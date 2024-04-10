@@ -1,10 +1,9 @@
-from typing import Self
 from sqlalchemy import Column, BigInteger, String, INTEGER, FLOAT, ForeignKey, select, delete, Boolean, update
 from models.db import SqlAlchemyBase
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import relationship
 
-
+print("3456789")
 class Chats(SqlAlchemyBase):
     __tablename__ = "chats"
 
@@ -24,7 +23,7 @@ class Chats(SqlAlchemyBase):
         await session.commit()
 
     @classmethod
-    async def obj(cls, id: int, session: AsyncSession) -> Self | None:
+    async def obj(cls, id: int, session: AsyncSession):
         if not session.is_active:
             try:
                 await session.begin()
@@ -83,7 +82,7 @@ class Users(SqlAlchemyBase):
         await session.commit()
 
     @classmethod
-    async def obj(cls, id: int, session: AsyncSession) -> Self | None:
+    async def obj(cls, id: int, session: AsyncSession):
         if not session.is_active:
             try:
                 await session.begin()
@@ -118,7 +117,7 @@ class Users(SqlAlchemyBase):
             return False
         
     @classmethod
-    async def get_all(cls, session: AsyncSession) -> list[Self]:
+    async def get_all(cls, session: AsyncSession) -> list:
         if not session.is_active:
             try:
                 await session.begin()
@@ -158,7 +157,7 @@ class Sellers(SqlAlchemyBase):
         await session.commit()
 
     @classmethod
-    async def obj(cls, id: int, session: AsyncSession) -> Self | None:
+    async def obj(cls, id: int, session: AsyncSession):
         if not session.is_active:
             try:
                 await session.begin()
@@ -219,7 +218,7 @@ class Deals(SqlAlchemyBase):
         await session.commit()
 
     @classmethod
-    async def obj(cls, id: int, session: AsyncSession) -> Self | None:
+    async def obj(cls, id: int, session: AsyncSession):
         if not session.is_active:
             try:
                 await session.begin()
@@ -240,7 +239,7 @@ class Deals(SqlAlchemyBase):
         await session.commit()
         
     @classmethod
-    async def get_all(cls, session: AsyncSession) -> list[Self]:
+    async def get_all(cls, session: AsyncSession) -> list:
         if not session.is_active:
             try:
                 await session.begin()
@@ -278,7 +277,7 @@ class Accounts(SqlAlchemyBase):
         await session.commit()
 
     @classmethod
-    async def obj(cls, id: int, session: AsyncSession) -> Self | None:
+    async def obj(cls, id: int, session: AsyncSession):
         if not session.is_active:
             try:
                 await session.begin()
@@ -299,7 +298,7 @@ class Accounts(SqlAlchemyBase):
         await session.commit()
         
     @classmethod
-    async def get_all(cls, session: AsyncSession) -> list[Self]:
+    async def get_all(cls, session: AsyncSession) -> list:
         if not session.is_active:
             try:
                 await session.begin()
@@ -316,3 +315,24 @@ class Accounts(SqlAlchemyBase):
     # __contains__= is_register +
     # get_all +
     # delete +
+
+
+def testing_DB():
+    pass
+    # seller = 
+    # user = 
+
+    # chat_1 = 
+    # deal_1 = 
+    # acc_1 = 
+
+    # deal_2 =
+    # acc_2 = 
+
+    # chat_3 =
+    # deal_3 =
+    # acc_3 = 
+
+
+if __name__ == "__main__":
+    testing_DB()
