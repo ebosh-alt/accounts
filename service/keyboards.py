@@ -50,6 +50,7 @@ class Builder:
         keyboard.adjust(*sizes)
         return keyboard.as_markup(resize_keyboard=True, one_time_keyboard=one_time_keyboard)
 
+
 class Keyboards:
     menu_kb = Builder.create_keyboard(
         {"Магазин": "shop",

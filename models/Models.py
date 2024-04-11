@@ -3,7 +3,6 @@ from models.db import SqlAlchemyBase
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import relationship
 
-print("3456789")
 class Chats(SqlAlchemyBase):
     __tablename__ = "chats"
 

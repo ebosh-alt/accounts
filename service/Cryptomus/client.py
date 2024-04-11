@@ -10,11 +10,7 @@ logger = logging.getLogger(__name__)
 
 
 class CryptomusClient:
-    def __init__(
-            self,
-            merchant_id: str,
-            api_key: str,
-    ) -> None:
+    def __init__(self, merchant_id: str, api_key: str,) -> None:
         _session = AIOHTTPSession(api_key)
         _session.headers["merchant"] = merchant_id
         self.session = _session
