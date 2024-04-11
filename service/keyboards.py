@@ -1,11 +1,12 @@
 from aiogram import types
 from aiogram.utils.keyboard import InlineKeyboardBuilder, ReplyKeyboardBuilder
 
+from data.config import link_support
+
 
 class Builder:
-    # Адаптация билдера aiogram под наши задачи
     @staticmethod
-    def inline_keyboard(name_buttons: list | dict, *sizes: int) -> types.InlineKeyboardMarkup:
+    def create_keyboard(name_buttons: list | dict, *sizes: int) -> types.InlineKeyboardMarkup:
         keyboard = InlineKeyboardBuilder()
         if type(name_buttons) is list:
             for name_button in name_buttons:
@@ -27,14 +28,11 @@ class Builder:
             sizes = (1,)
         keyboard.adjust(*sizes)
         return keyboard.as_markup(resize_keyboard=True, one_time_keyboard=True)
-    
-
 
     @staticmethod
-    def reply_keyboard(name_buttons: list, one_time_keyboard: bool = False, request_contact: bool = False,
-                            *sizes) -> types.ReplyKeyboardMarkup:
+    def create_reply_keyboard(name_buttons: list, one_time_keyboard: bool = False, request_contact: bool = False,
+                              *sizes) -> types.ReplyKeyboardMarkup:
         keyboard = ReplyKeyboardBuilder()
-
         for name_button in name_buttons:
             if name_button is not tuple:
                 keyboard.button(
@@ -53,12 +51,9 @@ class Builder:
         return keyboard.as_markup(resize_keyboard=True, one_time_keyboard=one_time_keyboard)
 
 class Keyboards:
-    pass
-
-
-
-
-
-# if __name__ == "__main__":
-#     print(type(Keyboards.st))
-    
+    menu_kb = Builder.create_keyboard(
+        {"Магазин": "shop",
+         "Правила": "rules",
+         "Поддержка": link_support,
+         "История покупок": "history_buy"})
+    back_menu_kb = Builder.create_keyboard({"Назад": "back_menu"})

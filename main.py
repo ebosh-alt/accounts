@@ -6,6 +6,7 @@ from data.config import dp, bot, client_s
 from handlers import routers
 from service.TGClient import startTGClient
 from models.db import global_init
+from service import middleware
 
 logger = logging.getLogger(__name__)
 
@@ -15,6 +16,7 @@ async def main() -> None:
     await startTGClient(client_s=client_s)
     for router in routers:
         dp.include_router(router)
+    dp.update.middleware(middleware.Logging())
     await dp.start_polling(bot)
 
 
