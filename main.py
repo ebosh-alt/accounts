@@ -7,13 +7,14 @@ from handlers import routers
 from service.TGClient import startTGClient
 from models.db import global_init
 from service import middleware
-
+from service.TGClient import startTGClient
+from models.db import global_init
 logger = logging.getLogger(__name__)
 
 
 async def main() -> None:
     await global_init()
-    await startTGClient(client_s=client_s)
+    # await startTGClient(client_s=client_s)
     for router in routers:
         dp.include_router(router)
     dp.update.middleware(middleware.Logging())

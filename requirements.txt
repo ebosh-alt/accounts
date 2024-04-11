@@ -27,3 +27,6 @@ SQLAlchemy==2.0.29
 Telethon==1.34.0
 typing_extensions==4.10.0
 yarl==1.9.4
+
+logging~=0.4.9.6
+adaptix~=3.0.0b4
