@@ -33,7 +33,6 @@ class Builder:
     def create_reply_keyboard(name_buttons: list, one_time_keyboard: bool = False, request_contact: bool = False,
                               *sizes) -> types.ReplyKeyboardMarkup:
         keyboard = ReplyKeyboardBuilder()
-
         for name_button in name_buttons:
             if name_button is not tuple:
                 keyboard.button(
@@ -50,7 +49,6 @@ class Builder:
             sizes = (1,)
         keyboard.adjust(*sizes)
         return keyboard.as_markup(resize_keyboard=True, one_time_keyboard=one_time_keyboard)
-
 
 class Keyboards:
     menu_kb = Builder.create_keyboard(
