@@ -315,3 +315,28 @@ class Accounts(SqlAlchemyBase):
     # __contains__= is_register +
     # get_all +
     # delete +
+
+
+@session_db
+async def test(session: AsyncSession):
+    await Sellers.register(id=1, rating=0, balance=0, username="test", session=session)
+    await Accounts.register(shop="Goggle", price=100.0, description="test description1",
+                            data="test data", view_type=True, name="youtube",
+                            session=session)
+    await Accounts.register(shop="Facebook", price=1200.0, description="test description2",
+                            data="test data", view_type=True, name="account",
+                            session=session)
+    await Accounts.register(shop="Amazon", price=1050.0, description="test description3",
+                            data="test data", view_type=True, name="AWS",
+                            session=session)
+    await Accounts.register(shop="Netflix", price=1020.0, description="test description4",
+                            data="test data", view_type=True, name="account",
+                            session=session)
+    await Accounts.register(shop="Goggle", price=10089.0, description="test description5",
+                            data="test data", view_type=True, name="VPS",
+                            session=session)
+    await Deals.register()
+
+
+if __name__ == "__main__":
+    asyncio.run(test())
