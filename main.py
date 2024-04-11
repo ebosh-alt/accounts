@@ -4,6 +4,7 @@ import logging
 
 from data.config import dp, bot
 from handlers import routers
+from service import middleware
 
 logger = logging.getLogger(__name__)
 
@@ -11,6 +12,7 @@ logger = logging.getLogger(__name__)
 async def main() -> None:
     for router in routers:
         dp.include_router(router)
+    dp.update.middleware(middleware.Logging())
     await dp.start_polling(bot)
 
 

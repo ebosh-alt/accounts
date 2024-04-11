@@ -1,3 +1,3 @@
-from .start import start_rt
+from .menu import menu_rt
 
-routers = (start_rt,)
+routers = (menu_rt,)

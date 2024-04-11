@@ -2,12 +2,12 @@ from pydantic import BaseModel
 
 
 class Score(BaseModel):
-    score_id: int
+    user_id: int | None
     amount: float
+    guarantor: bool
     is_payment: bool
 
 
 class Account(BaseModel):
     id_account: int
-    guarantor: bool
     score: Score
