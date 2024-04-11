@@ -5,3 +5,4 @@ gen
 .venv
 /data/.env
 *.session
+*.db

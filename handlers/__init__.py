@@ -1,3 +1,5 @@
-from .start import start_rt
+from admins import admin_routers
+from managers import manager_routers
+from users import users_routers
 
-routers = (start_rt,)
+routers = (*admin_routers, *manager_routers, *users_routers, )

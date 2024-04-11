@@ -250,7 +250,20 @@ class Deals(SqlAlchemyBase):
         sobjs = result.scalars().all()
 
         return sobjs
-    
+
+    @classmethod
+    async def is_register(cls, id: int, session: AsyncSession) -> bool:
+        if not session.is_active:
+            try:
+                await session.begin()
+            except Exception as e:
+                print(e)
+        result = await session.execute(select(cls).filter_by(id=id))
+        sobj = result.first()
+        if sobj:
+            return True
+        else:
+            return False
     # obj = get +
     # register +
     # __contains__ = is_register -
@@ -309,6 +322,20 @@ class Accounts(SqlAlchemyBase):
         sobjs = result.scalars().all()
 
         return sobjs
+    
+    @classmethod
+    async def is_register(cls, id: int, session: AsyncSession) -> bool:
+        if not session.is_active:
+            try:
+                await session.begin()
+            except Exception as e:
+                print(e)
+        result = await session.execute(select(cls).filter_by(id=id))
+        sobj = result.first()
+        if sobj:
+            return True
+        else:
+            return False
     
     # obj = get +
     # register + 

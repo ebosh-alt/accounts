@@ -20,27 +20,30 @@ from telethon.tl.functions.messages import CreateChatRequest
 
 
 class TG_Acc:
+    '''
     session_name: str
     api_id: int
     api_hash: str
     phone_number: str
-
+    '''
     def __init__(self, session_name: str, api_id: int, api_hash: str, phone_number: str) -> None:
-        self.session_name = session_name
-        self.api_id = api_id
-        self.api_hash = api_hash
-        self.phone_number = phone_number
+        self.session_name: str = session_name
+        self.api_id: int = api_id
+        self.api_hash: str = api_hash
+        self.phone_number: str = phone_number
 
 
 class TGClient_S:
+    '''
     client: TelegramClient
     account: TG_Acc
     code: str|int
+    '''
 
-    def __init__(self, account) -> None:
-        self.account = account
-        self.client = TelegramClient(session=account.session_name, api_id=account.api_id, api_hash=account.api_hash, system_version='4.16.30-vxCUSTOM')
-        self.code = None
+    def __init__(self, account: TG_Acc) -> None:
+        self.client: TelegramClient = TelegramClient(session=account.session_name, api_id=account.api_id, api_hash=account.api_hash, system_version='4.16.30-vxCUSTOM')
+        self.account: TG_Acc = account
+        self.code: str|int = None
         self.client.parse_mode = "md"
 
 
