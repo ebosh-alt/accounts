@@ -4,14 +4,15 @@ from sqlalchemy import Column, BigInteger, String, INTEGER, FLOAT, ForeignKey, s
 from models.db import SqlAlchemyBase, session_db
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import relationship
+from __future__ import annotations
 
 
 class Chats(SqlAlchemyBase):
     __tablename__ = "chats"
 
-    id = Column(BigInteger, primary_key=True)
-    user_id = Column(BigInteger, ForeignKey("users.id"))
-    seller_id = Column(BigInteger, ForeignKey("sellers.id"))
+    id: int = Column(BigInteger, primary_key=True)
+    user_id: int = Column(BigInteger, ForeignKey("users.id"))
+    seller_id: id = Column(BigInteger, ForeignKey("sellers.id"))
     user = relationship("Users", back_populates="chats")
     seller = relationship("Sellers", back_populates="chats")
 
@@ -24,7 +25,7 @@ class Chats(SqlAlchemyBase):
         await session.commit()
 
     @classmethod
-    async def obj(cls, id: int, session: AsyncSession):
+    async def obj(cls, id: int, session: AsyncSession) -> Chats:
         if not session.is_active:
             try:
                 await session.begin()
@@ -76,12 +77,12 @@ class Users(SqlAlchemyBase):
     async def register(cls, id: int, username: str, session: AsyncSession) -> None:
         if await cls.is_register(id, session):
             return
-        sobj = cls(id=id, username=username)
-        session.add(sobj)
+        obj = cls(id=id, username=username)
+        session.add(obj)
         await session.commit()
 
     @classmethod
-    async def obj(cls, id: int, session: AsyncSession):
+    async def obj(cls, id: int, session: AsyncSession) -> Users:
         if not session.is_active:
             try:
                 await session.begin()
@@ -314,5 +315,3 @@ class Accounts(SqlAlchemyBase):
     # __contains__= is_register +
     # get_all +
     # delete +
-
-
