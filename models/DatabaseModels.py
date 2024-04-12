@@ -1,10 +1,10 @@
+from __future__ import annotations
 import asyncio
 
 from sqlalchemy import Column, BigInteger, String, INTEGER, FLOAT, ForeignKey, select, delete, Boolean, update
-from models.db import SqlAlchemyBase, session_db
+from models.db import SqlAlchemyBase, session_db, global_init
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import relationship
-from __future__ import annotations
 
 
 class Chats(SqlAlchemyBase):
@@ -197,7 +197,7 @@ class Sellers(SqlAlchemyBase):
 class Deals(SqlAlchemyBase):
     __tablename__ = "deals"
 
-    id = Column(BigInteger, primary_key=True, autoincrement=True)
+    id = Column(BigInteger, primary_key=True, unique=True, autoincrement=True)
     buyer_id = Column(BigInteger, ForeignKey("users.id"))
     seller_id = Column(BigInteger, ForeignKey("sellers.id"))
     acc_id = Column(BigInteger, ForeignKey("accounts.id"), unique=True)
@@ -259,8 +259,7 @@ class Deals(SqlAlchemyBase):
 
 class Accounts(SqlAlchemyBase):
     __tablename__ = "accounts"
-
-    id: int = Column(BigInteger, primary_key=True, autoincrement=True)
+    id: int = Column(BigInteger, primary_key=True, unique=True, autoincrement=True)
     shop: str = Column(String)
     price: float = Column(FLOAT)
     description: str = Column(String)
@@ -321,21 +320,30 @@ class Accounts(SqlAlchemyBase):
 async def test(session: AsyncSession):
     await Sellers.register(id=1, rating=0, balance=0, username="test", session=session)
     await Accounts.register(shop="Goggle", price=100.0, description="test description1",
-                            data="test data", view_type=True, name="youtube",
+                            data="test data1", view_type=True, name="youtube",
                             session=session)
     await Accounts.register(shop="Facebook", price=1200.0, description="test description2",
-                            data="test data", view_type=True, name="account",
+                            data="test data2", view_type=True, name="account",
                             session=session)
     await Accounts.register(shop="Amazon", price=1050.0, description="test description3",
-                            data="test data", view_type=True, name="AWS",
+                            data="test data3", view_type=True, name="AWS",
                             session=session)
     await Accounts.register(shop="Netflix", price=1020.0, description="test description4",
-                            data="test data", view_type=True, name="account",
+                            data="test data4", view_type=True, name="account",
                             session=session)
     await Accounts.register(shop="Goggle", price=10089.0, description="test description5",
-                            data="test data", view_type=True, name="VPS",
+                            data="test data5", view_type=True, name="AWS",
                             session=session)
-    await Deals.register()
+    await Deals.register(buyer_id=6989531851, seller_id=1, acc_id=0, date=2345678, garant=True, payment_status=3,
+                         session=session)
+    await Deals.register(buyer_id=6989531851, seller_id=1, acc_id=1, date=23456780, garant=True, payment_status=2,
+                         session=session)
+    await Deals.register(buyer_id=6989531851, seller_id=1, acc_id=2, date=23456730, garant=False, payment_status=1,
+                         session=session)
+    await Deals.register(buyer_id=6989531851, seller_id=1, acc_id=3, date=234567823, garant=True, payment_status=0,
+                         session=session)
+    await Deals.register(buyer_id=6989531851, seller_id=1, acc_id=4, date=234567810938, garant=False, payment_status=3,
+                         session=session)
 
 
 if __name__ == "__main__":
