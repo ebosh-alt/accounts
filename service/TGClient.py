@@ -3,8 +3,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 import asyncio
 
 from telethon.tl.functions.messages import CreateChatRequest
-
-
 # from telethon.client import DialogMethods
 # from db.db import session_db
 # from db.models import Accounts, Messages, Chats, Acc_Chat, Admins
@@ -22,29 +20,32 @@ from telethon.tl.functions.messages import CreateChatRequest
 
 
 class TG_Acc:
+    '''
     session_name: str
     api_id: int
     api_hash: str
     phone_number: str
-
+    '''
     def __init__(self, session_name: str, api_id: int, api_hash: str, phone_number: str) -> None:
-        self.session_name = session_name
-        self.api_id = api_id
-        self.api_hash = api_hash
-        self.phone_number = phone_number
+        self.session_name: str = session_name
+        self.api_id: int = api_id
+        self.api_hash: str = api_hash
+        self.phone_number: str = phone_number
 
 
 class TGClient_S:
+    '''
     client: TelegramClient
     account: TG_Acc
-    code: str | int
+    code: str|int
+    '''
 
-    def __init__(self, account) -> None:
-        self.account = account
-        self.client = TelegramClient(session=account.session_name, api_id=account.api_id, api_hash=account.api_hash,
-                                     system_version='4.16.30-vxCUSTOM')
-        self.code = None
+    def __init__(self, account: TG_Acc) -> None:
+        self.client: TelegramClient = TelegramClient(session=account.session_name, api_id=account.api_id, api_hash=account.api_hash, system_version='4.16.30-vxCUSTOM')
+        self.account: TG_Acc = account
+        self.code: str|int = None
         self.client.parse_mode = "md"
+
 
     def __call__(self):
         pass
@@ -69,7 +70,8 @@ class TGClient_S:
         await self.disconnect_client()
         return result
 
-    async def get_authorization_code(self) -> bool | str:
+
+    async def get_authorization_code(self) -> bool|str:
         result = False
         # Установление соединения clinet
         await self.connect_client()
@@ -86,9 +88,10 @@ class TGClient_S:
         except Exception as er:
             print(er)
 
-        # Завершение соединения с клиентом
+        # Завершение соединения с клиентом 
         await self.disconnect_client()
         return result
+    
 
     async def enter_authorization_code(self, phone_code_hash) -> bool:
         result = False
@@ -106,7 +109,7 @@ class TGClient_S:
         except Exception as er:
             print(er)
 
-        # Завершение соединения с клиентом
+        # Завершение соединения с клиентом 
         await self.disconnect_client()
         return result
 
@@ -122,7 +125,7 @@ class TGClient_S:
         except Exception as er:
             print(er)
 
-    async def createChat(self, users: list[int | str], title: str) -> bool:
+    async def createChat(self, users: list[int|str], title: str) -> bool:
         result = True
         try:
             self.client(CreateChatRequest(users=users, title=title))
@@ -130,14 +133,14 @@ class TGClient_S:
             result = False
             print(er)
         return result
-
+        
 
 async def startTGClient(client_s: TGClient_S):
     if await client_s.is_code_needed() == 1:
         result_getting_auth_code = await client_s.get_authorization_code()
         if result_getting_auth_code.__class__.__name__ == "str":
             client_s.code = input("Введи код: ")
-            result_auth = await client_s.enter_authorization_code(result_getting_auth_code)
+            result_auth = await client_s.enter_authorization_code(result_getting_auth_code)  
             if result_auth:
                 return print("Аккаунт авторизован после отправки кода")
         else:

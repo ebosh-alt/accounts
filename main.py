@@ -1,22 +1,26 @@
 import asyncio
-from contextlib import suppress
 import logging
+from contextlib import suppress
 
 from data.config import dp, bot
 from handlers import routers
-from service import middleware
-from service.TGClient import startTGClient
+from models.database.accounts import test
+from models.database.base import create_async_database
 from models.db import global_init
+from service import middleware
+
 logger = logging.getLogger(__name__)
 
 
 async def main() -> None:
-    await global_init()
+    await create_async_database()
+    await test()
+    # await test()
     # await startTGClient(client_s=client_s)
-    for router in routers:
-        dp.include_router(router)
-    dp.update.middleware(middleware.Logging())
-    await dp.start_polling(bot)
+    # for router in routers:
+    #     dp.include_router(router)
+    # dp.update.middleware(middleware.Logging())
+    # await dp.start_polling(bot)
 
 
 if __name__ == "__main__":

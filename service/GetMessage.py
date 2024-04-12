@@ -7,7 +7,7 @@ def get_mes(path: str, **kwargs):
         autoescape=select_autoescape(['html', 'xml'])
     )
 
-    if path not in ".md":
+    if ".md" not in path:
         path = path + '.md'
     tmpl = env.get_template(path)
     return tmpl.render(kwargs)

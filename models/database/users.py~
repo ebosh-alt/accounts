@@ -1,0 +1,52 @@
+import asyncio
+import logging
+
+from sqlalchemy import Column, String, Boolean, BigInteger, FLOAT
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
+from sqlalchemy.orm import sessionmaker
+
+from data.config import SQLALCHEMY_DATABASE_URI
+from .base import Base, create_session
+from service.save_execute import save_execute, save_commit
+
+logger = logging.getLogger(__name__)
+
+
+class Account(Base):
+    __tablename__ = "accounts"
+    id: int = Column(BigInteger, primary_key=True, autoincrement=True)
+    shop: str = Column(String)
+    price: float = Column(FLOAT)
+    description: str = Column(String)
+    data: str = Column(String)
+    view_type: bool = Column(Boolean)
+    name: str = Column(String)
+
+
+class Accounts:
+    def __init__(self):
+        engine = create_async_engine(SQLALCHEMY_DATABASE_URI)
+        self.session = sessionmaker(bind=engine, expire_on_commit=False, class_=AsyncSession)
+        
+
+    async def new(self, account):
+        await self.add(account)
+        print(self.session())
+        print(account.__dict__)
+        await self.commit()
+
+    async def add(self, obj):
+        self.session().add(obj)
+
+    async def commit(self):
+        await self.session().commit()
+
+
+async def test():
+    a = Accounts()
+    await a.new(Account(shop="Goggle", price=10089.0, description="test description5",
+                        data="test data5", view_type=True, name="AWS"))
+
+
+if __name__ == "__main__":
+    asyncio.run(test())
