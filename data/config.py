@@ -18,6 +18,7 @@ api_hash = env('API_HASH')
 phone_number = env('PHONE_NUMBER')
 # tg_acc = TG_Acc(session_name=session_path, api_id=api_id, api_hash=api_hash, phone_number=phone_number)
 # client_s = TGClient_S(tg_acc)
+SQLALCHEMY_DATABASE_URI = f'sqlite+aiosqlite:///data/database.sqlite3'
 
 
 API_BASE_URL = "https://api.cryptomus.com/{}"

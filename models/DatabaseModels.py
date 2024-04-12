@@ -1,10 +1,9 @@
+from __future__ import annotations
 import asyncio
-
 from sqlalchemy import Column, BigInteger, String, INTEGER, FLOAT, ForeignKey, select, delete, Boolean, update
 from models.db import SqlAlchemyBase, session_db
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import relationship
-from __future__ import annotations
 
 
 class Chats(SqlAlchemyBase):
