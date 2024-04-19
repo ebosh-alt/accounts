@@ -8,22 +8,36 @@ from data.config import SQLALCHEMY_DATABASE_URI
 
 Base = declarative_base()
 
+__factory = None
+
 
 async def create_async_database():
+    global __factory
     engine = create_async_engine(SQLALCHEMY_DATABASE_URI)
-
+    if __factory:
+        return
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+    await create_session()
     await conn.close()
+
+
+async def create_session():
+    global __factory
+    engine = create_async_engine(SQLALCHEMY_DATABASE_URI)
+    __factory = sessionmaker(bind=engine, expire_on_commit=True, class_=AsyncSession)
+
+
+def create_session_():
+    global __factory
+    return __factory()
 
 
 class BaseDB:
     @staticmethod  # __table__ = "accounts"
     async def _get_session() -> AsyncSession:
-        engine = create_async_engine(SQLALCHEMY_DATABASE_URI)
-        session = sessionmaker(bind=engine, expire_on_commit=False, class_=AsyncSession)
-        async with session() as ses:
-            return ses
+        async with create_session_() as session:
+            return session
 
     async def _add_obj(self, obj):
         async with await self._get_session() as session:
@@ -51,4 +65,3 @@ class BaseDB:
             sql = update(obj).values(attribute)
             await session.execute(sql)
             await session.commit()
-

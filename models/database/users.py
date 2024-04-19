@@ -14,7 +14,7 @@ class User(Base):
 
     id = Column(BigInteger, primary_key=True)
     username = Column(String)
-    # deals: Mapped[List["Deal"]] = relationship()
+    deals = relationship("Deal", back_populates="buyer")
 
     def dict(self):
         return {"id": self.id,

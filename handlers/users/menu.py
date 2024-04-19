@@ -2,7 +2,7 @@ from datetime import datetime
 from aiogram import Router, F
 from aiogram.filters import Command
 from aiogram.types import Message, CallbackQuery
-from models.database import users, User, accounts, deals, Deal, Account, sellers, Seller
+from models.database import accounts, deals, Deal, Account, sellers, Seller
 from data.config import bot
 from service import keyboards as kb
 from service.GetMessage import get_mes

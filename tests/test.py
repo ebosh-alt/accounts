@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from models.database import accounts, Account, User, users, Chat, chats, Seller, sellers, deals, Deal
+from models.database import accounts, Account, users, Chat, chats, Seller, sellers, deals, Deal
 
 
 async def new_data():

@@ -21,7 +21,7 @@ class Deal(Base):
     guarantor = Column(Boolean)
     payment_status = Column(INTEGER)
 
-    buyer = relationship("User", backref="deals")
+    buyer = relationship("User", back_populates="deals", lazy="selectin")
 
     # seller = relationship("Seller", back_populates="deals")
     # acc = relationship("Account", back_populates="deal")
@@ -31,7 +31,7 @@ class Deal(Base):
             "id": self.id,
             "buyer_id": self.buyer_id,
             "seller_id": self.seller_id,
-            "acc_id": self.acc_id,
+            "account_id": self.account_id,
             "date": self.date,
             "guarantor": self.guarantor,
             "payment_status": self.payment_status,
@@ -68,4 +68,6 @@ class Deals(BaseDB):
 async def test():
     deals = Deals()
     deal = await deals.get(1)
-    print(deal.buyer)
+    # print(deal.dict())
+    print(deal.buyer.dict())
+
