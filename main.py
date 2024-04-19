@@ -4,10 +4,10 @@ from contextlib import suppress
 
 from data.config import dp, bot
 from handlers import routers
-from models.database.accounts import test
 from models.database.base import create_async_database
-from models.db import global_init
+from models.database.deals import test
 from service import middleware
+from tests.test import new_data
 
 logger = logging.getLogger(__name__)
 
@@ -15,7 +15,6 @@ logger = logging.getLogger(__name__)
 async def main() -> None:
     await create_async_database()
     await test()
-    # await test()
     # await startTGClient(client_s=client_s)
     # for router in routers:
     #     dp.include_router(router)

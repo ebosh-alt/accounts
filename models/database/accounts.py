@@ -1,9 +1,8 @@
-import asyncio
 import logging
+from typing import Coroutine, Any
 
-from sqlalchemy import Column, String, Boolean, BigInteger, FLOAT, Sequence, Integer
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy import Column, String, Boolean, FLOAT, Integer, Row
+
 from .base import Base, BaseDB
 
 logger = logging.getLogger(__name__)
@@ -33,20 +32,24 @@ class Account(Base):
 
 class Accounts(BaseDB):
     async def new(self, account: Account):
-        await self.add_obj(account)
+        await self._add_obj(account)
 
     async def get(self, id: int) -> Account | None:
-        result = await self.get_obj(Account, id)
+        result = await self._get_obj(Account, id)
         return result
 
     async def update(self, account: Account) -> None:
-        await self.update_obj(instance=account, obj=Account)
+        await self._update_obj(instance=account, obj=Account)
 
     async def delete(self, account: Account) -> None:
-        await self.delete_obj(instance=account)
+        await self._delete_obj(instance=account)
 
     async def in_(self, id: int) -> Account | bool:
         result = await self.get(id)
         if result is Account:
             return result
         return False
+
+    async def get_shop(self) -> Coroutine[Any, Any, list[Row]]:
+        result = await self._get_attribute(obj=Account, attribute="shop")
+        return result

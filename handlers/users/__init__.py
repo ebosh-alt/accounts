@@ -1,3 +1,4 @@
 from .menu import menu_rt
+from .shop import shop_rt
 
-users_routers = (menu_rt,)
+users_routers = (menu_rt, shop_rt)

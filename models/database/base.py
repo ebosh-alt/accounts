@@ -19,33 +19,36 @@ async def create_async_database():
 
 class BaseDB:
     @staticmethod  # __table__ = "accounts"
-    async def get_session() -> AsyncSession:
+    async def _get_session() -> AsyncSession:
         engine = create_async_engine(SQLALCHEMY_DATABASE_URI)
         session = sessionmaker(bind=engine, expire_on_commit=False, class_=AsyncSession)
         async with session() as ses:
             return ses
 
-    async def add_obj(self, obj):
-        async with await self.get_session() as session:
+    async def _add_obj(self, obj):
+        async with await self._get_session() as session:
             session.add(obj)
             await session.commit()
 
-    async def get_obj(self, obj, id):
-        async with await self.get_session() as session:
+    async def _get_obj(self, obj, id):
+        async with await self._get_session() as session:
             res = await session.get(obj, id)
-            print(res)
-            # sql = select(obj).where(obj.id == id)
-            # query = await session.execute(sql)
-            # user = query.scalar_one_or_none()
             return res
 
-    async def update_obj(self, obj, instance):
-        async with await self.get_session() as session:
+    async def _update_obj(self, obj, instance):
+        async with await self._get_session() as session:
             query = update(obj).where(obj.id == instance.id).values(**instance.dict())
             await session.execute(query)
             await session.commit()
 
-    async def delete_obj(self, instance):
-        async with await self.get_session() as session:
+    async def _delete_obj(self, instance):
+        async with await self._get_session() as session:
             await session.delete(instance)
             await session.commit()
+
+    async def _get_attribute(self, obj, attribute: str):
+        async with await self._get_session() as session:
+            sql = update(obj).values(attribute)
+            await session.execute(sql)
+            await session.commit()
+

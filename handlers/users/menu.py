@@ -1,11 +1,9 @@
+from datetime import datetime
 from aiogram import Router, F
 from aiogram.filters import Command
 from aiogram.types import Message, CallbackQuery
-from sqlalchemy.ext.asyncio import AsyncSession
-
+from models.database import users, User, accounts, deals, Deal, Account, sellers, Seller
 from data.config import bot
-from models.DatabaseModels import Users
-from models.db import session_db
 from service import keyboards as kb
 from service.GetMessage import get_mes
 from service.keyboards import Keyboards as kb
@@ -13,15 +11,20 @@ from service.keyboards import Keyboards as kb
 router = Router()
 
 
+# @router.message(Command("test"))
+# async def test(message: Message | CallbackQuery):
+#     user = await users.get(id=message.from_user.id)
+#     print(user.dict())
+
+
 @router.callback_query(F.data == "back_menu")
 @router.message(Command("start"))
-@session_db
-async def start(message: Message | CallbackQuery, session: AsyncSession):
+async def start(message: Message | CallbackQuery):
     id = message.from_user.id
-    is_reg = await Users.is_register(id, session)
-    if is_reg is False:
-        await Users.register(id=id, username=message.from_user.username, session=session)
-    user = await Users.obj(id=id, session=session)
+    user = await users.in_(id=id)
+    if user is False:
+        user = User(id=id, username=message.from_user.username)
+        await users.new(user)
 
     if type(message) is Message:
         await bot.send_message(chat_id=id,
@@ -47,12 +50,5 @@ async def rules_callback(message: CallbackQuery):
 async def history_buy_callback(message: CallbackQuery):
     id = message.from_user.id
     ...
-
-
-@router.callback_query(F.data == "shop")
-async def shop_callback(message: CallbackQuery):
-    id = message.from_user.id
-    ...
-
 
 menu_rt = router
