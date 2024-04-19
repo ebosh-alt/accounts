@@ -1,7 +1,6 @@
 import asyncio
 from contextlib import suppress
 import logging
-from models.Models import Accounts, Chats, Users, Deals, Sellers
 from data.config import dp, bot, client_s
 from handlers import routers
 from service.TGClient import startTGClient
