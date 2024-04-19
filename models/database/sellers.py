@@ -14,16 +14,12 @@ class Seller(Base):
     rating = Column(BigInteger)
     balance = Column(BigInteger)
     username = Column(String)
-    # chats = relationship("Chat", back_populates="seller", lazy="selectin")
-    # deals = relationship("Deal", back_populates="seller", lazy="selectin")
 
     def dict(self):
         return {"id": self.id,
                 "rating": self.rating,
                 "balance": self.balance,
                 "username": self.username,
-                "chats": self.chats.dict(),
-                "deals": self.deals.dict(),
                 }
 
 
@@ -32,7 +28,7 @@ class Sellers(BaseDB):
         await self._add_obj(seller)
 
     async def get(self, id: int) -> Seller | None:
-        result = await self._get_obj(Seller, id)
+        result = await self._get_object(Seller, id)
         return result
 
     async def update(self, seller: Seller) -> None:

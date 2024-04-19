@@ -1,11 +1,11 @@
 import logging
-from typing import List
 
-from sqlalchemy import Column, String, Boolean, FLOAT, Integer, BigInteger, ForeignKey
-from sqlalchemy.orm import relationship, Mapped
+from sqlalchemy import Column, String, BigInteger
+from sqlalchemy.orm import relationship
 
+from . import Deal
 from .base import Base, BaseDB
-from models.database import Deal
+
 logger = logging.getLogger(__name__)
 
 
@@ -14,7 +14,6 @@ class User(Base):
 
     id = Column(BigInteger, primary_key=True)
     username = Column(String)
-    deals = relationship("Deal", back_populates="buyer")
 
     def dict(self):
         return {"id": self.id,
@@ -28,7 +27,7 @@ class Users(BaseDB):
         await self._add_obj(user)
 
     async def get(self, id: int) -> User | None:
-        result = await self._get_obj(User, id)
+        result = await self._get_object(User, id)
         return result
 
     async def update(self, user: User) -> None:
@@ -42,3 +41,9 @@ class Users(BaseDB):
         if type(result) is User:
             return result
         return False
+
+    async def get_deals(self, id: int):
+        filters = {Deal.buyer_id: id}
+        result = await self._get_objects(Deal, filters)
+        return result
+

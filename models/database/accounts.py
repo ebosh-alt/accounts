@@ -35,7 +35,7 @@ class Accounts(BaseDB):
         await self._add_obj(account)
 
     async def get(self, id: int) -> Account | None:
-        result = await self._get_obj(Account, id)
+        result = await self._get_object(Account, id)
         return result
 
     async def update(self, account: Account) -> None:
@@ -51,5 +51,5 @@ class Accounts(BaseDB):
         return False
 
     async def get_shop(self) -> Coroutine[Any, Any, list[Row]]:
-        result = await self._get_attribute(obj=Account, attribute="shop")
+        result = await self._get_attributes(obj=Account, attribute="shop")
         return result

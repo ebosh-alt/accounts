@@ -8,7 +8,7 @@ from data.config import SQLALCHEMY_DATABASE_URI
 
 Base = declarative_base()
 
-__factory = None
+__factory: sessionmaker | None = None
 
 
 async def create_async_database():
@@ -18,17 +18,17 @@ async def create_async_database():
         return
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
-    await create_session()
+    await create_factory()
     await conn.close()
 
 
-async def create_session():
+async def create_factory():
     global __factory
     engine = create_async_engine(SQLALCHEMY_DATABASE_URI)
     __factory = sessionmaker(bind=engine, expire_on_commit=True, class_=AsyncSession)
 
 
-def create_session_():
+def get_factory():
     global __factory
     return __factory()
 
@@ -36,7 +36,7 @@ def create_session_():
 class BaseDB:
     @staticmethod  # __table__ = "accounts"
     async def _get_session() -> AsyncSession:
-        async with create_session_() as session:
+        async with get_factory() as session:
             return session
 
     async def _add_obj(self, obj):
@@ -44,10 +44,18 @@ class BaseDB:
             session.add(obj)
             await session.commit()
 
-    async def _get_obj(self, obj, id):
+    async def _get_object(self, obj, id):
         async with await self._get_session() as session:
             res = await session.get(obj, id)
             return res
+
+    async def _get_objects(self, obj, filters):
+        async with await self._get_session() as session:
+            sql = select(obj)
+            for key in filters:
+                sql = sql.where(key == filters[key])
+            result = await session.execute(sql)
+            return result.scalars().all()
 
     async def _update_obj(self, obj, instance):
         async with await self._get_session() as session:
@@ -60,7 +68,7 @@ class BaseDB:
             await session.delete(instance)
             await session.commit()
 
-    async def _get_attribute(self, obj, attribute: str):
+    async def _get_attributes(self, obj, attribute: str):
         async with await self._get_session() as session:
             sql = update(obj).values(attribute)
             await session.execute(sql)

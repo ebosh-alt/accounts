@@ -14,8 +14,6 @@ class Chat(Base):
     id: int = Column(BigInteger, primary_key=True)
     user_id: int = Column(BigInteger, ForeignKey("users.id"))
     seller_id: id = Column(BigInteger, ForeignKey("sellers.id"))
-    # user = relationship("User", back_populates="chats")
-    # seller = relationship("Seller", back_populates="chats")
 
     def dict(self):
         return {"id": self.id,
@@ -31,7 +29,7 @@ class Chats(BaseDB):
         await self._add_obj(chat)
 
     async def get(self, id: int) -> Chat | None:
-        result = await self._get_obj(Chat, id)
+        result = await self._get_object(Chat, id)
         return result
 
     async def update(self, chat: Chat) -> None:
