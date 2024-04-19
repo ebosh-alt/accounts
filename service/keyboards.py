@@ -58,3 +58,8 @@ class Keyboards:
          "Поддержка": link_support,
          "История покупок": "history_buy"})
     back_menu_kb = Builder.create_keyboard({"Назад": "back_menu"})
+    admin_kb = Builder.create_keyboard(
+        {"Отменить покупку": "cancel_buy",
+        "Просмотреть сделки": "show_deals",
+        "Просмотреть инфо продавца": "show_seller_info"}
+        )

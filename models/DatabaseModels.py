@@ -155,14 +155,17 @@ class Sellers(SqlAlchemyBase):
         await session.commit()
 
     @classmethod
-    async def obj(cls, id: int, session: AsyncSession):
+    async def obj(cls, session: AsyncSession):
         if not session.is_active:
             try:
                 await session.begin()
             except Exception as e:
                 print(e)
-        _ = await session.execute(select(cls).where(cls.id == id))
-        return _.scalar()
+
+        result = await session.execute(select(cls))
+        sobj = result.scalars().first()
+
+        return sobj
 
     @classmethod
     async def delete(cls, id: int, session: AsyncSession) -> None:
@@ -203,7 +206,7 @@ class Deals(SqlAlchemyBase):
     acc_id = Column(BigInteger, ForeignKey("accounts.id"), unique=True)
     date = Column(BigInteger)
     garant = Column(Boolean)
-    payment_status = Column(INTEGER)
+    payment_status = Column(INTEGER) #0 - не оплачено; 1 - оплачено; 2 - возврат
     buyer = relationship("Users", back_populates="deals")
     seller = relationship("Sellers", back_populates="deals")
     acc = relationship("Accounts", back_populates="deal")
@@ -217,13 +220,28 @@ class Deals(SqlAlchemyBase):
         await session.commit()
 
     @classmethod
+    async def is_register(cls, id: int, session: AsyncSession) -> bool:
+        if not session.is_active:
+            try:
+                await session.begin()
+            except Exception as e:
+                print(e)
+        result = await session.execute(select(cls).filter_by(id=id))
+        sobj = result.first()
+        if sobj:
+            return True
+        else:
+            return False
+
+    @classmethod
     async def obj(cls, id: int, session: AsyncSession):
         if not session.is_active:
             try:
                 await session.begin()
             except Exception as e:
                 print(e)
-        _ = await session.execute(select(cls).where(cls.id == id))
+        _ = await session.execute(select(cls).where(cls.i
+                                                    d == id))
         return _.scalar()
 
     @classmethod
@@ -348,3 +366,4 @@ async def test(session: AsyncSession):
 
 if __name__ == "__main__":
     asyncio.run(test())
+

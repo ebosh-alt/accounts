@@ -1,8 +1,7 @@
 import asyncio
 import logging
-from contextlib import suppress
+from data.config import dp, bot, client_s
 
-from data.config import dp, bot
 from handlers import routers
 from models.DatabaseModels import test
 from models.db import global_init
