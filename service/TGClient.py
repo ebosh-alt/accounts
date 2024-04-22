@@ -129,7 +129,7 @@ class TGClient_S:
     async def createChat(self, users: list[int | str], title: str) -> bool:
         result = True
         try:
-            self.client(CreateChatRequest(users=users, title=title))
+            await self.client(CreateChatRequest(users=users, title=title))
         except Exception as er:
             result = False
             print(er)
