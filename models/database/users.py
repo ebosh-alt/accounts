@@ -1,12 +1,25 @@
 import logging
+from datetime import datetime
 
+from pydantic import BaseModel
 from sqlalchemy import Column, String, BigInteger
-from sqlalchemy.orm import relationship
 
 from . import Deal
+from .accounts import Accounts
+
 from .base import Base, BaseDB
 
 logger = logging.getLogger(__name__)
+
+
+class DataDeals(BaseModel):
+    shop: str
+    name: str
+    price: float
+    description: str
+    data: str
+    date: datetime
+    guarantor: bool
 
 
 class User(Base):
@@ -18,7 +31,6 @@ class User(Base):
     def dict(self):
         return {"id": self.id,
                 "username": self.username,
-                # "deals": self.deals,
                 }
 
 
@@ -28,6 +40,24 @@ class Users(BaseDB):
 
     async def get(self, id: int) -> User | None:
         result = await self._get_object(User, id)
+        return result
+
+    async def get_deals(self, id: int) -> list:
+        filters = {Deal.buyer_id: id}
+        deals = await self._get_objects(Deal, filters=filters)
+        result = list()
+
+        for deal in deals:
+            account = await Accounts().get(deal.account_id)
+            result.append(DataDeals(
+                shop=account.shop,
+                name=account.name,
+                price=account.price,
+                description=account.description,
+                data=account.data,
+                date=deal.date,
+                guarantor=deal.guarantor
+            ))
         return result
 
     async def update(self, user: User) -> None:
@@ -41,9 +71,3 @@ class Users(BaseDB):
         if type(result) is User:
             return result
         return False
-
-    async def get_deals(self, id: int):
-        filters = {Deal.buyer_id: id}
-        result = await self._get_objects(Deal, filters)
-        return result
-

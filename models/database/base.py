@@ -6,7 +6,9 @@ from sqlalchemy.orm import sessionmaker
 
 from data.config import SQLALCHEMY_DATABASE_URI
 
+
 Base = declarative_base()
+
 
 __factory: sessionmaker | None = None
 

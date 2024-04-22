@@ -30,7 +30,6 @@ class Deal(Base):
             "date": self.date,
             "guarantor": self.guarantor,
             "payment_status": self.payment_status,
-            # "buyer": self.buyer.dict(),
         }
 
 
@@ -47,6 +46,8 @@ class Deals(BaseDB):
 
     async def delete(self, deal: Deal) -> None:
         await self._delete_obj(instance=deal)
+
+
 
     async def get_deals(self, *args) -> list[Deal]:
         ...

@@ -45,10 +45,4 @@ async def rules_callback(message: CallbackQuery):
                                 text=get_mes("rules"),
                                 reply_markup=kb.back_menu_kb)
 
-
-@router.callback_query(F.data == "history_buy")
-async def history_buy_callback(message: CallbackQuery):
-    id = message.from_user.id
-    ...
-
 menu_rt = router

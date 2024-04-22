@@ -39,9 +39,7 @@ retort = Retort()
 cryptomus_merchant_id = env('MERCHANT_ID')
 cryptomus_api_key = env('API_KEY')
 
-<<<<<<< HEAD
-=======
 ADMINS = [int(admin_id) for admin_id in env('ADMINS').split()]
 
 SELLER = env('SELLER')
->>>>>>> ab45d69339154f6472305f843072a9847b9283eb
+
