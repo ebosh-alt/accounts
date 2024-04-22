@@ -1,8 +1,7 @@
 import asyncio
 import logging
-from contextlib import suppress
+from data.config import dp, bot, client_s
 
-from data.config import dp, bot
 from handlers import routers
 from models.database.base import create_async_database
 # from models.database.deals import test
