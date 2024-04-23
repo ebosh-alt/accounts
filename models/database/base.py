@@ -1,4 +1,6 @@
-from sqlalchemy import select, update
+from typing import Tuple, Any, Sequence
+
+from sqlalchemy import select, update, Row
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.orm import declarative_base
@@ -6,9 +8,7 @@ from sqlalchemy.orm import sessionmaker
 
 from data.config import SQLALCHEMY_DATABASE_URI
 
-
 Base = declarative_base()
-
 
 __factory: sessionmaker | None = None
 
@@ -51,11 +51,12 @@ class BaseDB:
             res = await session.get(obj, id)
             return res
 
-    async def _get_objects(self, obj, filters):
+    async def _get_objects(self, obj, filters: dict = None):
         async with await self._get_session() as session:
             sql = select(obj)
-            for key in filters:
-                sql = sql.where(key == filters[key])
+            if filters is not None:
+                for key in filters:
+                    sql = sql.where(key == filters[key])
             result = await session.execute(sql)
             return result.scalars().all()
 
@@ -70,8 +71,9 @@ class BaseDB:
             await session.delete(instance)
             await session.commit()
 
-    async def _get_attributes(self, obj, attribute: str):
+    async def _get_attributes(self, obj, attribute: str) -> Sequence[Row[tuple[Any, ...] | Any]]:
+        # получение всех значений конкретного атрибута сущности
         async with await self._get_session() as session:
-            sql = update(obj).values(attribute)
-            await session.execute(sql)
-            await session.commit()
+            sql = select(obj).column(attribute)
+            result = await session.execute(sql)
+            return result.all()

@@ -47,8 +47,6 @@ class Deals(BaseDB):
     async def delete(self, deal: Deal) -> None:
         await self._delete_obj(instance=deal)
 
-
-
     async def get_deals(self, *args) -> list[Deal]:
         ...
 
@@ -57,6 +55,3 @@ class Deals(BaseDB):
         if result is Deal:
             return result
         return False
-
-
-

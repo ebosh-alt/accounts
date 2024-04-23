@@ -17,7 +17,7 @@ router = Router()
 #     print(user.dict())
 
 
-@router.callback_query(F.data == "back_menu")
+@router.callback_query((F.data == "back_menu") | (F.data == "В главное меню"))
 @router.message(Command("start"))
 async def start(message: Message | CallbackQuery):
     id = message.from_user.id
@@ -44,5 +44,6 @@ async def rules_callback(message: CallbackQuery):
                                 message_id=message.message.message_id,
                                 text=get_mes("rules"),
                                 reply_markup=kb.back_menu_kb)
+
 
 menu_rt = router

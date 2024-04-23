@@ -1,5 +1,5 @@
 import logging
-from typing import Coroutine, Any
+from typing import Coroutine, Any, Tuple, Sequence, Set, List
 
 from sqlalchemy import Column, String, Boolean, FLOAT, Integer, Row
 
@@ -50,6 +50,20 @@ class Accounts(BaseDB):
             return result
         return False
 
-    async def get_shop(self) -> Coroutine[Any, Any, list[Row]]:
-        result = await self._get_attributes(obj=Account, attribute="shop")
+    async def get_shops(self) -> list[Any]:
+        data = await self._get_objects(obj=Account)
+        result = []
+        [result.append(i.shop) for i in data if i.shop not in result]
+        return result
+
+    async def get_account_by_name(self, name):
+        filters = {Account.name: name}
+        result: list[Account] = await self._get_objects(obj=Account, filters=filters)
+        account = result[0]
+        return account
+
+    async def get_name_accounts_shop(self, shop: str):
+        filters = {Account.shop: shop}
+        result = await self._get_objects(obj=Account, filters=filters)
+        result = [i.name for i in result]
         return result

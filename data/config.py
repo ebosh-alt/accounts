@@ -2,6 +2,7 @@ from typing import Callable, TypeVar, Any
 
 from adaptix import Retort
 from aiogram import Dispatcher, Bot
+from aiogram.enums import ParseMode
 from environs import Env
 
 # from models.database.accounts import Accounts
@@ -13,7 +14,7 @@ env.read_env()
 bot_token = env('BOT_TOKEN')
 link_support = env('LINK_SUPPORT')
 dp = Dispatcher()
-bot = Bot(bot_token, parse_mode="Markdown")
+bot = Bot(bot_token)
 
 link_to_bot = "https://t.me/selling_accounts_test_bot"
 

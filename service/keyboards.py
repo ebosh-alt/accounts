@@ -1,7 +1,12 @@
+import logging
+
 from aiogram import types
 from aiogram.utils.keyboard import InlineKeyboardBuilder, ReplyKeyboardBuilder
 
 from data.config import link_support
+from models.database import accounts
+
+logger = logging.getLogger(__name__)
 
 
 class Builder:
@@ -60,6 +65,25 @@ class Keyboards:
     back_menu_kb = Builder.create_keyboard({"Назад": "back_menu"})
     admin_kb = Builder.create_keyboard(
         {"Отменить покупку": "cancel_buy",
-        "Просмотреть сделки": "show_deals",
-        "Просмотреть инфо продавца": "show_seller_info"}
-        )
+         "Просмотреть сделки": "show_deals",
+         "Просмотреть инфо продавца": "show_seller_info"}
+    )
+
+    @staticmethod
+    async def shops_kb():
+        shops = await accounts.get_shops()
+        shops.append("В главное меню")
+        logger.info(f"{shops}")
+        kb = Builder.create_keyboard(shops)
+        return kb
+
+    @staticmethod
+    async def name_accounts_shop_kb(shop):
+        names = await accounts.get_name_accounts_shop(shop)
+        names.append("В главное меню")
+        logger.info(f"{names}")
+        kb = Builder.create_keyboard(names)
+        return kb
+
+    @staticmethod
+    async def confirm_basket(id_account: int):
