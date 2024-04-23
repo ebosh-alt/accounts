@@ -1,7 +1,6 @@
 import logging
 from datetime import datetime
 
-from pydantic import BaseModel
 from sqlalchemy import Column, String, BigInteger
 
 from . import Deal
@@ -9,17 +8,10 @@ from .accounts import Accounts
 
 from .base import Base, BaseDB
 
+from .data_deals import DataDeals
+
+
 logger = logging.getLogger(__name__)
-
-
-class DataDeals(BaseModel):
-    shop: str
-    name: str
-    price: float
-    description: str
-    data: str
-    date: datetime
-    guarantor: bool
 
 
 class User(Base):

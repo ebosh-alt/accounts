@@ -1,5 +1,5 @@
 Информация о продавце
 user_id: {{user_id}}
-Рэйтинг: {{rating}}
+Рейтинг: {{rating}}
 Баланс: {{balance}}
 username: {{username}}

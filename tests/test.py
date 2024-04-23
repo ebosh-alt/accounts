@@ -4,7 +4,7 @@ from models.database import accounts, Account, users, Chat, chats, Seller, selle
 
 
 async def new_data():
-    # await accounts.new(Account(shop="Goggle", price=100.0, description="description1", data=datetime.now(), view_type=True,
+    # await accounts.new(Account(id=0, shop="Goggle", price=100.0, description="description1", data=datetime.datetime.now(), view_type=True,
     #                      name="name1"))
     # await accounts.new(Account(shop="Facebook", price=110.0, description="description2", data=datetime.now(), view_type=True,
     #                      name="name2"))
@@ -32,5 +32,5 @@ async def new_data():
         Deal(buyer_id=6989531851, seller_id=1, account_id=2, date=datetime.datetime.now() - datetime.timedelta(hours=2),
              guarantor=False, payment_status=1))
     await deals.new(
-        Deal(buyer_id=6989531851, seller_id=1, account_id=0,
+        Deal(buyer_id=6989531851, seller_id=1, account_id=3,
              date=datetime.datetime.now() - datetime.timedelta(hours=18), guarantor=False, payment_status=1))

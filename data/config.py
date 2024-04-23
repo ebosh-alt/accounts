@@ -13,7 +13,7 @@ env.read_env()
 bot_token = env('BOT_TOKEN')
 link_support = env('LINK_SUPPORT')
 dp = Dispatcher()
-bot = Bot(bot_token, parse_mode="Markdown")
+bot = Bot(bot_token)
 
 link_to_bot = "https://t.me/selling_accounts_test_bot"
 
@@ -41,5 +41,5 @@ cryptomus_api_key = env('API_KEY')
 
 ADMINS = [int(admin_id) for admin_id in env('ADMINS').split()]
 
-SELLER = env('SELLER')
+SELLER = int(env('SELLER'))
 

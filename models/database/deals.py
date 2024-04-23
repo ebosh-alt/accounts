@@ -6,6 +6,9 @@ from sqlalchemy import Column, Boolean, BigInteger, ForeignKey, INTEGER, DATETIM
 from sqlalchemy.orm import relationship
 
 from .base import Base, BaseDB
+from .accounts import Accounts
+from .data_deals import DataDeals
+
 
 logger = logging.getLogger(__name__)
 
@@ -49,12 +52,27 @@ class Deals(BaseDB):
 
 
 
-    async def get_deals(self, *args) -> list[Deal]:
-        ...
+    async def get_data_deals(self) -> list[Deal]:
+        all_deals: list[Deal] = await self._get_objects(Deal, {})
+        result = list()
+
+        for deal in all_deals:
+            account = await Accounts().get(deal.account_id)
+            result.append(DataDeals(
+                id=deal.id,
+                shop=account.shop,
+                name=account.name,
+                price=account.price,
+                description=account.description,
+                data=account.data,
+                date=deal.date,
+                guarantor=deal.guarantor
+            ))
+        return result
 
     async def in_(self, id: int) -> Deal | bool:
         result = await self.get(id)
-        if result is Deal:
+        if type(result) is Deal:
             return result
         return False
 
