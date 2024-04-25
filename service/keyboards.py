@@ -69,21 +69,31 @@ class Keyboards:
          "Просмотреть инфо продавца": "show_seller_info"}
     )
 
+    choice_guarantor_kb = Builder.create_keyboard({
+        "C гарантом": f"yes_guarantor",
+        "Без гаранта": f"no_guarantor",
+        "Вернуться к выбору аккаунта": "back_to_choice_account",
+        "В главное меню": "В главное меню"
+    })
+    ready_payment_kb = Builder.create_keyboard({
+        "Оплата": "payment",
+        "Вернуться к выбору аккаунта": "back_to_choice_account",
+        "В главное меню": "В главное меню"
+    })
+
     @staticmethod
     async def shops_kb():
-        shops = await accounts.get_shops()
-        shops.append("В главное меню")
-        logger.info(f"{shops}")
-        kb = Builder.create_keyboard(shops)
+        buttons = await accounts.get_shops()
+        buttons.append("В главное меню")
+        logger.info(f"{buttons}")
+        kb = Builder.create_keyboard(buttons)
         return kb
 
     @staticmethod
     async def name_accounts_shop_kb(shop):
-        names = await accounts.get_name_accounts_shop(shop)
-        names.append("В главное меню")
-        logger.info(f"{names}")
-        kb = Builder.create_keyboard(names)
+        buttons = await accounts.get_name_accounts_shop(shop)
+        buttons.append("Вернуться к выбору магазина")
+        buttons.append("В главное меню")
+        logger.info(f"{buttons}")
+        kb = Builder.create_keyboard(buttons)
         return kb
-
-    @staticmethod
-    async def confirm_basket(id_account: int):

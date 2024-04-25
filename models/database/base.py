@@ -1,4 +1,5 @@
-from typing import Tuple, Any, Sequence
+import logging
+from typing import Any, Sequence
 
 from sqlalchemy import select, update, Row
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -11,6 +12,8 @@ from data.config import SQLALCHEMY_DATABASE_URI
 Base = declarative_base()
 
 __factory: sessionmaker | None = None
+
+logger = logging.getLogger(__name__)
 
 
 async def create_async_database():
@@ -41,9 +44,10 @@ class BaseDB:
         async with get_factory() as session:
             return session
 
-    async def _add_obj(self, obj):
+    async def _add_obj(self, instance):
         async with await self._get_session() as session:
-            session.add(obj)
+            session.add(instance)
+            logger.info(f"add new {instance.__class__.__name__}: {instance.dict()}")
             await session.commit()
 
     async def _get_object(self, obj, id):
@@ -64,11 +68,13 @@ class BaseDB:
         async with await self._get_session() as session:
             query = update(obj).where(obj.id == instance.id).values(**instance.dict())
             await session.execute(query)
+            logger.info(f"update data {instance.__class__.__name__}: {instance.dict()}")
             await session.commit()
 
     async def _delete_obj(self, instance):
         async with await self._get_session() as session:
             await session.delete(instance)
+            logger.info(f"delete {instance.__class__.__name__}: {instance.dict()}")
             await session.commit()
 
     async def _get_attributes(self, obj, attribute: str) -> Sequence[Row[tuple[Any, ...] | Any]]:

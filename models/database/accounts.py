@@ -1,7 +1,7 @@
 import logging
-from typing import Coroutine, Any, Tuple, Sequence, Set, List
+from typing import Any
 
-from sqlalchemy import Column, String, Boolean, FLOAT, Integer, Row
+from sqlalchemy import Column, String, Boolean, FLOAT, Integer
 
 from .base import Base, BaseDB
 
@@ -63,7 +63,7 @@ class Accounts(BaseDB):
         return account
 
     async def get_name_accounts_shop(self, shop: str):
-        filters = {Account.shop: shop}
+        filters = {Account.shop: shop, Account.view_type: True}
         result = await self._get_objects(obj=Account, filters=filters)
         result = [i.name for i in result]
         return result

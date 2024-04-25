@@ -1,11 +1,16 @@
 from __future__ import annotations
 
+import datetime
 import logging
 
+from aiogram.fsm.context import FSMContext
 from sqlalchemy import Column, Boolean, BigInteger, ForeignKey, INTEGER, DATETIME, Integer
-from sqlalchemy.orm import relationship
+
+from data.config import SELLER
+from .accounts import Accounts
 
 from .base import Base, BaseDB
+from ..StateModels import ShoppingCart
 
 logger = logging.getLogger(__name__)
 
@@ -55,3 +60,30 @@ class Deals(BaseDB):
         if result is Deal:
             return result
         return False
+
+    async def get_last_deal(self, user_id) -> Deal:
+        filters = {Deal.buyer_id: user_id}
+        data = await self._get_objects(Deal, filters)
+        return data[-1]
+
+    async def create_deal(self, state: FSMContext, user_id: int, message_id: int):
+        accounts = Accounts()
+        data = await state.get_data()
+        shopping_cart: ShoppingCart = data["ShoppingCart"]
+        account = await accounts.get(shopping_cart.account_id)
+        account.view_type = False
+        deal = Deal(
+            buyer_id=user_id,
+            seller_id=SELLER,
+            account_id=shopping_cart.account_id,
+            date=datetime.datetime.now(),
+            guarantor=shopping_cart.guarantor,
+            payment_status=0
+        )
+
+        await accounts.update(account)
+        await self.new(deal)
+        deal = await self.get_last_deal(user_id)
+        shopping_cart.deal_id = deal.id
+        shopping_cart.message_id = message_id
+        await state.update_data(ShoppingCart=shopping_cart)

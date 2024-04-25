@@ -15,6 +15,7 @@ class IsAdmin(Filter):
 class IsShop(Filter):
     async def __call__(self, message: CallbackQuery, event_from_user: User) -> bool:
         buttons = await accounts.get_shops()
+        buttons.append("back_to_choice_account")
         if message.data in buttons:
             return True
         return False
@@ -23,8 +24,8 @@ class IsShop(Filter):
 class IsNameAccount(Filter):
     async def __call__(self, message: CallbackQuery, event_from_user: User, state: FSMContext) -> bool:
         data = await state.get_data()
-        basket = data.get('basket')
-        buttons = await accounts.get_name_accounts_shop(basket.shop)
+        shopping_cart = data.get('ShoppingCart')
+        buttons = await accounts.get_name_accounts_shop(shopping_cart.shop)
         if message.data in buttons:
             return True
         return False

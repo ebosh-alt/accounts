@@ -44,3 +44,4 @@ ADMINS = [int(admin_id) for admin_id in env('ADMINS').split()]
 
 SELLER = env('SELLER')
 
+PERCENT = float(env('PERCENT'))

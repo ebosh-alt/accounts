@@ -1,5 +1,5 @@
 from .history_buy import history_buy_rt
 from .menu import menu_rt
-from .shop import shop_rt
+from .buy_automatically import buy_automatically_rt
 
-users_routers = (menu_rt, shop_rt, history_buy_rt)
+users_routers = (menu_rt, buy_automatically_rt, history_buy_rt)

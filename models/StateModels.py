@@ -13,10 +13,13 @@ class Account(BaseModel):
     score: Score
 
 
-class Basket(BaseModel):
-    id_account: int | None = None
+class ShoppingCart(BaseModel):
+    account_id: int | None = None
     shop: str | None = None
-    name: str | None = None
+    account_name: str | None = None
     price: str | None = None
     description: str | None = None
+    guarantor: bool | None = None
+    message_id: int | None = None
+    deal_id: int | None = None
 
