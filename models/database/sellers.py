@@ -2,6 +2,7 @@ import logging
 from sqlalchemy import Column, String, Boolean, FLOAT, Integer, BigInteger, ForeignKey
 from sqlalchemy.orm import relationship
 
+from data.config import SELLER
 from .base import Base, BaseDB
 
 logger = logging.getLogger(__name__)
@@ -27,7 +28,9 @@ class Sellers(BaseDB):
     async def new(self, seller: Seller):
         await self._add_obj(seller)
 
-    async def get(self, id: int) -> Seller | None:
+    async def get(self, id: int = None) -> Seller | None:
+        if id is None:
+            id = SELLER
         result = await self._get_object(Seller, id)
         return result
 

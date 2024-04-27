@@ -7,7 +7,8 @@ from aiogram.types import CallbackQuery
 
 from data.config import bot, PERCENT
 from filters.Filters import IsShop, IsNameAccount
-from models.database import deals
+from models.StateModels import ShoppingCart
+from models.database import deals, accounts, sellers
 from service.GetMessage import get_mes
 from service.buy_automatically import set_data_shopping_cart
 from service.keyboards import Keyboards
@@ -78,10 +79,72 @@ async def confirm_shopping_cart(message: CallbackQuery, state: FSMContext):
 async def payment(message: CallbackQuery, state: FSMContext):
     id = message.from_user.id
     await bot.edit_message_text(chat_id=id,
-                                text="оплачивай сука нахуй блять",
-                                message_id=message.message.message_id)
+                                message_id=message.message.message_id,
+                                text="здесь будет счет на оплату",
+                                reply_markup=Keyboards.payment_kb)
 
     await deals.create_deal(state=state, user_id=id, message_id=message.message.message_id)
+
+
+@router.callback_query(UserStates.ShoppingCart, F.data == "complete_payment")
+async def complete_payment(message: CallbackQuery, state: FSMContext):
+    id = message.from_user.id
+    status_payment = True
+
+    data = await state.get_data()
+    shopping_cart: ShoppingCart = data['ShoppingCart']
+    if status_payment:
+        account = await accounts.get(shopping_cart.account_id)
+        deal = await deals.get(shopping_cart.deal_id)
+        await bot.edit_message_text(chat_id=id,
+                                    message_id=message.message.message_id,
+                                    text=account.data,
+                                    reply_markup=Keyboards.support_kb)
+
+        if shopping_cart.guarantor is False:
+            text = get_mes("mark_seller")
+            keyboard = Keyboards.mark_seller_kb
+            deal.payment_status = 2
+
+        else:
+            text = get_mes("support_24_hours")
+            keyboard = Keyboards.confirm_account_user_kb
+            deal.payment_status = 1
+
+        await deals.update(deal)
+        await bot.send_message(chat_id=id,
+                               text=text,
+                               reply_markup=keyboard)
+
+
+@router.callback_query(UserStates.ShoppingCart, F.data == "ok_account")
+async def complete_payment(message: CallbackQuery, state: FSMContext):
+    id = message.from_user.id
+    data = await state.get_data()
+    shopping_cart: ShoppingCart = data['ShoppingCart']
+    deal = await deals.get(shopping_cart.deal_id)
+    deal.payment_status = 2
+    await deals.update(deal)
+    await bot.edit_message_text(chat_id=id,
+                                message_id=message.message.message_id,
+                                text=get_mes("mark_seller"),
+                                reply_markup=Keyboards.mark_seller_kb)
+
+
+@router.callback_query(UserStates.ShoppingCart, (F.data == "0") | (F.data == "1"))
+async def set_mark(message: CallbackQuery, state: FSMContext):
+    id = message.from_user.id
+    mark = int(message.data)
+    seller = await sellers.get()
+
+    seller.rating += mark
+    await sellers.update(seller)
+    await bot.edit_message_text(chat_id=id,
+                                message_id=message.message.message_id,
+                                text="Спасибо за оценку!",
+                                reply_markup=Keyboards.confirm_payment_kb)
+
+    await state.clear()
 
 
 buy_automatically_rt = router

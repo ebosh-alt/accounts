@@ -81,9 +81,28 @@ class Keyboards:
         "В главное меню": "В главное меню"
     })
 
+    payment_kb = Builder.create_keyboard({
+        "Оплатил": "complete_payment"
+    })
+    support_kb = Builder.create_keyboard({
+        "Поддержка": link_support
+    })
+    confirm_payment_kb = Builder.create_keyboard({
+        "В главное меню": "В главное меню",
+        "Поддержка": link_support})
+
+    mark_seller_kb = Builder.create_keyboard({
+        "0": "0",
+        "1": "1"
+    })
+    confirm_account_user_kb = Builder.create_keyboard({
+        "Ок": "ok_account"
+    })
+
     @staticmethod
     async def shops_kb():
         buttons = await accounts.get_shops()
+        buttons.append("Общение с продавцом")
         buttons.append("В главное меню")
         logger.info(f"{buttons}")
         kb = Builder.create_keyboard(buttons)
