@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import datetime
 import logging
+from typing import List
 
 from aiogram.fsm.context import FSMContext
 from sqlalchemy import Column, Boolean, BigInteger, ForeignKey, INTEGER, DATETIME, Integer
@@ -12,7 +13,7 @@ from .accounts import Accounts
 from .base import Base, BaseDB
 from ..StateModels import ShoppingCart
 from .accounts import Accounts
-from .data_deals import DataDeals
+from ..models import DataDeals
 
 logger = logging.getLogger(__name__)
 
@@ -54,12 +55,7 @@ class Deals(BaseDB):
     async def delete(self, deal: Deal) -> None:
         await self._delete_obj(instance=deal)
 
-
-    async def get_deals(self, *args) -> list[Deal]:
-        ...
-
-
-    async def get_data_deals(self) -> list[Deal]:
+    async def get_data_deals(self) -> list[DataDeals]:
         all_deals: list[Deal] = await self._get_objects(Deal, {})
         result = list()
 
@@ -72,7 +68,26 @@ class Deals(BaseDB):
                 price=account.price,
                 description=account.description,
                 data=account.data,
-                date=deal.date,
+                date=deal.date.strftime("%d.%m.%Y в %H:%M"),
+                guarantor=deal.guarantor
+            ))
+        return result
+
+    async def get_user_deals(self, id: int) -> list[DataDeals]:
+        filters = {Deal.buyer_id: id}
+        deals = await self._get_objects(Deal, filters=filters)
+        result = list()
+
+        for deal in deals:
+            account = await Accounts().get(deal.account_id)
+            result.append(DataDeals(
+                id=deal.id,
+                shop=account.shop,
+                name=account.name,
+                price=account.price,
+                description=account.description,
+                data=account.data,
+                date=deal.date.strftime("%d.%m.%Y в %H:%M "),
                 guarantor=deal.guarantor
             ))
         return result

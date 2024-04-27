@@ -40,12 +40,13 @@ async def set_data_shopping_cart(state: FSMContext, **kwargs) -> ShoppingCart:
 
 async def clear_state_shopping_cart(state: FSMContext, user_id: int):
     data = await state.get_data()
-    shopping_cart: ShoppingCart = data["ShoppingCart"]
-    account = await accounts.get(shopping_cart.account_id)
-    deal = await deals.get(shopping_cart.deal_id)
-    account.view_type = True
-    await bot.delete_message(chat_id=user_id,
-                             message_id=shopping_cart.message_id)
-    await accounts.update(account)
-    await deals.delete(deal)
-    await state.clear()
+    shopping_cart: ShoppingCart = data.get("ShoppingCart")
+    if shopping_cart is not None:
+        account = await accounts.get(shopping_cart.account_id)
+        deal = await deals.get(shopping_cart.deal_id)
+        account.view_type = True
+        await bot.delete_message(chat_id=user_id,
+                                 message_id=shopping_cart.message_id)
+        await accounts.update(account)
+        await deals.delete(deal)
+        await state.clear()

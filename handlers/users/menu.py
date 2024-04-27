@@ -7,8 +7,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, CallbackQuery
 
 from data.config import bot
-from models.StateModels import ShoppingCart
-from models.database import users, User, accounts, deals
+from models.database import users, User
 from service.GetMessage import get_mes
 from service.buy_automatically import clear_state_shopping_cart
 from service.keyboards import Keyboards
