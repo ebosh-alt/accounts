@@ -1,7 +1,6 @@
 import logging
 from datetime import datetime
 
-from pydantic import BaseModel
 from sqlalchemy import Column, String, BigInteger
 
 from . import Deal
@@ -9,8 +8,9 @@ from .accounts import Accounts
 
 from .base import Base, BaseDB
 
-logger = logging.getLogger(__name__)
+from .data_deals import DataDeals
 
+logger = logging.getLogger(__name__)
 
 class DataDeals(BaseModel):
     id: int

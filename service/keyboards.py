@@ -63,11 +63,12 @@ class Keyboards:
          "Поддержка": link_support,
          "История покупок": "history_buy"})
     back_menu_kb = Builder.create_keyboard({"Назад": "back_menu"})
-    admin_kb = Builder.create_keyboard(
+    admin_menu_kb = Builder.create_keyboard(
         {"Отменить покупку": "cancel_buy",
          "Просмотреть сделки": "show_deals",
-         "Просмотреть инфо продавца": "show_seller_info"}
-    )
+         "Просмотреть инфо продавца": "show_seller_info"
+        })
+    admin_back_menu_kb = Builder.create_keyboard({"Назад": "admin_back_menu"})
 
     choice_guarantor_kb = Builder.create_keyboard({
         "C гарантом": f"yes_guarantor",
@@ -116,3 +117,6 @@ class Keyboards:
         logger.info(f"{buttons}")
         kb = Builder.create_keyboard(buttons)
         return kb
+
+
+    

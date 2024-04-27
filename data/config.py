@@ -42,6 +42,6 @@ cryptomus_api_key = env('API_KEY')
 
 ADMINS = [int(admin_id) for admin_id in env('ADMINS').split()]
 
-SELLER = env('SELLER')
+SELLER = int(env('SELLER'))
 
 PERCENT = float(env('PERCENT'))
