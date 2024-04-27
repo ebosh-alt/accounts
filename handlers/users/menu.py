@@ -1,40 +1,44 @@
-from datetime import datetime
+import logging
+
 from aiogram import Router, F
+from aiogram.enums import ParseMode
 from aiogram.filters import Command
+from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, CallbackQuery
-from models.database import accounts, deals, Deal, Account, sellers, Seller, users, User
+
 from data.config import bot
-from service import keyboards as kb
+from models.StateModels import ShoppingCart
+from models.database import users, User, accounts, deals
 from service.GetMessage import get_mes
-from service.keyboards import Keyboards as kb
+from service.buy_automatically import clear_state_shopping_cart
+from service.keyboards import Keyboards
+from states.states import UserStates
 
 router = Router()
+logger = logging.getLogger(__name__)
 
 
-# @router.message(Command("test"))
-# async def test(message: Message | CallbackQuery):
-#     user = await users.get(id=message.from_user.id)
-#     print(user.dict())
-
-
-@router.callback_query(F.data == "back_menu")
+@router.callback_query((F.data == "back_menu") | (F.data == "В главное меню"))
 @router.message(Command("start"))
-async def start(message: Message | CallbackQuery):
+async def start(message: Message | CallbackQuery, state: FSMContext):
     id = message.from_user.id
+    if await state.get_state() == UserStates.ShoppingCart:
+        await clear_state_shopping_cart(state, user_id=id)
+
     user = await users.in_(id=id)
     if user is False:
         user = User(id=id, username=message.from_user.username)
         await users.new(user)
-
     if type(message) is Message:
         await bot.send_message(chat_id=id,
                                text=get_mes("menu"),
-                               reply_markup=kb.menu_kb)
+                               reply_markup=Keyboards.menu_kb,
+                               parse_mode=ParseMode.MARKDOWN_V2)
     else:
         await bot.edit_message_text(chat_id=id,
                                     message_id=message.message.message_id,
                                     text=get_mes("menu"),
-                                    reply_markup=kb.menu_kb)
+                                    reply_markup=Keyboards.menu_kb)
 
 
 @router.callback_query(F.data == "rules")
@@ -43,6 +47,7 @@ async def rules_callback(message: CallbackQuery):
     await bot.edit_message_text(chat_id=id,
                                 message_id=message.message.message_id,
                                 text=get_mes("rules"),
-                                reply_markup=kb.back_menu_kb)
+                                reply_markup=Keyboards.back_menu_kb)
+
 
 menu_rt = router

@@ -1,7 +1,12 @@
+import logging
+
 from aiogram import types
 from aiogram.utils.keyboard import InlineKeyboardBuilder, ReplyKeyboardBuilder
 
 from data.config import link_support
+from models.database import accounts
+
+logger = logging.getLogger(__name__)
 
 
 class Builder:
@@ -60,8 +65,58 @@ class Keyboards:
     back_menu_kb = Builder.create_keyboard({"Назад": "back_menu"})
     admin_menu_kb = Builder.create_keyboard(
         {"Отменить покупку": "cancel_buy",
-        "Просмотреть сделки": "show_deals",
-        "Просмотреть инфо продавца": "show_seller_info"}
-        )
+         "Просмотреть сделки": "show_deals",
+         "Просмотреть инфо продавца": "show_seller_info"
+        })
     admin_back_menu_kb = Builder.create_keyboard({"Назад": "admin_back_menu"})
+
+    choice_guarantor_kb = Builder.create_keyboard({
+        "C гарантом": f"yes_guarantor",
+        "Без гаранта": f"no_guarantor",
+        "Вернуться к выбору аккаунта": "back_to_choice_account",
+        "В главное меню": "В главное меню"
+    })
+    ready_payment_kb = Builder.create_keyboard({
+        "Оплата": "payment",
+        "Вернуться к выбору аккаунта": "back_to_choice_account",
+        "В главное меню": "В главное меню"
+    })
+
+    payment_kb = Builder.create_keyboard({
+        "Оплатил": "complete_payment"
+    })
+    support_kb = Builder.create_keyboard({
+        "Поддержка": link_support
+    })
+    confirm_payment_kb = Builder.create_keyboard({
+        "В главное меню": "В главное меню",
+        "Поддержка": link_support})
+
+    mark_seller_kb = Builder.create_keyboard({
+        "0": "0",
+        "1": "1"
+    })
+    confirm_account_user_kb = Builder.create_keyboard({
+        "Ок": "ok_account"
+    })
+
+    @staticmethod
+    async def shops_kb():
+        buttons = await accounts.get_shops()
+        buttons.append("Общение с продавцом")
+        buttons.append("В главное меню")
+        logger.info(f"{buttons}")
+        kb = Builder.create_keyboard(buttons)
+        return kb
+
+    @staticmethod
+    async def name_accounts_shop_kb(shop):
+        buttons = await accounts.get_name_accounts_shop(shop)
+        buttons.append("Вернуться к выбору магазина")
+        buttons.append("В главное меню")
+        logger.info(f"{buttons}")
+        kb = Builder.create_keyboard(buttons)
+        return kb
+
+
     

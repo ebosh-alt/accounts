@@ -2,6 +2,7 @@ from typing import Callable, TypeVar, Any
 
 from adaptix import Retort
 from aiogram import Dispatcher, Bot
+from aiogram.enums import ParseMode
 from environs import Env
 
 # from models.database.accounts import Accounts
@@ -43,3 +44,4 @@ ADMINS = [int(admin_id) for admin_id in env('ADMINS').split()]
 
 SELLER = int(env('SELLER'))
 
+PERCENT = float(env('PERCENT'))

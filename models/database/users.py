@@ -10,8 +10,17 @@ from .base import Base, BaseDB
 
 from .data_deals import DataDeals
 
-
 logger = logging.getLogger(__name__)
+
+class DataDeals(BaseModel):
+    id: int
+    shop: str
+    name: str
+    price: float
+    description: str
+    data: str
+    date: str
+    guarantor: bool
 
 
 class User(Base):
@@ -34,7 +43,7 @@ class Users(BaseDB):
         result = await self._get_object(User, id)
         return result
 
-    async def get_deals(self, id: int) -> list:
+    async def get_data_deals(self, id: int) -> list[DataDeals]:
         filters = {Deal.buyer_id: id}
         deals = await self._get_objects(Deal, filters=filters)
         result = list()
@@ -42,12 +51,13 @@ class Users(BaseDB):
         for deal in deals:
             account = await Accounts().get(deal.account_id)
             result.append(DataDeals(
+                id=deal.id,
                 shop=account.shop,
                 name=account.name,
                 price=account.price,
                 description=account.description,
                 data=account.data,
-                date=deal.date,
+                date=deal.date.strftime("%d.%m.%Y в %H:%M "),
                 guarantor=deal.guarantor
             ))
         return result
