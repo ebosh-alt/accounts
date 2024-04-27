@@ -1,4 +1,4 @@
-from .history_buy import history_buy_rt
+from .view_history import history_buy_rt
 from .menu import menu_rt
 from .buy_automatically import buy_automatically_rt
 

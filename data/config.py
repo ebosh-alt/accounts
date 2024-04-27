@@ -24,8 +24,8 @@ api_hash = env('API_HASH')
 phone_number = env('PHONE_NUMBER')
 SQLALCHEMY_DATABASE_URI = f'sqlite+aiosqlite:///data/database.db'
 
-# tg_acc = TG_Acc(session_name=session_path, api_id=api_id, api_hash=api_hash, phone_number=phone_number)
-# client_s = TGClient_S(tg_acc)
+tg_acc = TG_Acc(session_name=session_path, api_id=api_id, api_hash=api_hash, phone_number=phone_number)
+client_s = TGClient_S(tg_acc)
 
 API_BASE_URL = "https://api.cryptomus.com/{}"
 DEFAULT_TIMEOUT = 60.0
