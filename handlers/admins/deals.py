@@ -11,8 +11,8 @@ from service.GetMessage import get_mes
 from service.keyboards import Keyboards
 from states.states import AdminStates
 
-
 router = Router()
+
 
 async def send_data_deals(message: CallbackQuery, all_data_deals: list[DataDeals], fmes_text_path: str, keyboard):
     '''service.GetMessage.get_mes() использует в качестве аргумента fmes_text_path\n
@@ -20,8 +20,8 @@ async def send_data_deals(message: CallbackQuery, all_data_deals: list[DataDeals
     get_mes(fmes_text_path)'''
     ind = 0
     new_data = list()
-    count_symb=0
-    while  ind<len(all_data_deals):
+    count_symb = 0
+    while ind < len(all_data_deals):
         count_symb += all_data_deals[ind].len() + 130
         if count_symb < 2000:
             new_data.append(all_data_deals[ind])
@@ -33,19 +33,20 @@ async def send_data_deals(message: CallbackQuery, all_data_deals: list[DataDeals
             count_symb = 0
             new_data = list()
             new_data.append(all_data_deals[ind])
-        ind+=1
+        ind += 1
     if len(new_data) != 0:
         print("HEY")
         await bot.send_message(
-                chat_id=message.message.chat.id,
-                text=get_mes("history_buy_user", deals=new_data),
-            )
+            chat_id=message.message.chat.id,
+            text=get_mes("history_buy_user", deals=new_data),
+        )
     await bot.send_message(
-                chat_id=message.message.chat.id,
-                text=get_mes(fmes_text_path), 
-                reply_markup=keyboard
-            )
-    
+        chat_id=message.message.chat.id,
+        text=get_mes(fmes_text_path),
+        reply_markup=keyboard
+    )
+
+
 @router.callback_query(F.data == "show_deals", IsAdmin())
 async def show_deals(message: CallbackQuery):
     all_data_deals = await deals.get_data_deals()
@@ -61,7 +62,8 @@ async def show_deals(message: CallbackQuery):
         all_data_deals=all_data_deals,
         fmes_text_path="admin",
         keyboard=Keyboards.admin_menu_kb
-        )
+    )
+
 
 @router.callback_query(F.data == "cancel_buy", IsAdmin())
 async def cancel_buy_1(message: CallbackQuery, state: FSMContext):
@@ -70,7 +72,7 @@ async def cancel_buy_1(message: CallbackQuery, state: FSMContext):
         message_id=message.message.message_id,
         text=get_mes("input_DealId_admin"),
         reply_markup=Keyboards.admin_back_menu_kb
-        )
+    )
     await state.set_state(AdminStates().cancel_buy)
 
 
@@ -86,12 +88,11 @@ async def cancel_buy_end(message: Message | CallbackQuery, state: FSMContext):
             return await message.answer(
                 text=get_mes("seccess_cancel_buy"),
                 reply_markup=Keyboards.admin_menu_kb
-                )     
+            )
     await message.answer(
         text=get_mes("err_cancel_buy"),
         reply_markup=Keyboards.admin_menu_kb
-        )
-
+    )
 
 
 deals_rt = router

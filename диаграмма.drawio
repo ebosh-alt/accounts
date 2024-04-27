@@ -1,17 +1,17 @@
-<mxfile host="Electron" modified="2024-04-05T13:02:17.943Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/24.1.0 Chrome/120.0.6099.109 Electron/28.1.0 Safari/537.36" etag="_pxTMj-rNcJa4hvqE9dh" version="24.1.0" type="device">
+<mxfile host="Electron" modified="2024-04-27T15:22:36.850Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/24.1.0 Chrome/120.0.6099.109 Electron/28.1.0 Safari/537.36" etag="NYYhjSjXwyeIgN9NI9Qt" version="24.1.0" type="device">
   <diagram name="Страница — 1" id="Xkmva3xVMpiTIHZ5Cn1W">
     <mxGraphModel dx="1500" dy="956" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
-        <mxCell id="Y-dcG0vQWilrhBYb-5fS-1" value="" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+        <mxCell id="Y-dcG0vQWilrhBYb-5fS-1" value="" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="5241" y="641" width="640" height="849" as="geometry" />
         </mxCell>
         <mxCell id="vJRkGxFZnLC7JfsSE_9j-39" value="" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="2760" y="640" width="1950" height="1320" as="geometry" />
         </mxCell>
         <mxCell id="dBPHSenZ_bj_M9V8KJF--151" value="" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
-          <mxGeometry x="240" y="641" width="1959" height="2280" as="geometry" />
+          <mxGeometry x="40" y="643.5" width="1959" height="2280" as="geometry" />
         </mxCell>
         <mxCell id="dBPHSenZ_bj_M9V8KJF--2" value="&#xa;&lt;span data-meta=&quot;&lt;--(miro-data-v1)tl2kroutqq+gnq+gn111oZynrqBnXZ2qnK2fhJ9ddV2wk6WRiY9zdKiOc3hdZ12fnK+cXXW2XaqdpaCer65ddZa2XbKkn6Kgr3+cr5xddbZdpa6qqV11tl2aq6qupK+kqqlddbZdqqGhrqCvi7NddbZds111a2ddtF11a7i4Z12unpynoF11tl2unpynoF11bLhnXa2gp5yvpLGgjp6cp6BddWxnXa2qr5yvpKqpXXW2Xa2qr5yvpKqpXXVruGddraCnnK+ksaCNqq+cr6SqqV11a2ddrqS1oF11tl2ypJ+vo111bGtrbGlrdG5ybm5wcGttbnFuZ12joKSio69ddW1ucGlvcHFwc3NvcXNzbGxtcLhnXZqrnK2gqa9ddamwp6dnXa+gs69ddV1dZ12ur7SnoF11XbaXXa6vl111bmeXXa6ul111bWeXXa6el111bHJsa3Fsc2eXXZ2el111aGxnl12dqpdddWxnl12drZ6XXXVscHNycnRtcWeXXZ2tspdddW1nl12draqXXXVsZ5ddna2ul111bGeXXaGhqZdddZddiqugqY6cqa6XXWeXXa+el111bHJsa3Fsc2eXXa+unpdddWtnl12vnJdddZddnpddZ5ddr5yxl111l12ol11nl12hrpdddW5tZ5ddnZdddWtnl12kl111a2eXXbCXXXVrZ5ddrpdddWtnl12drp6XXXVsZ5ddkYCNl111bWlsZ5ddo6eXXXWXXZdduF1nXa6jnKugXXVdbl24Z12vtKugXXVdrqOcq6BduGddr7SroF11bG9nXaSfXXVrZ12kqaSvpJynhJ9ddV1ub3BzcnFvcHFzdGxzb29ycXJvXbiYZ12ooK+cXXW2uLhnXbGgra6kqqlddW1nXaOqrq9ddV2opK2qaZ6qqF24(/miro-data-v1)--&gt;&quot;&gt;&lt;/span&gt;&#xa;&#xa;" style="text;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="270" y="680" width="30" height="20" as="geometry" />
@@ -506,7 +506,7 @@
         <mxCell id="gM9pf-RmF_ScYVk0jBHa-27" value="сделка отменена!" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="5490" y="1299" width="120" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="Y-dcG0vQWilrhBYb-5fS-3" value="работа админа" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+        <mxCell id="Y-dcG0vQWilrhBYb-5fS-3" value="работа админа" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
           <mxGeometry x="5495" y="610" width="110" height="30" as="geometry" />
         </mxCell>
       </root>
