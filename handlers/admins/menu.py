@@ -5,10 +5,8 @@ from aiogram.types import Message, CallbackQuery
 
 from data.config import bot
 from filters.Filters import IsAdmin
-from models.database import deals, sellers
 from service.GetMessage import get_mes
 from service.keyboards import Keyboards
-from states.states import AdminStates
 
 router = Router()
 

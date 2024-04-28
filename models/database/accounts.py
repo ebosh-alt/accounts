@@ -53,3 +53,8 @@ class Accounts(BaseDB):
     async def get_shop(self) -> Coroutine[Any, Any, list[Row]]:
         result = await self._get_attributes(obj=Account, attribute="shop")
         return result
+    
+    async def get_last(self) -> Account:
+        filters = {}
+        data = await self._get_objects(Account, filters)
+        return data[-1]
