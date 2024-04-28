@@ -67,3 +67,8 @@ class Accounts(BaseDB):
         result = await self._get_objects(obj=Account, filters=filters)
         result = [i.name for i in result]
         return result
+    
+    async def get_last(self) -> Account:
+        filters = {}
+        data = await self._get_objects(Account, filters)
+        return data[-1]
