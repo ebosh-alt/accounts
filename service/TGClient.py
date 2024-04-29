@@ -1,7 +1,7 @@
 from telethon import TelegramClient
 from sqlalchemy.ext.asyncio import AsyncSession
 import asyncio
-
+from telethon.tl.types import Chat, Updates
 from telethon.tl.functions.messages import CreateChatRequest
 
 
@@ -126,14 +126,31 @@ class TGClient_S:
         except Exception as er:
             print(er)
 
-    async def createChat(self, users: list[int | str], title: str) -> bool:
-        result = True
+    async def createChat(self, users: list[int | str], title: str) -> tuple[int, bool]:
+        chat_id = 0
+        err = False
         try:
-            await self.client(CreateChatRequest(users=users, title=title))
+            await self.client.connect()
         except Exception as er:
-            result = False
             print(er)
-        return result
+        try:
+            data:Updates = await self.client(CreateChatRequest(users=users, title=title))
+            chat:Chat = data.chats[0]
+            chat_id = chat.id
+            try:
+                data1 = await self.client.edit_admin(
+                    chat, 
+                    users[1], 
+                    is_admin=True,
+                    )
+                # print(data1)
+                # print(data1.__dict__)
+            except Exception as er:
+                print(er)
+        except Exception as er:
+            err = True
+            print(er)
+        return (chat_id, err)
 
 
 async def startTGClient(client_s: TGClient_S):

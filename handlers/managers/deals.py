@@ -34,7 +34,7 @@ async def create_deal_shop(message: Message, state: FSMContext):
     data: dict = await state.get_data()
     deal: Deal_ = data["deal"]
     if message.text.isdigit():
-        if users.in_(id=int(message.text)):
+        if await users.in_(id=int(message.text)):
             deal.user_id = int(message.text)
             await state.update_data(deal=deal)
             await state.set_state(ManagerStates.create_deal_shop)

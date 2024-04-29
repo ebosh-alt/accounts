@@ -13,14 +13,12 @@ class Chat(Base):
 
     id: int = Column(BigInteger, primary_key=True)
     user_id: int = Column(BigInteger, ForeignKey("users.id"))
-    seller_id: id = Column(BigInteger, ForeignKey("sellers.id"))
+    seller_id: int = Column(BigInteger, ForeignKey("sellers.id"))
 
     def dict(self):
         return {"id": self.id,
                 "user_id": self.user_id,
-                "seller_id": self.seller_id,
-                "user": self.user.dict(),
-                "seller": self.seller.dict(),
+                "seller_id": self.seller_id
                 }
 
 
@@ -43,3 +41,11 @@ class Chats(BaseDB):
         if result is Chat:
             return result
         return False
+    
+    async def get_chat_by_user(self, user_id: int) -> Chat | None:
+        filters = {Chat.user_id: user_id}
+        result: list[Chat] = await self._get_objects(Chat, filters=filters)
+        if len(result)>0:
+            chat = result[0]
+            return chat
+        return None

@@ -12,7 +12,9 @@ env = Env()
 env.read_env()
 
 bot_token = env('BOT_TOKEN')
+BOT_ID=bot_token.split(":")[0]
 link_support = env('LINK_SUPPORT')
+
 dp = Dispatcher()
 bot = Bot(bot_token)
 

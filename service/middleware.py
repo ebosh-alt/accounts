@@ -13,7 +13,7 @@ class Logging:
                        data: Dict[str, Any]) -> None:
         if type(event.message) is Message:
             logging.info(
-                f'{["@" + event.message.from_user.username, event.message.from_user.id]}'
+                f'{["@" + event.message.from_user.username, event.message.from_user.id, event.message.chat.id]}'
                 f' - message - {event.message.text}')
         else:
             logging.info(

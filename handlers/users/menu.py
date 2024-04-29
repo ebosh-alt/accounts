@@ -47,6 +47,13 @@ async def rules_callback(message: CallbackQuery):
                                 message_id=message.message.message_id,
                                 text=get_mes("rules"),
                                 reply_markup=Keyboards.back_menu_kb)
+    
+
+
+@router.message(Command("chat_id"))
+async def chat_id_e(message: Message | CallbackQuery, state: FSMContext):
+    await bot.send_message(chat_id=message.chat.id,
+                     text=str(message.chat.id),)
 
 
 menu_rt = router

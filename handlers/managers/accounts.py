@@ -43,7 +43,7 @@ async def load_accs_end(message: Message, state: FSMContext):
                 file=document,
                 destination=path
             )
-            create_accounts(file_name=path)
+            await create_accounts(file_name=path)
             await bot.send_message(
                 chat_id=message.chat.id,
                 text=get_mes("success_loading_accs"),
