@@ -4,7 +4,7 @@ from aiogram.types import Message, CallbackQuery
 
 from data.config import bot
 from filters.Filters import IsAdmin
-from models.database import deals
+from models.database import deals, Deal
 from models.models import DataDeals
 from service.GetMessage import get_mes
 from service.keyboards import Keyboards
@@ -49,7 +49,7 @@ async def cancel_buy_end(message: Message | CallbackQuery, state: FSMContext):
     if message.text.isdigit():
         deal_id = int(message.text)
         if await deals.in_(deal_id):
-            deal = await deals.get(id=deal_id)
+            deal: Deal = await deals.get(id=deal_id)
             deal.payment_status = 2
             await deals.update(deal)
             return await message.answer(

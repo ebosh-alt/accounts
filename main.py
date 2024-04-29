@@ -2,13 +2,14 @@ import asyncio
 import logging
 from contextlib import suppress
 
-from data.config import dp, bot, client_s
+from data.config import dp, bot, client_s, SELLER
 
 from handlers import routers
 from models.database.base import create_async_database
 from service import middleware
 from tests.test import new_data
 from service.TGClient import startTGClient
+from models.database import sellers, Seller
 
 logger = logging.getLogger(__name__)
 
@@ -16,6 +17,11 @@ logger = logging.getLogger(__name__)
 async def main() -> None:
     await create_async_database()
     # await new_data()
+    if await sellers.in_(id=SELLER):
+        pass
+    else:
+        seller = Seller(id=SELLER, rating=5, balance=0, username=None)
+        await sellers.new(seller=seller)
     await startTGClient(client_s=client_s)
     for router in routers:
         dp.include_router(router)
