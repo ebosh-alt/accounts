@@ -10,13 +10,19 @@ from service import middleware
 from tests.test import new_data
 from service.TGClient import startTGClient
 from models.database import sellers, Seller
+from multiprocessing import Process
+from service.Background.checker import run_checker
 
 logger = logging.getLogger(__name__)
 
 
 async def main() -> None:
     await create_async_database()
+    bg_proc = Process(target=run_checker)
+    bg_proc.start()
     # await new_data()
+    t =await sellers.in_(id=SELLER)
+    print(t) 
     if await sellers.in_(id=SELLER):
         pass
     else:
