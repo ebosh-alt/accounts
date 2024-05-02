@@ -12,12 +12,17 @@ class Logging:
                        event: TelegramObject,
                        data: Dict[str, Any]) -> None:
         if type(event.message) is Message:
+            name = "@" + event.message.from_user.username if event.message.from_user.username \
+                else event.message.from_user.firstname
             logging.info(
-                f'{["@" + event.message.from_user.username, event.message.from_user.id]}'
+                f'{[name, event.message.from_user.id]}'
                 f' - message - {event.message.text}')
-        else:
+        elif type(event.message) is CallbackQuery:
+            name = "@" + event.callback_query.from_user.username if event.callback_query.from_user.username \
+                else event.callback_query.from_user.firstname
+
             logging.info(
-                f'{["@" + event.callback_query.from_user.username, event.callback_query.from_user.id]}'
+                f'{[name, event.callback_query.from_user.id]}'
                 f' - callback_query - {event.callback_query.data}')
 
         result = await handler(event, data)
