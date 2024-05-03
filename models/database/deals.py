@@ -102,6 +102,16 @@ class Deals(BaseDB):
         filters = {Deal.buyer_id: user_id}
         data = await self._get_objects(Deal, filters)
         return data[-1]
+    
+    async def get_unpaid_deals(self) -> list[Deal]:
+        filters = {Deal.payment_status: 0}
+        data = await self._get_objects(Deal, filters)
+        return data
+        
+    async def get_guarant_deals(self) -> list[Deal]:
+        filters = {Deal.guarantor: True}
+        data = await self._get_objects(Deal, filters)
+        return data
 
     async def create_deal(self, state: FSMContext, user_id: int, message_id: int):
         accounts = Accounts()

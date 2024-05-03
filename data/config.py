@@ -12,10 +12,13 @@ env = Env()
 env.read_env()
 
 bot_token = env('BOT_TOKEN')
+# BOT_ID = bot_token.split(":")[0]
 link_support = env('LINK_SUPPORT')
+
 dp = Dispatcher()
 bot = Bot(bot_token)
-
+BOT_ID = bot.id
+print(BOT_ID)
 link_to_bot = "https://t.me/selling_accounts_test_bot"
 
 session_path = env('SESSION_PATH')
@@ -45,3 +48,6 @@ ADMINS = [int(admin_id) for admin_id in env('ADMINS').split()]
 SELLER = int(env('SELLER'))
 
 PERCENT = float(env('PERCENT'))
+EXCEL_TEMPLATE_PATH = env('EXCEL_TEMPLATE_PATH')
+EXCEL_LOAD_FILE_PATH = env('EXCEL_LOAD_FILE_PATH')
+USERNAME = env("USERNAME")

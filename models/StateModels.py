@@ -23,3 +23,12 @@ class ShoppingCart(BaseModel):
     message_id: int | None = None
     deal_id: int | None = None
 
+
+class Deal(BaseModel):
+    user_id: int = None
+    shop: str = None
+    price: int = None
+    description: str = None
+    data: str = None
+    name: str = None
+    guarant_type: bool = None

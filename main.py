@@ -2,18 +2,33 @@ import asyncio
 import logging
 from contextlib import suppress
 
-from data.config import dp, bot, client_s
+from data.config import dp, bot, client_s, SELLER
 
 from handlers import routers
 from models.database.base import create_async_database
 from service import middleware
+from tests.test import new_data
+from service.TGClient import startTGClient
+from models.database import sellers, Seller
+from multiprocessing import Process
+from service.Background.checker import run_checker
 
 logger = logging.getLogger(__name__)
 
 
 async def main() -> None:
     await create_async_database()
-    # await startTGClient(client_s=client_s)
+    bg_proc = Process(target=run_checker)
+    bg_proc.start()
+
+    t = await sellers.in_(id=SELLER)
+    if await sellers.in_(id=SELLER):
+        pass
+    else:
+        seller = Seller(id=SELLER, rating=5, balance=0, username=None)
+        await sellers.new(seller=seller)
+    await startTGClient(client_s=client_s)
+    await new_data()
     for router in routers:
         dp.include_router(router)
     dp.update.middleware(middleware.Logging())

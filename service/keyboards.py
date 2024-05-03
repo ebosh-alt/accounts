@@ -2,7 +2,6 @@ import logging
 
 from aiogram import types
 from aiogram.utils.keyboard import InlineKeyboardBuilder, ReplyKeyboardBuilder
-
 from data.config import link_support
 from models.database import accounts
 
@@ -54,6 +53,10 @@ class Builder:
             sizes = (1,)
         keyboard.adjust(*sizes)
         return keyboard.as_markup(resize_keyboard=True, one_time_keyboard=one_time_keyboard)
+    
+    @staticmethod
+    def create_force_reply(text: str):
+        return types.ForceReply(input_field_placeholder=text)
 
 
 class Keyboards:
@@ -69,6 +72,37 @@ class Keyboards:
          "Просмотреть сделки": "show_deals",
          "Просмотреть инфо продавца": "show_seller_info"})
     admin_back_menu_kb = Builder.create_keyboard({"Назад": "admin_back_menu"})
+    manager_menu_kb = Builder.create_keyboard(
+        {
+            "Выставить счет": "create_deal",
+            "Загрузить аккаунты": "load_accs"
+        }
+    )
+    manager_back_menu_kb = Builder.create_keyboard({"Назад": "manager_back_menu"})
+
+    # def manager_create_deal_input_filed_guarant(text:str) :
+    #     return Builder.create_force_reply(text=text)
+
+    manager_deal_cr_choose_g_type = Builder.create_keyboard(
+        {
+            "С гарантом": "cr_deal_g",
+            "Без гаранта": "cr_deal_not_g"
+        }
+    )
+    
+    manager_deal_cr_confirm = Builder.create_keyboard(
+        {
+            "Подтвердить": "cr_deal_success",
+            "Отмена": "cr_deal_unsuccess"
+        }
+    )
+
+    confirm_cr_deal_by_user = Builder.create_keyboard(
+        {
+            "Оплатить": "confirm_cr_deal_user",
+        }
+    )
+    
 
     choice_guarantor_kb = Builder.create_keyboard({
         "C гарантом": f"yes_guarantor",

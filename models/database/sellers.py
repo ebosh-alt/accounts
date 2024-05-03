@@ -42,6 +42,6 @@ class Sellers(BaseDB):
 
     async def in_(self, id: int) -> Seller | bool:
         result = await self.get(id)
-        if result is Seller:
+        if type(result) is Seller:
             return result
         return False

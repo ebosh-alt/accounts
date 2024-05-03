@@ -1,9 +1,10 @@
+import logging
+
 from telethon import TelegramClient
 from sqlalchemy.ext.asyncio import AsyncSession
 import asyncio
-
+from telethon.tl.types import Chat, Updates
 from telethon.tl.functions.messages import CreateChatRequest
-
 
 # from telethon.client import DialogMethods
 # from db.db import session_db
@@ -19,6 +20,7 @@ from telethon.tl.functions.messages import CreateChatRequest
 
 # import threading
 # import time
+logger = logging.getLogger(__name__)
 
 
 class TG_Acc:
@@ -66,7 +68,7 @@ class TGClient_S:
             if await self.client.is_user_authorized():
                 result = 0
         except Exception as er:
-            print(er)
+            logger.info(er)
             result = 2
 
         # Завершение соединения с клиентом
@@ -88,7 +90,7 @@ class TGClient_S:
 
             result = result_sending_auth_code.phone_code_hash
         except Exception as er:
-            print(er)
+            logger.info(er)
 
         # Завершение соединения с клиентом 
         await self.disconnect_client()
@@ -98,17 +100,13 @@ class TGClient_S:
         result = False
         # Установление соединения clinet
         await self.connect_client()
-        # try:
-        #     await self.client.connect()
-        # except Exception as er:
-        #     print(er)
 
         # Ввод кода авторизации
         try:
             await self.client.sign_in(phone=self.account.phone_number, code=self.code, phone_code_hash=phone_code_hash)
             result = True
         except Exception as er:
-            print(er)
+            logger.info(er)
 
         # Завершение соединения с клиентом 
         await self.disconnect_client()
@@ -118,22 +116,40 @@ class TGClient_S:
         try:
             await self.client.connect()
         except Exception as er:
-            print(er)
+            logger.info(er)
 
     async def disconnect_client(self):
         try:
             await self.client.disconnect()
         except Exception as er:
-            print(er)
+            logger.info(er)
 
-    async def createChat(self, users: list[int | str], title: str) -> bool:
-        result = True
+    async def createChat(self, users: list[int | str], title: str) -> tuple[int, bool]:
+        chat_id = 0
+        err = False
         try:
-            await self.client(CreateChatRequest(users=users, title=title))
+            await self.client.connect()
         except Exception as er:
-            result = False
-            print(er)
-        return result
+            logger.info(er)
+        try:
+            print(users)
+            data: Updates = await self.client(CreateChatRequest(users=users, title=title))
+            chat: Chat = data.chats[0]
+            chat_id = chat.id
+            try:
+                data1 = await self.client.edit_admin(
+                    chat,
+                    users[1],
+                    is_admin=True,
+                )
+                # print(data1)
+                # print(data1.__dict__)
+            except Exception as er:
+                logger.info(er)
+        except Exception as er:
+            err = True
+            logger.info(er)
+        return (chat_id, err)
 
 
 async def startTGClient(client_s: TGClient_S):
@@ -143,10 +159,10 @@ async def startTGClient(client_s: TGClient_S):
             client_s.code = input("Введи код: ")
             result_auth = await client_s.enter_authorization_code(result_getting_auth_code)
             if result_auth:
-                return print("Аккаунт авторизован после отправки кода")
+                return logger.info("Аккаунт авторизован после отправки кода")
         else:
-            return print("1: Что-то пошло не так")
+            return logger.info("1: Что-то пошло не так")
     elif await client_s.is_code_needed() == 2:
-        return print("Аккаунт не подключился во время проверки на необходимость кода для авторизации")
+        return logger.info("Аккаунт не подключился во время проверки на необходимость кода для авторизации")
     elif await client_s.is_code_needed() == 0:
-        return print("Аккаунт авторизован раннее")
+        return logger.info("Аккаунт авторизован раннее")

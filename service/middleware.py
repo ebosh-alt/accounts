@@ -13,17 +13,13 @@ class Logging:
                        data: Dict[str, Any]) -> None:
         if type(event.message) is Message:
             name = "@" + event.message.from_user.username if event.message.from_user.username \
-                else event.message.from_user.firstname
-            logging.info(
-                f'{[name, event.message.from_user.id]}'
-                f' - message - {event.message.text}')
+                else event.message.from_user.first_name
+            logging.info(f'{[name, event.message.from_user.id]} - message - {event.message.text}')
         elif type(event.message) is CallbackQuery:
             name = "@" + event.callback_query.from_user.username if event.callback_query.from_user.username \
-                else event.callback_query.from_user.firstname
-
+                else event.callback_query.from_user.first_name
             logging.info(
-                f'{[name, event.callback_query.from_user.id]}'
-                f' - callback_query - {event.callback_query.data}')
+                f'{[name, event.callback_query.from_user.id]} - callback_query - {event.callback_query.data}')
 
         result = await handler(event, data)
         return result
