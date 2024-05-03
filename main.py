@@ -28,7 +28,7 @@ async def main() -> None:
         seller = Seller(id=SELLER, rating=5, balance=0, username=None)
         await sellers.new(seller=seller)
     await startTGClient(client_s=client_s)
-    await new_data()
+    # await new_data()
     for router in routers:
         dp.include_router(router)
     dp.update.middleware(middleware.Logging())
