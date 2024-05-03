@@ -53,7 +53,7 @@ class Builder:
             sizes = (1,)
         keyboard.adjust(*sizes)
         return keyboard.as_markup(resize_keyboard=True, one_time_keyboard=one_time_keyboard)
-    
+
     @staticmethod
     def create_force_reply(text: str):
         return types.ForceReply(input_field_placeholder=text)
@@ -89,7 +89,7 @@ class Keyboards:
             "Без гаранта": "cr_deal_not_g"
         }
     )
-    
+
     manager_deal_cr_confirm = Builder.create_keyboard(
         {
             "Подтвердить": "cr_deal_success",
@@ -99,10 +99,9 @@ class Keyboards:
 
     confirm_cr_deal_by_user = Builder.create_keyboard(
         {
-            "Оплатить": "confirm_cr_deal_user",
+            "Оплатить": "payment",
         }
     )
-    
 
     choice_guarantor_kb = Builder.create_keyboard({
         "C гарантом": f"yes_guarantor",
@@ -151,4 +150,3 @@ class Keyboards:
         logger.info(f"{buttons}")
         kb = Builder.create_keyboard(buttons)
         return kb
-
