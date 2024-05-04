@@ -20,7 +20,7 @@ async def set_data_shopping_cart(state: FSMContext, **kwargs) -> ShoppingCart:
         shopping_cart = ShoppingCart(shop=message)
     if name is not None:
         shopping_cart.account_name = name
-        account = await accounts.get_account_by_name(name)
+        account = await accounts.get_account_by_name(name, shopping_cart.shop)
         shopping_cart.account_id = account.id
         shopping_cart.price = account.price
         shopping_cart.description = account.description

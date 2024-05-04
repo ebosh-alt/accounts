@@ -51,13 +51,14 @@ class Accounts(BaseDB):
         return False
 
     async def get_shops(self) -> list[Any]:
-        data = await self._get_objects(obj=Account)
+        filters = {Account.view_type: True}
+        data = await self._get_objects(obj=Account, filters=filters)
         result = []
         [result.append(i.shop) for i in data if i.shop not in result]
         return result
 
-    async def get_account_by_name(self, name):
-        filters = {Account.name: name}
+    async def get_account_by_name(self, name, shop):
+        filters = {Account.name: name, Account.shop: shop}
         result: list[Account] = await self._get_objects(obj=Account, filters=filters)
         account = result[0]
         return account

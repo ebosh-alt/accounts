@@ -1,18 +1,17 @@
+from datetime import datetime
+
 from aiogram import Router, F
-from aiogram.filters import Command
-from aiogram.fsm.context import FSMContext
-from aiogram.types import Message, CallbackQuery, FSInputFile, Document, ForceReply
 from aiogram.enums import ParseMode
+from aiogram.fsm.context import FSMContext
+from aiogram.types import Message, CallbackQuery, ForceReply
+
 from data.config import bot
 from filters.Filters import IsManager
+from models.StateModels import Deal as Deal_
+from models.database import accounts, Account, deals, Deal, users
 from service.GetMessage import get_mes
 from service.keyboards import Keyboards
 from states.states import ManagerStates
-from data.config import EXCEL_TEMPLATE_PATH, EXCEL_LOAD_FILE_PATH
-from service.ExcelS.s import create_accounts
-from models.StateModels import Deal as Deal_
-from models.database import accounts, Account, deals, Deal, users
-from datetime import datetime
 
 router = Router()
 
@@ -23,11 +22,11 @@ async def create_deal_user_id(message: CallbackQuery, state: FSMContext):
     await state.update_data(deal=Deal_())
     await bot.send_message(
         chat_id=message.message.chat.id,
-        text=get_mes("create_deal_data_input", data="user\_id"),
+        text=get_mes("create_deal_data_input", data="user_id"),
         reply_markup=ForceReply(input_field_placeholder=get_mes("create_deal_input_text", data="user_id")),
         parse_mode=ParseMode.MARKDOWN_V2
-        )
-    
+    )
+
 
 @router.message(ManagerStates.create_deal_user_id, IsManager())
 async def create_deal_shop(message: Message, state: FSMContext):
@@ -38,20 +37,20 @@ async def create_deal_shop(message: Message, state: FSMContext):
             deal.user_id = int(message.text)
             await state.update_data(deal=deal)
             await state.set_state(ManagerStates.create_deal_shop)
-            text = get_mes("create_deal_data_input", data="shop")
-            keyboard = ForceReply(input_field_placeholder=get_mes("create_deal_input_text", data="shop"))
+            text = get_mes("create_deal_data_input", data="название магазина")
+            keyboard = ForceReply(input_field_placeholder=get_mes("create_deal_input_text", data="название магазина"))
         else:
-            text = get_mes("create_deal_data_input", er="Нет такого пользователя\!", data="user\_id")
+            text = get_mes("create_deal_data_input", er="Нет такого пользователя\!", data="user_id")
             keyboard = ForceReply(input_field_placeholder=get_mes("create_deal_input_text", data="user_id"))
     else:
-        text = get_mes("create_deal_data_input", er="Введите число\!", data="user\_id")
+        text = get_mes("create_deal_data_input", er="Введите число\!", data="user_id")
         keyboard = ForceReply(input_field_placeholder=get_mes("create_deal_input_text", data="user_id"))
     await bot.send_message(
         chat_id=message.chat.id,
         text=text,
         reply_markup=keyboard,
         parse_mode=ParseMode.MARKDOWN_V2
-        )
+    )
 
 
 @router.message(ManagerStates.create_deal_shop, IsManager())
@@ -63,11 +62,11 @@ async def create_deal_price(message: Message, state: FSMContext):
     await state.set_state(ManagerStates.create_deal_price)
     await bot.send_message(
         chat_id=message.chat.id,
-        text=get_mes("create_deal_data_input", data="price"),
-        reply_markup=ForceReply(input_field_placeholder=get_mes("create_deal_input_text", data="price")),
+        text=get_mes("create_deal_data_input", data="стоимость"),
+        reply_markup=ForceReply(input_field_placeholder=get_mes("create_deal_input_text", data="стоимость")),
         parse_mode=ParseMode.MARKDOWN_V2
-        )
-    
+    )
+
 
 @router.message(ManagerStates.create_deal_price, IsManager())
 async def create_deal_description(message: Message, state: FSMContext):
@@ -77,17 +76,17 @@ async def create_deal_description(message: Message, state: FSMContext):
         deal.price = int(message.text)
         await state.update_data(deal=deal)
         await state.set_state(ManagerStates.create_deal_description)
-        text = get_mes("create_deal_data_input", data="description")
-        keyboard = ForceReply(input_field_placeholder=get_mes("create_deal_input_text", data="description"))
+        text = get_mes("create_deal_data_input", data="описание")
+        keyboard = ForceReply(input_field_placeholder=get_mes("create_deal_input_text", data="описание"))
     else:
-        text = get_mes("create_deal_data_input", er="Введите число\!", data="price")
-        keyboard = ForceReply(input_field_placeholder=get_mes("create_deal_input_text", data="price"))
+        text = get_mes("create_deal_data_input", er="Введите число\!", data="стоимость")
+        keyboard = ForceReply(input_field_placeholder=get_mes("create_deal_input_text", data="стоимость"))
     await bot.send_message(
         chat_id=message.chat.id,
         text=text,
         reply_markup=keyboard,
         parse_mode=ParseMode.MARKDOWN_V2
-        )
+    )
 
 
 @router.message(ManagerStates.create_deal_description, IsManager())
@@ -99,11 +98,11 @@ async def create_deal_data(message: Message, state: FSMContext):
     await state.set_state(ManagerStates.create_deal_data)
     await bot.send_message(
         chat_id=message.chat.id,
-        text=get_mes("create_deal_data_input", data="data"),
-        reply_markup=ForceReply(input_field_placeholder=get_mes("create_deal_input_text", data="data")),
+        text=get_mes("create_deal_data_input", data="данные аккаунта"),
+        reply_markup=ForceReply(input_field_placeholder=get_mes("create_deal_input_text", data="данные аккаунта")),
         parse_mode=ParseMode.MARKDOWN_V2
-        )
-    
+    )
+
 
 @router.message(ManagerStates.create_deal_data, IsManager())
 async def create_deal_name(message: Message, state: FSMContext):
@@ -114,10 +113,10 @@ async def create_deal_name(message: Message, state: FSMContext):
     await state.set_state(ManagerStates.create_deal_name)
     await bot.send_message(
         chat_id=message.chat.id,
-        text=get_mes("create_deal_data_input", data="name"),
-        reply_markup=ForceReply(input_field_placeholder=get_mes("create_deal_input_text", data="name")),
+        text=get_mes("create_deal_data_input", data="название аккаунта"),
+        reply_markup=ForceReply(input_field_placeholder=get_mes("create_deal_input_text", data="название аккаунта")),
         parse_mode=ParseMode.MARKDOWN_V2
-        )
+    )
 
 
 @router.message(ManagerStates.create_deal_name, IsManager())
@@ -129,42 +128,45 @@ async def create_deal_guarant(message: Message, state: FSMContext):
     await state.set_state(ManagerStates.create_deal_guarant)
     await bot.send_message(
         chat_id=message.chat.id,
-        text=get_mes("create_deal_data_input", data="guarant"),
+        text=get_mes("create_deal_data_input", data="гарант"),
         reply_markup=Keyboards.manager_deal_cr_choose_g_type,
         parse_mode=ParseMode.MARKDOWN_V2
-        )
+    )
 
 
-@router.callback_query(ManagerStates.create_deal_guarant, IsManager(), F.data == "cr_deal_g" or F.data == "cr_deal_not_g")
+@router.callback_query(ManagerStates.create_deal_guarant, IsManager(),
+                       (F.data == "cr_deal_g") | (F.data == "cr_deal_not_g"))
 async def create_deal_confirm(message: CallbackQuery, state: FSMContext):
     data: dict = await state.get_data()
     deal: Deal_ = data["deal"]
-    if  message.data == "cr_deal_g":    
+    if message.data == "cr_deal_g":
         deal.guarant_type = True
     elif message.data == "cr_deal_not_g":
         deal.guarant_type = False
     await state.update_data(deal=deal)
     await state.set_state(ManagerStates.create_deal_end)
-    await bot.send_message(
+    await bot.edit_message_text(
         chat_id=message.message.chat.id,
-        text=get_mes("manager_confirm_cr_deal", deal = deal),
+        message_id=message.message.message_id,
+        text=get_mes("manager_confirm_cr_deal", deal=deal),
         reply_markup=Keyboards.manager_deal_cr_confirm,
         parse_mode=ParseMode.MARKDOWN_V2
-        )
+    )
 
 
-@router.callback_query(ManagerStates.create_deal_end, IsManager(), F.data == "cr_deal_success" or F.data == "cr_deal_unsuccess")
+@router.callback_query(ManagerStates.create_deal_end, IsManager(),
+                       (F.data == "cr_deal_success") | (F.data == "cr_deal_unsuccess"))
 async def create_deal_end(message: CallbackQuery, state: FSMContext):
     data: dict = await state.get_data()
     deal: Deal_ = data["deal"]
-    if  message.data == "cr_deal_success":  
+    if message.data == "cr_deal_success":
         account = Account(
-            shop = deal.shop,
-            price = deal.price,
-            description = deal.description,
-            data = deal.data,
-            view_type = False,
-            name = deal.name
+            shop=deal.shop,
+            price=deal.price,
+            description=deal.description,
+            data=deal.data,
+            view_type=False,
+            name=deal.name
         )
         await accounts.new(account=account)
         account = await accounts.get_last()
@@ -177,21 +179,23 @@ async def create_deal_end(message: CallbackQuery, state: FSMContext):
             payment_status=0,
         )
         await deals.new(c_deal)
+        deal_bd = await deals.get_last_deal(deal.user_id)
         await bot.send_message(
             chat_id=deal.user_id,
             text=get_mes("created_deal_to_user", deal=deal),
-            reply_markup=Keyboards.confirm_cr_deal_by_user,
+            reply_markup=await Keyboards.payment_manually(deal_bd.id),
             parse_mode=ParseMode.MARKDOWN_V2
-            )        
+        )
     elif message.data == "cr_deal_unsuccess":
         pass
     await state.clear()
-    await bot.send_message(
+    await bot.edit_message_text(
         chat_id=message.message.chat.id,
+        message_id=message.message.message_id,
         text=get_mes("manager"),
         reply_markup=Keyboards.manager_menu_kb,
         parse_mode=ParseMode.MARKDOWN_V2
-        )
+    )
 
 
 deals_rt = router

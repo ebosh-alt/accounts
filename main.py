@@ -2,7 +2,7 @@ import asyncio
 import logging
 from contextlib import suppress
 
-from data.config import dp, bot, client_s, SELLER
+from data.config import dp, bot, client_s, SELLER, USERNAME
 
 from handlers import routers
 from models.database.base import create_async_database
@@ -25,7 +25,7 @@ async def main() -> None:
     if await sellers.in_(id=SELLER):
         pass
     else:
-        seller = Seller(id=SELLER, rating=5, balance=0, username=None)
+        seller = Seller(id=SELLER, rating=5, balance=0, username=USERNAME)
         await sellers.new(seller=seller)
     await startTGClient(client_s=client_s)
     # await new_data()

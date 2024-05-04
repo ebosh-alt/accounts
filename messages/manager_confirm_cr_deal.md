@@ -1,8 +1,9 @@
 Подтвердите или отмените создание сделки
-*user_id*: {{deal.user_id}}
-*shop*: {{deal.shop}} 
-*price*: {{deal.price}} 
-*description*: {{deal.description}} 
-*data*: {{deal.data}} 
-*name*: {{deal.name}} 
-*guarant_type*: {{deal.guarant_type}}  
+*user id:* `{{deal.user_id}}`
+*Название магазина:* `{{deal.shop}}`
+*Стоимость:* `{{deal.price}}$`
+*Описание:* `{{deal.description}}` 
+*Данные аккаунта:* `{{deal.data}}`
+*Название магазина:* `{{deal.name}}`
+{% if deal.guarant_type == True %}*Покупка будет совершена с гарантом*
+{% else %}*Покупка будет совершена без гаранта*{% endif %}

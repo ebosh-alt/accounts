@@ -4,6 +4,7 @@ from aiogram.fsm.state import StatesGroup, State
 class UserStates(StatesGroup):
     ShoppingCart = State()
     MailingSeller = State()
+    Manually = State()
 
 
 class AdminStates(StatesGroup):

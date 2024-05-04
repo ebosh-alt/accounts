@@ -6,9 +6,10 @@ from aiogram.types import CallbackQuery, Message
 
 from data.config import bot, client_s, SELLER, BOT_ID
 from filters.Filters import IsUserMessageValid
-from models.database import chats, Chat
+from models.database import chats, Chat, deals, accounts, sellers
 from service.GetMessage import get_mes
 from states.states import UserStates
+from service.keyboards import Keyboards
 
 logger = logging.getLogger(__name__)
 router = Router()
@@ -18,7 +19,7 @@ router = Router()
 async def start_mailing_to_seller(message: CallbackQuery, state: FSMContext):
     user_id = message.from_user.id
     await state.set_state(UserStates.MailingSeller)
-    #Создание чата
+    # Создание чата
     chat = await chats.get_chat_by_user(user_id=user_id)
     if chat is None:
         chat_id, er = await client_s.createChat([SELLER, int(BOT_ID)], title=str(user_id))
@@ -52,6 +53,78 @@ async def send_message_seller(message: Message, state: FSMContext):
             chat_id=message.from_user.id,
             text=get_mes("err_send_text_manager"),
         )
+
+
+@router.callback_query(F.data.contains("payment_manually_"))
+async def payment(message: CallbackQuery, state: FSMContext):
+    id = message.from_user.id
+    await bot.edit_message_text(chat_id=id,
+                                message_id=message.message.message_id,
+                                text="здесь будет счет на оплату",
+                                reply_markup=Keyboards.payment_kb)
+    await state.set_state(UserStates.Manually)
+    deal_id = int(message.data.replace("payment_manually_", ""))
+    await state.update_data(deal_id=deal_id)
+
+
+@router.callback_query(UserStates.Manually, F.data == "complete_payment")
+async def complete_payment(message: CallbackQuery, state: FSMContext):
+    id = message.from_user.id
+    status_payment = True
+    data = await state.get_data()
+    deal_id = data["deal_id"]
+    if status_payment:
+        deal = await deals.get(deal_id)
+        account = await accounts.get(deal.account_id)
+        await bot.edit_message_text(chat_id=id,
+                                    message_id=message.message.message_id,
+                                    text=account.data,
+                                    reply_markup=Keyboards.support_kb)
+
+        if deal.guarantor is False:
+            text = get_mes("mark_seller")
+            keyboard = Keyboards.mark_seller_kb
+            deal.payment_status = 2
+
+        else:
+            text = get_mes("support_24_hours")
+            keyboard = Keyboards.confirm_account_user_kb
+            deal.payment_status = 1
+
+        await deals.update(deal)
+        await bot.send_message(chat_id=id,
+                               text=text,
+                               reply_markup=keyboard)
+
+
+@router.callback_query(UserStates.Manually, F.data == "ok_account")
+async def complete_payment(message: CallbackQuery, state: FSMContext):
+    id = message.from_user.id
+    data = await state.get_data()
+
+    deal_id = data['deal_id']
+    deal = await deals.get(deal_id)
+    deal.payment_status = 2
+    await deals.update(deal)
+    await bot.edit_message_text(chat_id=id,
+                                message_id=message.message.message_id,
+                                text=get_mes("mark_seller"),
+                                reply_markup=Keyboards.mark_seller_kb)
+
+
+@router.callback_query((F.data == "0") | (F.data == "1"))
+async def set_mark(message: CallbackQuery, state: FSMContext):
+    id = message.from_user.id
+    mark = int(message.data)
+    seller = await sellers.get()
+    seller.rating += mark
+    await sellers.update(seller)
+    await bot.edit_message_text(chat_id=id,
+                                message_id=message.message.message_id,
+                                text="Спасибо за оценку!",
+                                reply_markup=Keyboards.confirm_payment_kb)
+
+    await state.clear()
 
 
 buy_manually_rt = router

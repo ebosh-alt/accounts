@@ -69,7 +69,8 @@ class Deals(BaseDB):
                 description=account.description,
                 data=account.data,
                 date=deal.date.strftime("%d.%m.%Y в %H:%M"),
-                guarantor=deal.guarantor
+                guarantor=deal.guarantor,
+                payment=deal.payment_status
             ))
         return result
 
@@ -88,7 +89,8 @@ class Deals(BaseDB):
                 description=account.description,
                 data=account.data,
                 date=deal.date.strftime("%d.%m.%Y в %H:%M "),
-                guarantor=deal.guarantor
+                guarantor=deal.guarantor,
+                payment=deal.payment_status
             ))
         return result
 
@@ -102,12 +104,12 @@ class Deals(BaseDB):
         filters = {Deal.buyer_id: user_id}
         data = await self._get_objects(Deal, filters)
         return data[-1]
-    
+
     async def get_unpaid_deals(self) -> list[Deal]:
         filters = {Deal.payment_status: 0}
         data = await self._get_objects(Deal, filters)
         return data
-        
+
     async def get_guarant_deals(self) -> list[Deal]:
         filters = {Deal.guarantor: True}
         data = await self._get_objects(Deal, filters)

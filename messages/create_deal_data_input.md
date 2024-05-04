@@ -1,7 +1,7 @@
-{{er}}
+`{{er}}`
 Напишите следующие данные:
-{{data}}
+`{{data}}`
 {%if format_data%}
 Формат данных:
-{{format_data}}
+`{{format_data}}`
 {%endif%}

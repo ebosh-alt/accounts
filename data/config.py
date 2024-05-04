@@ -18,7 +18,6 @@ link_support = env('LINK_SUPPORT')
 dp = Dispatcher()
 bot = Bot(bot_token)
 BOT_ID = bot.id
-print(BOT_ID)
 link_to_bot = "https://t.me/selling_accounts_test_bot"
 
 session_path = env('SESSION_PATH')

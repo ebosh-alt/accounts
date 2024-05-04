@@ -13,6 +13,9 @@ async def send(message: CallbackQuery, all_data_deals: list[DataDeals], fmes_tex
     ind = 0
     new_data = list()
     count_symbol = 0
+    if len(all_data_deals) == 0:
+        await message.answer("У Вас ещё нет совершенных сделок")
+        return
     while ind < len(all_data_deals):
         count_symbol += all_data_deals[ind].len() + 130
         if count_symbol < 2000:

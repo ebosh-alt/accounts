@@ -97,12 +97,6 @@ class Keyboards:
         }
     )
 
-    confirm_cr_deal_by_user = Builder.create_keyboard(
-        {
-            "Оплатить": "payment",
-        }
-    )
-
     choice_guarantor_kb = Builder.create_keyboard({
         "C гарантом": f"yes_guarantor",
         "Без гаранта": f"no_guarantor",
@@ -150,3 +144,12 @@ class Keyboards:
         logger.info(f"{buttons}")
         kb = Builder.create_keyboard(buttons)
         return kb
+
+    @staticmethod
+    async def payment_manually(deal_id):
+        confirm_cr_deal_by_user = Builder.create_keyboard(
+            {
+                "Оплатить": f"payment_manually_{deal_id}",
+            }
+        )
+        return confirm_cr_deal_by_user

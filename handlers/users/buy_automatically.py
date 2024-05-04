@@ -131,7 +131,7 @@ async def complete_payment(message: CallbackQuery, state: FSMContext):
                                 reply_markup=Keyboards.mark_seller_kb)
 
 
-@router.callback_query(UserStates.ShoppingCart, (F.data == "0") | (F.data == "1"))
+@router.callback_query((F.data == "0") | (F.data == "1"))
 async def set_mark(message: CallbackQuery, state: FSMContext):
     id = message.from_user.id
     mark = int(message.data)
