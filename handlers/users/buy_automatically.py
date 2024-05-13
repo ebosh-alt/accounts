@@ -5,7 +5,7 @@ from aiogram.enums import ParseMode
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
 
-from data.config import bot, PERCENT
+from data.config import bot, PERCENT, CryptoCloud
 from filters.Filters import IsShop, IsNameAccount
 from models.StateModels import ShoppingCart
 from models.database import deals, accounts, sellers
@@ -78,22 +78,27 @@ async def confirm_shopping_cart(message: CallbackQuery, state: FSMContext):
 @router.callback_query(UserStates.ShoppingCart, F.data == "payment")
 async def payment(message: CallbackQuery, state: FSMContext):
     id = message.from_user.id
+    data = await state.get_data()
+    shopping_cart: ShoppingCart = data['ShoppingCart']
+    invoice = CryptoCloud.create_invoice(amount=shopping_cart.price)
+    shopping_cart.uuid = invoice["result"]["uuid"]
+    link = invoice["result"]["link"]
     await bot.edit_message_text(chat_id=id,
                                 message_id=message.message.message_id,
                                 text="здесь будет счет на оплату",
-                                reply_markup=Keyboards.payment_kb)
-
+                                reply_markup=await Keyboards.payment(link))
+    await state.update_data(ShoppingCart=shopping_cart)
     await deals.create_deal(state=state, user_id=id, message_id=message.message.message_id)
 
 
 @router.callback_query(UserStates.ShoppingCart, F.data == "complete_payment")
 async def complete_payment(message: CallbackQuery, state: FSMContext):
     id = message.from_user.id
-    status_payment = True
-
     data = await state.get_data()
     shopping_cart: ShoppingCart = data['ShoppingCart']
-    if status_payment:
+    invoice = CryptoCloud.get_invoice_info([shopping_cart.uuid])
+
+    if invoice["result"][0]["status"] == "paid":
         account = await accounts.get(shopping_cart.account_id)
         deal = await deals.get(shopping_cart.deal_id)
         await bot.edit_message_text(chat_id=id,
@@ -115,6 +120,8 @@ async def complete_payment(message: CallbackQuery, state: FSMContext):
         await bot.send_message(chat_id=id,
                                text=text,
                                reply_markup=keyboard)
+    else:
+        await message.answer("Счет ещё не оплачен! Не уходите с этого этапа")
 
 
 @router.callback_query(UserStates.ShoppingCart, F.data == "ok_account")

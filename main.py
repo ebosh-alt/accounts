@@ -18,8 +18,8 @@ logger = logging.getLogger(__name__)
 
 async def main() -> None:
     await create_async_database()
-    bg_proc = Process(target=run_checker)
-    bg_proc.start()
+    # bg_proc = Process(target=run_checker)
+    # bg_proc.start()
 
     t = await sellers.in_(id=SELLER)
     if await sellers.in_(id=SELLER):
@@ -38,7 +38,7 @@ async def main() -> None:
 if __name__ == "__main__":
     logging.basicConfig(
         level=logging.INFO,
-        filename="log.logging",
+        # filename="log.logging",
         format=u'%(filename)s:%(lineno)d #%(levelname)-3s [%(asctime)s] - %(message)s',
         filemode="w",
         encoding='utf-8')

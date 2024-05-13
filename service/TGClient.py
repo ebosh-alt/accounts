@@ -132,7 +132,6 @@ class TGClient_S:
         except Exception as er:
             logger.info(er)
         try:
-            print(users)
             data: Updates = await self.client(CreateChatRequest(users=users, title=title))
             chat: Chat = data.chats[0]
             chat_id = chat.id

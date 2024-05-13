@@ -4,7 +4,7 @@ from aiogram import Router, F
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
 
-from data.config import bot, client_s, SELLER, BOT_ID
+from data.config import bot, client_s, SELLER, BOT_ID, CryptoCloud, PERCENT
 from filters.Filters import IsUserMessageValid
 from models.database import chats, Chat, deals, accounts, sellers
 from service.GetMessage import get_mes
@@ -58,22 +58,33 @@ async def send_message_seller(message: Message, state: FSMContext):
 @router.callback_query(F.data.contains("payment_manually_"))
 async def payment(message: CallbackQuery, state: FSMContext):
     id = message.from_user.id
+    deal = await deals.get_last_deal(user_id=id)
+    account = await accounts.get(deal.account_id)
+    if deal.guarantor:
+        price = float("%.2f" % (account.price * (1 + PERCENT / 100)))
+    else:
+        price = account.price
+    invoice = CryptoCloud.create_invoice(amount=price)
+    uuid = invoice["result"]["uuid"]
+    link = invoice["result"]["link"]
     await bot.edit_message_text(chat_id=id,
                                 message_id=message.message.message_id,
                                 text="здесь будет счет на оплату",
-                                reply_markup=Keyboards.payment_kb)
+                                reply_markup=await Keyboards.payment(link))
     await state.set_state(UserStates.Manually)
     deal_id = int(message.data.replace("payment_manually_", ""))
     await state.update_data(deal_id=deal_id)
+    await state.update_data(uuid=uuid)
 
 
 @router.callback_query(UserStates.Manually, F.data == "complete_payment")
 async def complete_payment(message: CallbackQuery, state: FSMContext):
     id = message.from_user.id
-    status_payment = True
     data = await state.get_data()
     deal_id = data["deal_id"]
-    if status_payment:
+    uuid = data["uuid"]
+    invoice = CryptoCloud.get_invoice_info([uuid])
+    if invoice["result"][0]["status"] == "paid":
         deal = await deals.get(deal_id)
         account = await accounts.get(deal.account_id)
         await bot.edit_message_text(chat_id=id,
@@ -95,6 +106,8 @@ async def complete_payment(message: CallbackQuery, state: FSMContext):
         await bot.send_message(chat_id=id,
                                text=text,
                                reply_markup=keyboard)
+    else:
+        await message.answer("Счет ещё не оплачен! Не уходите с этого этапа")
 
 
 @router.callback_query(UserStates.Manually, F.data == "ok_account")

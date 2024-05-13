@@ -153,3 +153,10 @@ class Keyboards:
             }
         )
         return confirm_cr_deal_by_user
+
+    @staticmethod
+    async def payment(link: str):
+        return Builder.create_keyboard({
+            "Оплатить": link,
+            "Оплатил": "complete_payment"
+        })

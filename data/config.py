@@ -7,6 +7,7 @@ from environs import Env
 
 # from models.database.accounts import Accounts
 from service.TGClient import TG_Acc, TGClient_S
+from service.cryptocloud import CryptoCloudClient
 
 env = Env()
 env.read_env()
@@ -50,3 +51,6 @@ PERCENT = float(env('PERCENT'))
 EXCEL_TEMPLATE_PATH = env('EXCEL_TEMPLATE_PATH')
 EXCEL_LOAD_FILE_PATH = env('EXCEL_LOAD_FILE_PATH')
 USERNAME = env("USERNAME")
+CRYPTO_API = env("CRYPTO_API")
+CRYPTO_SHOP_ID = env("CRYPTO_SHOP_ID")
+CryptoCloud: CryptoCloudClient = CryptoCloudClient(CRYPTO_API, CRYPTO_SHOP_ID)
