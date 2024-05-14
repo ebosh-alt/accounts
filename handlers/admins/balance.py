@@ -21,7 +21,7 @@ async def admin(message: Message | CallbackQuery, state: FSMContext):
                                 message_id=message.message.message_id,
                                 text=get_mes("change_balance"),
                                 reply_markup=Keyboards.admin_back_menu_kb)
-    await state.set_state(AdminStates.change_balance())
+    await state.set_state(AdminStates.change_balance)
 
 
 @router.message(IsAdmin(), AdminStates.change_balance())
