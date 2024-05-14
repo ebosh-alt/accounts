@@ -36,8 +36,7 @@ DEFAULT_HEADERS = {
 }
 ResponseType = TypeVar("ResponseType")
 JsonDumps = Callable[..., Any]
-cryptomus_merchant_id = env('MERCHANT_ID')
-cryptomus_api_key = env('API_KEY')
+
 
 ADMINS = [int(admin_id) for admin_id in env('ADMINS').split()]
 
