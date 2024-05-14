@@ -2,10 +2,8 @@ from typing import Callable, TypeVar, Any
 
 from adaptix import Retort
 from aiogram import Dispatcher, Bot
-from aiogram.enums import ParseMode
 from environs import Env
 
-# from models.database.accounts import Accounts
 from service.TGClient import TG_Acc, TGClient_S
 from service.cryptocloud import CryptoCloudClient
 
