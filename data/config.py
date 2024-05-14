@@ -1,6 +1,5 @@
 from typing import Callable, TypeVar, Any
 
-from adaptix import Retort
 from aiogram import Dispatcher, Bot
 from environs import Env
 
