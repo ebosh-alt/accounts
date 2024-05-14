@@ -34,7 +34,7 @@ class Builder:
         return keyboard.as_markup(resize_keyboard=True, one_time_keyboard=True)
 
     @staticmethod
-    def create_reply_keyboard(name_buttons: list, one_time_keyboard: bool = False, request_contact: bool = False,
+    def create_reply_keyboard(name_buttons: list = None, one_time_keyboard: bool = False, request_contact: bool = False,
                               *sizes) -> types.ReplyKeyboardMarkup:
         keyboard = ReplyKeyboardBuilder()
         for name_button in name_buttons:
@@ -70,7 +70,8 @@ class Keyboards:
     admin_menu_kb = Builder.create_keyboard(
         {"Отменить покупку": "cancel_buy",
          "Просмотреть сделки": "show_deals",
-         "Просмотреть инфо продавца": "show_seller_info"})
+         "Просмотреть инфо продавца": "show_seller_info",
+         "Изменить баланс": "change_balance"})
     admin_back_menu_kb = Builder.create_keyboard({"Назад": "admin_back_menu"})
     manager_menu_kb = Builder.create_keyboard(
         {

@@ -10,6 +10,7 @@ from filters.Filters import IsManager
 from models.StateModels import Deal as Deal_
 from models.database import accounts, Account, deals, Deal, users
 from service.GetMessage import get_mes
+from service.is_float import is_float
 from service.keyboards import Keyboards
 from states.states import ManagerStates
 
@@ -72,8 +73,8 @@ async def create_deal_price(message: Message, state: FSMContext):
 async def create_deal_description(message: Message, state: FSMContext):
     data: dict = await state.get_data()
     deal: Deal_ = data["deal"]
-    if message.text.isdigit():
-        deal.price = int(message.text)
+    if is_float(message.text):
+        deal.price = float(message.text)
         await state.update_data(deal=deal)
         await state.set_state(ManagerStates.create_deal_description)
         text = get_mes("create_deal_data_input", data="описание")

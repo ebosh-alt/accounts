@@ -9,6 +9,7 @@ class UserStates(StatesGroup):
 
 class AdminStates(StatesGroup):
     cancel_buy = State()
+    change_balance = State()
 
 
 class ManagerStates(StatesGroup):
