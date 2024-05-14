@@ -24,7 +24,7 @@ async def admin(message: Message | CallbackQuery, state: FSMContext):
     await state.set_state(AdminStates.change_balance())
 
 
-@router.message(IsAdmin(), AdminStates.change_balance)
+@router.message(IsAdmin(), AdminStates.change_balance())
 async def change_balance(message: Message | CallbackQuery, state: FSMContext):
     id = message.from_user.id
     if is_float(message.text):
