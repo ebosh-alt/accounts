@@ -65,8 +65,11 @@ class Accounts(BaseDB):
 
     async def get_name_accounts_shop(self, shop: str):
         filters = {Account.shop: shop, Account.view_type: True}
-        result = await self._get_objects(obj=Account, filters=filters)
-        result = [i.name for i in result]
+        request = await self._get_objects(obj=Account, filters=filters)
+        result = []
+        for i in request:
+            if len(i.name) < 65:
+                result.append(i.name)
         return result
     
     async def get_last(self) -> Account:
