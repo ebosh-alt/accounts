@@ -1,5 +1,6 @@
 import logging
 
+from data.config import BASE_PERCENT
 from models.database import sellers, Seller, deals, Deal, accounts, Account
 import time
 import datetime
@@ -21,12 +22,12 @@ async def checking_payment_status():
                 account.view_type = True
                 await accounts.update(account=account)
                 await deals.delete(deal=deal)
-        guarant_deals: list[Deal] = await deals.get_guarant_deals()
-        for deal in guarant_deals:
+        guarantor_deals: list[Deal] = await deals.get_guarant_deals()
+        for deal in guarantor_deals:
             if datetime.datetime.now() - deal.date >= datetime.timedelta(hours=24):
                 seller: Seller = await sellers.get(id=deal.seller_id)
                 account: Account = await accounts.get(id=deal.account_id)
-                seller.balance += account.price
+                seller.balance += float("%.2f" % (account.price * (1 - BASE_PERCENT / 100)))
                 await sellers.update(seller=seller)
                 deal.payment_status = 2
                 await deals.update(deal=deal)

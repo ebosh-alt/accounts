@@ -5,7 +5,7 @@ from aiogram.enums import ParseMode
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
 
-from data.config import bot, PERCENT, CryptoCloud
+from data.config import bot, PERCENT, CryptoCloud, BASE_PERCENT
 from filters.Filters import IsShop, IsNameAccount
 from models.StateModels import ShoppingCart
 from models.database import deals, accounts, sellers
@@ -101,6 +101,7 @@ async def complete_payment(message: CallbackQuery, state: FSMContext):
     if invoice["result"][0]["status"] == "paid":
         account = await accounts.get(shopping_cart.account_id)
         deal = await deals.get(shopping_cart.deal_id)
+        seller = await sellers.get()
         await bot.edit_message_text(chat_id=id,
                                     message_id=message.message.message_id,
                                     text=account.data,
@@ -110,7 +111,7 @@ async def complete_payment(message: CallbackQuery, state: FSMContext):
             text = get_mes("mark_seller")
             keyboard = Keyboards.mark_seller_kb
             deal.payment_status = 2
-
+            seller.balance += float("%.2f" % (shopping_cart.price * (1 - BASE_PERCENT / 100)))
         else:
             text = get_mes("support_24_hours")
             keyboard = Keyboards.confirm_account_user_kb
@@ -143,7 +144,6 @@ async def set_mark(message: CallbackQuery, state: FSMContext):
     id = message.from_user.id
     mark = int(message.data)
     seller = await sellers.get()
-
     seller.rating += mark
     await sellers.update(seller)
     await bot.edit_message_text(chat_id=id,
