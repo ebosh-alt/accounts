@@ -60,7 +60,7 @@ class Accounts(BaseDB):
     async def get_account_by_name(self, name, shop):
         filters = {Account.name: name, Account.shop: shop}
         result: list[Account] = await self._get_objects(obj=Account, filters=filters)
-        account = result[0]
+        account = result
         return account
 
     async def get_name_accounts_shop(self, shop: str):

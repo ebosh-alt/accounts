@@ -14,11 +14,11 @@ class Account(BaseModel):
 
 
 class ShoppingCart(BaseModel):
-    account_id: int | None = None
     shop: str | None = None
-    account_name: str | None = None
+    name: str | None = None
     price: float | None = None
     description: str | None = None
+    count: int | None = None
     guarantor: bool | None = None
     message_id: int | None = None
     deal_id: int | None = None

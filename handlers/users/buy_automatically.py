@@ -44,7 +44,7 @@ async def choice_account(message: CallbackQuery, state: FSMContext):
 async def choice_guarantor(message: CallbackQuery, state: FSMContext):
     # выбор с или без гаранта и сохранение имени выбранного аккаунта
     id = message.from_user.id
-    shopping_cart = await set_data_shopping_cart(state, name=message.data)
+    shopping_cart, count_account = await set_data_shopping_cart(state, name=message.data)
     await bot.edit_message_text(chat_id=id,
                                 message_id=message.message.message_id,
                                 text=get_mes("shopping_cart_user",
@@ -52,10 +52,12 @@ async def choice_guarantor(message: CallbackQuery, state: FSMContext):
                                              name=shopping_cart.account_name,
                                              price_no=shopping_cart.price,
                                              price_yes=float("%.2f" % (shopping_cart.price * (1 + PERCENT / 100))),
-                                             description=shopping_cart.description
+                                             description=shopping_cart.description,
+                                             count=count_account
                                              ),
                                 parse_mode=ParseMode.MARKDOWN_V2,
                                 reply_markup=Keyboards.choice_guarantor_kb)
+                                # reply_markup=Keyboards.choice_guarantor_kb)
 
 
 @router.callback_query(UserStates.ShoppingCart, F.data.contains("guarantor"))

@@ -161,3 +161,4 @@ class Keyboards:
             "Оплатить": link,
             "Оплатил": "complete_payment"
         })
+    @s

@@ -1,4 +1,5 @@
 import logging
+from typing import Tuple
 
 from aiogram.fsm.context import FSMContext
 
@@ -9,7 +10,7 @@ from models.database import accounts, deals
 logger = logging.getLogger(__name__)
 
 
-async def set_data_shopping_cart(state: FSMContext, **kwargs) -> ShoppingCart:
+async def set_data_shopping_cart(state: FSMContext, **kwargs) -> tuple[ShoppingCart, int] | ShoppingCart:
     # message: str = None, name: str = None, guarantor: str = None
     data = await state.get_data()
     message = kwargs.get('message')
@@ -19,11 +20,13 @@ async def set_data_shopping_cart(state: FSMContext, **kwargs) -> ShoppingCart:
     if shopping_cart is None:
         shopping_cart = ShoppingCart(shop=message)
     if name is not None:
-        shopping_cart.account_name = name
+        shopping_cart.name = name
         account = await accounts.get_account_by_name(name, shopping_cart.shop)
-        shopping_cart.account_id = account.id
+
+        # shopping_cart.account_id = account.id
         shopping_cart.price = account.price
-        shopping_cart.description = account.description
+        shopping_cart.description = account[0].description
+        return shopping_cart, len(account)
     elif guarantor is not None:
         shopping_cart.guarantor = True if guarantor == "yes_guarantor" else False
         if shopping_cart.guarantor:
@@ -49,7 +52,7 @@ async def clear_state_shopping_cart(state: FSMContext, user_id: int):
             await accounts.update(account)
         if shopping_cart.message_id is not None:
             await bot.delete_message(chat_id=user_id,
-                                    message_id=shopping_cart.message_id)
+                                     message_id=shopping_cart.message_id)
         if shopping_cart.deal_id is not None:
             deal = await deals.get(shopping_cart.deal_id)
             await deals.delete(deal)
