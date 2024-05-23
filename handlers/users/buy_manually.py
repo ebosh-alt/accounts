@@ -69,7 +69,7 @@ async def payment(message: CallbackQuery, state: FSMContext):
     link = invoice["result"]["link"]
     await bot.edit_message_text(chat_id=id,
                                 message_id=message.message.message_id,
-                                text="здесь будет счет на оплату",
+                                text=get_mes("rule_payment"),
                                 reply_markup=await Keyboards.payment(link))
     await state.set_state(UserStates.Manually)
     deal_id = int(message.data.replace("payment_manually_", ""))

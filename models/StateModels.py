@@ -18,10 +18,11 @@ class ShoppingCart(BaseModel):
     name: str | None = None
     price: float | None = None
     description: str | None = None
-    count: int | None = None
+    count: int = 1
     guarantor: bool | None = None
     message_id: int | None = None
-    deal_id: int | None = None
+    deals_id: list = []
+    accounts_id: list = []
     uuid: str | None = None
 
 

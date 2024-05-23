@@ -58,7 +58,7 @@ class Accounts(BaseDB):
         return result
 
     async def get_account_by_name(self, name, shop):
-        filters = {Account.name: name, Account.shop: shop}
+        filters = {Account.name: name, Account.shop: shop, Account.view_type: True}
         result: list[Account] = await self._get_objects(obj=Account, filters=filters)
         account = result
         return account
@@ -68,7 +68,7 @@ class Accounts(BaseDB):
         request = await self._get_objects(obj=Account, filters=filters)
         result = []
         for i in request:
-            if len(i.name) < 65:
+            if len(i.name) < 65 and i.name not in result:
                 result.append(i.name)
         return result
     

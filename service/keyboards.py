@@ -61,10 +61,10 @@ class Builder:
 
 class Keyboards:
     menu_kb = Builder.create_keyboard(
-        {"Магазин": "shop",
-         "Правила": "rules",
-         "Поддержка": link_support,
-         "История покупок": "history_buy"})
+        {"🛒 Магазин": "shop",
+         "📜 Правила": "rules",
+         "🛠 Поддержка": link_support,
+         "📦 История покупок": "history_buy"})
     back_menu_kb = Builder.create_keyboard({"Назад": "back_menu"})
 
     admin_menu_kb = Builder.create_keyboard(
@@ -90,13 +90,14 @@ class Keyboards:
             "Без гаранта": "cr_deal_not_g"
         }
     )
-
     manager_deal_cr_confirm = Builder.create_keyboard(
         {
             "Подтвердить": "cr_deal_success",
             "Отмена": "cr_deal_unsuccess"
         }
     )
+
+    # choice_count_account_kb
 
     choice_guarantor_kb = Builder.create_keyboard({
         "C гарантом": f"yes_guarantor",
@@ -161,4 +162,24 @@ class Keyboards:
             "Оплатить": link,
             "Оплатил": "complete_payment"
         })
-    @s
+
+    @staticmethod
+    async def choice_count_account(name: str = None, shop: str = None, count: int = None):
+        if count is None:
+            count = len(await accounts.get_account_by_name(name, shop))
+        if count <= 1:
+            return Builder.create_keyboard({
+                "C гарантом": f"yes_guarantor",
+                "Без гаранта": f"no_guarantor",
+                "Вернуться к выбору аккаунта": "back_to_choice_account",
+                "В главное меню": "В главное меню"
+            })
+        else:
+            return Builder.create_keyboard({
+                "-1": "remove_account",
+                "+1": "add_account",
+                "C гарантом": f"yes_guarantor",
+                "Без гаранта": f"no_guarantor",
+                "Вернуться к выбору аккаунта": "back_to_choice_account",
+                "В главное меню": "В главное меню"
+            }, 2, 2, 1, 1)

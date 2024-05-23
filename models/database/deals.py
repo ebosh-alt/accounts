@@ -5,7 +5,7 @@ import logging
 from typing import List
 
 from aiogram.fsm.context import FSMContext
-from sqlalchemy import Column, Boolean, BigInteger, ForeignKey, INTEGER, DATETIME, Integer
+from sqlalchemy import Column, Boolean, BigInteger, ForeignKey, INTEGER, DATETIME, Integer, Float
 
 from data.config import SELLER
 from .accounts import Accounts
@@ -25,9 +25,11 @@ class Deal(Base):
     buyer_id = Column(BigInteger, ForeignKey("users.id"))
     seller_id = Column(BigInteger, ForeignKey("sellers.id"))
     account_id = Column(BigInteger, ForeignKey("accounts.id"))
+    price = Column(Float)
     date = Column(DATETIME)
     guarantor = Column(Boolean)
     payment_status = Column(INTEGER)
+    group_id = Column(BigInteger)
 
     def dict(self):
         return {
@@ -38,6 +40,7 @@ class Deal(Base):
             "date": self.date,
             "guarantor": self.guarantor,
             "payment_status": self.payment_status,
+            "group_id": self.group_id,
         }
 
 
@@ -81,17 +84,19 @@ class Deals(BaseDB):
 
         for deal in deals:
             account = await Accounts().get(deal.account_id)
-            result.append(DataDeals(
+            data_deals = DataDeals(
                 id=deal.id,
                 shop=account.shop,
                 name=account.name,
-                price=account.price,
+                price=deal.price,
                 description=account.description,
                 data=account.data,
                 date=deal.date.strftime("%d.%m.%Y в %H:%M "),
                 guarantor=deal.guarantor,
                 payment=deal.payment_status
-            ))
+            )
+            if data_deals not in result:
+                result.append(data_deals)
         return result
 
     async def in_(self, id: int) -> Deal | bool:
@@ -133,6 +138,17 @@ class Deals(BaseDB):
         await accounts.update(account)
         await self.new(deal)
         deal = await self.get_last_deal(user_id)
-        shopping_cart.deal_id = deal.id
+        shopping_cart.deals_id = deal.id
         shopping_cart.message_id = message_id
         await state.update_data(ShoppingCart=shopping_cart)
+
+    async def get_all(self):
+        return await self._get_objects(Deal, {})
+
+    async def get_new_group_id(self):
+        all_deals = await self._get_objects(Deal, {})
+        count_group = []
+        for deal in all_deals:
+            if deal.group_id not in count_group:
+                count_group.append(deal.group_id)
+        return len(count_group)
