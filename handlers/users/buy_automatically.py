@@ -138,7 +138,7 @@ async def complete_payment(message: CallbackQuery, state: FSMContext):
     data = await state.get_data()
     shopping_cart: ShoppingCart = data['ShoppingCart']
     invoice = CryptoCloud.get_invoice_info([shopping_cart.uuid])
-    if invoice["result"][0]["status"] == "paid" or True:
+    if invoice["result"][0]["status"] == "paid":
         data = ""
         for account_id in shopping_cart.accounts_id:
             account = await accounts.get(account_id)
