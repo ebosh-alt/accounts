@@ -24,10 +24,11 @@ buy_automatically_rt = router
 async def menu_shop(message: CallbackQuery, state: FSMContext):
     # главное меню покупки аккаунтов и выбор магазина
     id = message.from_user.id
-    await bot.edit_message_text(chat_id=id,
-                                message_id=message.message.message_id,
-                                text=get_mes("shop_user"),
-                                reply_markup=await Keyboards.shops_kb())
+    await message.message.delete()
+    await bot.send_message(chat_id=id,
+                           # message_id=message.message.message_id,
+                           text=get_mes("shop_user"),
+                           reply_markup=await Keyboards.shops_kb())
     await state.set_state(UserStates.ShoppingCart)
 
 

@@ -11,14 +11,15 @@ from states.states import ManagerStates
 
 router = Router()
 
+
 @router.callback_query(F.data == "manager_back_menu")
 @router.message(Command("manager"), IsManager())
 async def admin(message: Message | CallbackQuery, state: FSMContext):
     if type(message) is Message:
         await message.answer(
-            text=get_mes("manager"), 
+            text=get_mes("manager"),
             reply_markup=Keyboards.manager_menu_kb
-            )
+        )
     elif await state.get_state() == ManagerStates().get_excel_file:
         await bot.delete_message(
             chat_id=message.message.chat.id,
@@ -31,11 +32,11 @@ async def admin(message: Message | CallbackQuery, state: FSMContext):
         )
     else:
         await bot.edit_message_text(
-                chat_id=message.message.chat.id,
-                message_id=message.message.message_id,
-                text=get_mes("manager"),
-                reply_markup=Keyboards.manager_menu_kb
-            )
+            chat_id=message.message.chat.id,
+            message_id=message.message.message_id,
+            text=get_mes("manager"),
+            reply_markup=Keyboards.manager_menu_kb
+        )
     await state.clear()
 
 

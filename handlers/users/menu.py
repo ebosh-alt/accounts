@@ -31,27 +31,28 @@ async def start(message: Message | CallbackQuery, state: FSMContext):
         await users.new(user)
 
     if type(message) is CallbackQuery:
-        await message.delete()
+        await message.message.delete()
 
-    await bot.edit_mes(chat_id=id,
-                       message_id=message.message.message_id,
-                       text=get_mes("menu"),
-                       reply_markup=Keyboards.menu_kb)
+    await bot.send_photo(chat_id=id,
+                         photo=photo,
+                         caption=get_mes("menu"),
+                         reply_markup=Keyboards.menu_kb)
 
 
 @router.callback_query(F.data == "rules")
 async def rules_callback(message: CallbackQuery):
     id = message.from_user.id
-    await bot.edit_message_text(chat_id=id,
-                                message_id=message.message.message_id,
-                                text=get_mes("rules"),
-                                reply_markup=Keyboards.back_menu_kb)
+    await message.message.delete()
+    await bot.send_message(chat_id=id,
+                           # message_id=message.message.message_id,
+                           text=get_mes("rules"),
+                           reply_markup=Keyboards.back_menu_kb)
 
 
 @router.message(Command("chat_id"))
-async def chat_id_e(message: Message | CallbackQuery, state: FSMContext):
+async def chat_id_e(message: Message | CallbackQuery):
     await bot.send_message(chat_id=message.chat.id,
-                           text=str(message.chat.id), )
+                           text=str(message.chat.id))
 
 
 menu_rt = router
