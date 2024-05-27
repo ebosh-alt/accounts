@@ -4,7 +4,7 @@ from aiogram import Router, F
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
 
-from data.config import bot, client_s, SELLER, BOT_ID, CryptoCloud, PERCENT
+from data.config import bot, client_s, SELLER, BOT_ID, CryptoCloud, PERCENT, BASE_PERCENT
 from filters.Filters import IsUserMessageValid
 from models.database import chats, Chat, deals, accounts, sellers
 from service.GetMessage import get_mes
@@ -62,9 +62,9 @@ async def payment(message: CallbackQuery, state: FSMContext):
     deal = await deals.get_last_deal(user_id=id)
     account = await accounts.get(deal.account_id)
     if deal.guarantor:
-        price = float("%.2f" % (account.price * (1 + PERCENT / 100)))
+        price = float("%.2f" % (account.price * (1 + BASE_PERCENT / 100) * (1 + PERCENT / 100)))
     else:
-        price = account.price
+        price = float("%.2f" % (account.price * (1 + BASE_PERCENT / 100)))
     invoice = CryptoCloud.create_invoice(amount=price)
     uuid = invoice["result"]["uuid"]
     link = invoice["result"]["link"]
@@ -97,7 +97,8 @@ async def complete_payment(message: CallbackQuery, state: FSMContext):
             text = get_mes("mark_seller")
             keyboard = Keyboards.mark_seller_kb
             deal.payment_status = 2
-
+            seller = await sellers.get()
+            seller.balance += account.price
         else:
             text = get_mes("support_24_hours")
             keyboard = Keyboards.confirm_account_user_kb
@@ -119,6 +120,9 @@ async def complete_payment(message: CallbackQuery, state: FSMContext):
     deal_id = data['deal_id']
     deal = await deals.get(deal_id)
     deal.payment_status = 2
+    account = await accounts.get(deal.account_id)
+    seller = await sellers.get()
+    seller.balance += account.price
     await deals.update(deal)
     await bot.edit_message_text(chat_id=id,
                                 message_id=message.message.message_id,

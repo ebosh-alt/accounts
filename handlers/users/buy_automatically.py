@@ -146,6 +146,7 @@ async def complete_payment(message: CallbackQuery, state: FSMContext):
         for account_id in shopping_cart.accounts_id:
             account = await accounts.get(account_id)
             data += account.data + "\n\n"
+
         seller = await sellers.get()
         await bot.edit_message_text(chat_id=id,
                                     message_id=message.message.message_id,
@@ -155,7 +156,8 @@ async def complete_payment(message: CallbackQuery, state: FSMContext):
         if shopping_cart.guarantor is False:
             text = get_mes("mark_seller")
             keyboard = Keyboards.mark_seller_kb
-            seller.balance += float("%.2f" % (shopping_cart.price * (1 - BASE_PERCENT / 100) * (1 - BASE_PERCENT / 100)))
+            account = await accounts.get(shopping_cart.accounts_id[0])
+            seller.balance += account.price * len(shopping_cart.accounts_id)
         else:
             text = get_mes("support_24_hours")
             keyboard = Keyboards.confirm_account_user_kb
@@ -183,8 +185,9 @@ async def complete_payment(message: CallbackQuery, state: FSMContext):
         deal = await deals.get(deal_id)
         deal.payment_status = 2
         await deals.update(deal)
+    account = await accounts.get(shopping_cart.accounts_id[0])
     seller = await sellers.get()
-    seller.balance += float("%.2f" % (shopping_cart.price * (1 - BASE_PERCENT / 100) * (1 - BASE_PERCENT / 100)))
+    seller.balance += account.price * len(shopping_cart.accounts_id)
     await bot.edit_message_text(chat_id=id,
                                 message_id=message.message.message_id,
                                 text=get_mes("mark_seller"),
