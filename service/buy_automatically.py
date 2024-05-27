@@ -4,7 +4,7 @@ from typing import Tuple
 
 from aiogram.fsm.context import FSMContext
 
-from data.config import PERCENT, bot, SELLER
+from data.config import PERCENT, bot, SELLER, BASE_PERCENT
 from models.StateModels import ShoppingCart
 from models.database import accounts, deals, Account, Deal
 
@@ -30,9 +30,10 @@ async def set_data_shopping_cart(state: FSMContext, **kwargs) -> tuple[ShoppingC
 
         shopping_cart.guarantor = True if guarantor == "yes_guarantor" else False
         if shopping_cart.guarantor:
-            shopping_cart.price = float("%.2f" % (shopping_cart.price * (1 + PERCENT / 100))) + shopping_cart.count
+            shopping_cart.price = float("%.2f" % (shopping_cart.price * (1 + BASE_PERCENT / 100) * (1 + PERCENT / 100))
+                                        * shopping_cart.count)
         else:
-            shopping_cart.price = shopping_cart.price * shopping_cart.price
+            shopping_cart.price = float("%.2f" % shopping_cart.price * (1 + BASE_PERCENT / 100) * shopping_cart.count)
     elif message == "back_to_choice_account":
         shop = shopping_cart.shop
         shopping_cart = ShoppingCart(shop=shop)

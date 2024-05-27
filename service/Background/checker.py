@@ -27,7 +27,8 @@ async def checking_payment_status():
             if datetime.datetime.now() - deal.date >= datetime.timedelta(hours=24):
                 seller: Seller = await sellers.get(id=deal.seller_id)
                 account: Account = await accounts.get(id=deal.account_id)
-                seller.balance += float("%.2f" % (account.price * (1 - BASE_PERCENT / 100)))
+                # seller.balance += float("%.2f" % (account.price * (1 - BASE_PERCENT / 100)))
+                seller.balance += account.price
                 await sellers.update(seller=seller)
                 deal.payment_status = 2
                 await deals.update(deal=deal)

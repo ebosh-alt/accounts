@@ -50,14 +50,16 @@ async def choice_guarantor(message: CallbackQuery, state: FSMContext):
     count_account: int
     id = message.from_user.id
     shopping_cart, count_account = await set_data_shopping_cart(state, name=message.data)
+    price_no = float("%.2f" % shopping_cart.price * (1 + BASE_PERCENT / 100) * shopping_cart.count)
+    price_yes = float("%.2f" % (shopping_cart.price * (1 + BASE_PERCENT / 100) * (1 + PERCENT / 100)) *
+                      shopping_cart.count)
     await bot.edit_message_text(chat_id=id,
                                 message_id=message.message.message_id,
                                 text=get_mes("shopping_cart_user",
                                              shop=shopping_cart.shop,
                                              name=shopping_cart.name,
-                                             price_no=shopping_cart.price * shopping_cart.count,
-                                             price_yes=float("%.2f" % (shopping_cart.price * (
-                                                     1 + PERCENT / 100))) * shopping_cart.count,
+                                             price_no=price_no,
+                                             price_yes=price_yes,
                                              description=shopping_cart.description,
                                              count=count_account,
                                              choice_count=shopping_cart.count
@@ -153,7 +155,7 @@ async def complete_payment(message: CallbackQuery, state: FSMContext):
         if shopping_cart.guarantor is False:
             text = get_mes("mark_seller")
             keyboard = Keyboards.mark_seller_kb
-            seller.balance += float("%.2f" % (shopping_cart.price * (1 - BASE_PERCENT / 100)))
+            seller.balance += float("%.2f" % (shopping_cart.price * (1 - BASE_PERCENT / 100) * (1 - BASE_PERCENT / 100)))
         else:
             text = get_mes("support_24_hours")
             keyboard = Keyboards.confirm_account_user_kb
@@ -181,6 +183,8 @@ async def complete_payment(message: CallbackQuery, state: FSMContext):
         deal = await deals.get(deal_id)
         deal.payment_status = 2
         await deals.update(deal)
+    seller = await sellers.get()
+    seller.balance += float("%.2f" % (shopping_cart.price * (1 - BASE_PERCENT / 100) * (1 - BASE_PERCENT / 100)))
     await bot.edit_message_text(chat_id=id,
                                 message_id=message.message.message_id,
                                 text=get_mes("mark_seller"),
