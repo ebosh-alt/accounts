@@ -4,7 +4,7 @@ from aiogram import Router, F
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
 
-from data.config import bot, client_s, SELLER, BOT_ID, CryptoCloud, PERCENT, BASE_PERCENT
+from data.config import bot, client_s, SELLER, BOT_ID, CryptoCloud, BASE_PERCENT, PERCENT_GUARANTOR
 from filters.Filters import IsUserMessageValid
 from models.database import chats, Chat, deals, accounts, sellers
 from service.GetMessage import get_mes
@@ -62,7 +62,7 @@ async def payment(message: CallbackQuery, state: FSMContext):
     deal = await deals.get_last_deal(user_id=id)
     account = await accounts.get(deal.account_id)
     if deal.guarantor:
-        price = float("%.2f" % (account.price * (1 + BASE_PERCENT / 100) * (1 + PERCENT / 100)))
+        price = float("%.2f" % (account.price * (1 + PERCENT_GUARANTOR / 100)))
     else:
         price = float("%.2f" % (account.price * (1 + BASE_PERCENT / 100)))
     invoice = CryptoCloud.create_invoice(amount=price)

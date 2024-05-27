@@ -42,7 +42,7 @@ ADMINS = [int(admin_id) for admin_id in env('ADMINS').split()]
 
 SELLER = int(env('SELLER'))
 BASE_PERCENT = float(env("BASE_PERCENT"))
-PERCENT = float(env('PERCENT'))
+PERCENT_GUARANTOR = float(env('PERCENT_GUARANTOR'))
 EXCEL_TEMPLATE_PATH = env('EXCEL_TEMPLATE_PATH')
 EXCEL_LOAD_FILE_PATH = env('EXCEL_LOAD_FILE_PATH')
 USERNAME = env("USERNAME")

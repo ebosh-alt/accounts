@@ -4,7 +4,7 @@ from typing import Tuple
 
 from aiogram.fsm.context import FSMContext
 
-from data.config import PERCENT, bot, SELLER, BASE_PERCENT
+from data.config import bot, SELLER, BASE_PERCENT, PERCENT_GUARANTOR
 from models.StateModels import ShoppingCart
 from models.database import accounts, deals, Account, Deal
 
@@ -27,13 +27,13 @@ async def set_data_shopping_cart(state: FSMContext, **kwargs) -> tuple[ShoppingC
         shopping_cart.description = account[0].description
         return shopping_cart, len(account)
     elif guarantor is not None:
-
+        # account = await accounts.get(shopping_cart.accounts_id[0])
         shopping_cart.guarantor = True if guarantor == "yes_guarantor" else False
         if shopping_cart.guarantor:
-            shopping_cart.price = float("%.2f" % (shopping_cart.price * (1 + BASE_PERCENT / 100) * (1 + PERCENT / 100))
-                                        * shopping_cart.count)
+            shopping_cart.price = float(
+                "%.2f" % (shopping_cart.price * (1 + PERCENT_GUARANTOR / 100) * shopping_cart.count))
         else:
-            shopping_cart.price = float("%.2f" % shopping_cart.price * (1 + BASE_PERCENT / 100) * shopping_cart.count)
+            shopping_cart.price = float("%.2f" % (shopping_cart.price * (1 + BASE_PERCENT / 100) * shopping_cart.count))
     elif message == "back_to_choice_account":
         shop = shopping_cart.shop
         shopping_cart = ShoppingCart(shop=shop)
@@ -75,14 +75,15 @@ async def clear_state_shopping_cart(state: FSMContext, user_id: int):
     data = await state.get_data()
     shopping_cart: ShoppingCart = data.get("ShoppingCart")
     if shopping_cart is not None:
-        account = await accounts.get(shopping_cart.account_id)
-        if account is not None:
-            account.view_type = True
-            await accounts.update(account)
-        if shopping_cart.message_id is not None:
-            await bot.delete_message(chat_id=user_id,
-                                     message_id=shopping_cart.message_id)
-        if shopping_cart.deal_id is not None:
-            deal = await deals.get(shopping_cart.deal_id)
-            await deals.delete(deal)
+        for account_id in shopping_cart.accounts_id:
+            account = await accounts.get(account_id)
+            if account is not None:
+                account.view_type = True
+                await accounts.update(account)
+            if shopping_cart.message_id is not None:
+                await bot.delete_message(chat_id=user_id,
+                                         message_id=shopping_cart.message_id)
+            if shopping_cart.deal_id is not None:
+                deal = await deals.get(shopping_cart.deal_id)
+                await deals.delete(deal)
         await state.clear()

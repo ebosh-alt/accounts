@@ -18,14 +18,14 @@ logger = logging.getLogger(__name__)
 
 async def main() -> None:
     await create_async_database()
-    bg_proc = Process(target=run_checker)
-    bg_proc.start()
+    # bg_proc = Process(target=run_checker)
+    # bg_proc.start()
     if await sellers.in_(id=SELLER):
         pass
     else:
         seller = Seller(id=SELLER, rating=5, balance=0, username=USERNAME)
         await sellers.new(seller=seller)
-    await startTGClient(client_s=client_s)
+    # await startTGClient(client_s=client_s)
     for router in routers:
         dp.include_router(router)
     dp.update.middleware(middleware.Logging())
