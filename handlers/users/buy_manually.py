@@ -33,7 +33,7 @@ async def start_mailing_to_seller(message: CallbackQuery, state: FSMContext):
             seller_id=SELLER,
         )
         await chats.new(chat=chat)
-    await message.delete()
+    await message.message.delete()
     await bot.send_message(
         chat_id=message.from_user.id,
         # message_id=message.message.message_id,

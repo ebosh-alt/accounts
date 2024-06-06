@@ -6,7 +6,9 @@ import time
 from models.database import sellers, Seller, deals, Deal, accounts, Account
 from models.database.base import create_async_database
 
+
 logger = logging.getLogger(__name__)
+
 
 
 async def checking_payment_status():
