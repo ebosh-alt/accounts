@@ -20,7 +20,7 @@ router = Router()
 buy_automatically_rt = router
 
 
-@router.callback_query((F.data == "shop") | (F.data == "Вернуться к выбору магазина"))
+@router.callback_query((F.data == "shop") | (F.data == "Вернуться к выбору магазина") | (F.data == "Вернуться к выбору действия"))
 async def menu_shop(message: CallbackQuery, state: FSMContext):
     # главное меню покупки аккаунтов и выбор магазина
     id = message.from_user.id
@@ -32,15 +32,37 @@ async def menu_shop(message: CallbackQuery, state: FSMContext):
     await state.set_state(UserStates.ShoppingCart)
 
 
+@router.callback_query(F.data == "Перейти к выбору категорий", UserStates.ShoppingCart)
+async def choose_shop(message: CallbackQuery, state: FSMContext):
+    id = message.from_user.id
+    await message.message.delete()
+    await bot.send_message(chat_id=id,
+                           # message_id=message.message.message_id,
+                           text=get_mes("shop_user_categories"),
+                           reply_markup=await Keyboards.shop_new_kb())
+    # await state.set_state(UserStates.ShoppingCart)
+
+
 @router.callback_query(IsShop(), UserStates.ShoppingCart)
-async def choice_account(message: CallbackQuery, state: FSMContext):
-    # выбор аккаунта и сохранение выбранного магазина
+async def choose_after_shop_act(message: CallbackQuery, state: FSMContext):
     id = message.from_user.id
     shopping_cart = await set_data_shopping_cart(state=state, message=message.data)
     await bot.edit_message_text(chat_id=id,
                                 message_id=message.message.message_id,
-                                text="Выберите аккаунт",
-                                reply_markup=await Keyboards.name_accounts_shop_kb(shop=shopping_cart.shop))
+                                text=get_mes("shop_user"),
+                                reply_markup=await Keyboards.name_accounts_shop_kb())#(shop=shopping_cart.shop))
+
+@router.callback_query(F.data == "Перейти к выбору товаров", UserStates.ShoppingCart) #(IsShop(), UserStates.ShoppingCart)
+async def choice_account(message: CallbackQuery, state: FSMContext):
+    # выбор аккаунта и сохранение выбранного магазина
+    id = message.from_user.id
+    # shopping_cart = await set_data_shopping_cart(state=state, message=message.data)
+    data = await state.get_data()
+    shopping_cart = data["ShoppingCart"]
+    await bot.edit_message_text(chat_id=id,
+                                message_id=message.message.message_id,
+                                text="Выберите товар",
+                                reply_markup=await Keyboards.new_name_accounts_shop_kb(shop=shopping_cart.shop))
 
 
 @router.callback_query(UserStates.ShoppingCart, IsNameAccount())
@@ -133,7 +155,7 @@ async def payment(message: CallbackQuery, state: FSMContext):
     link = invoice["result"]["link"]
     await bot.edit_message_text(chat_id=id,
                                 message_id=message.message.message_id,
-                                text="здесь будет счет на оплату",
+                                text=f"Ниже лежит счет — проведите оплату по нему и нажмите кнопку «Оплачено»\n\nСчет на оплату: {link}",
                                 reply_markup=await Keyboards.payment(link))
     await state.update_data(ShoppingCart=shopping_cart)
     await create_deal(state=state, user_id=id, message_id=message.message.message_id)
@@ -145,7 +167,7 @@ async def complete_payment(message: CallbackQuery, state: FSMContext):
     data = await state.get_data()
     shopping_cart: ShoppingCart = data['ShoppingCart']
     invoice = CryptoCloud.get_invoice_info([shopping_cart.uuid])
-    if invoice["result"][0]["status"] == "paid" or True:
+    if invoice["result"][0]["status"] == "paid" or invoice["result"][0]["status"] == True:
         data = ""
         count = 1
         for account_id in shopping_cart.accounts_id:
@@ -199,7 +221,7 @@ async def complete_payment(message: CallbackQuery, state: FSMContext):
                                 reply_markup=Keyboards.mark_seller_kb)
 
 
-@router.callback_query((F.data == "0") | (F.data == "1"))
+@router.callback_query((F.data == "0") | (F.data == "1") | (F.data == "2") | (F.data == "3") | (F.data == "4") | (F.data == "5") )
 async def set_mark(message: CallbackQuery, state: FSMContext):
     id = message.from_user.id
     mark = int(message.data)

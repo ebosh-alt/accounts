@@ -70,6 +70,13 @@ class Accounts(BaseDB):
         for i in request:
             if len(i.name) < 65 and i.name not in result:
                 result.append(i.name)
+        logger.info(f"result: {result}")
+        logger.info(f"request: {request}")
+
+
+        filters = {Account.shop: shop}
+        request = await self._get_objects(obj=Account, filters=filters)
+        logger.info(f"request: {request}")
         return result
     
     async def get_last(self) -> Account:

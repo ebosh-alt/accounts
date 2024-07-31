@@ -12,6 +12,7 @@ from service.TGClient import startTGClient
 from models.database import sellers, Seller
 from multiprocessing import Process
 from service.Background.checker import run_checker
+from aiogram.types import BotCommand
 
 logger = logging.getLogger(__name__)
 
@@ -29,6 +30,7 @@ async def main() -> None:
     for router in routers:
         dp.include_router(router)
     dp.update.middleware(middleware.Logging())
+    await bot.set_my_commands(commands=[BotCommand(command="start", description="Меню")])
     await dp.start_polling(bot)
 
 

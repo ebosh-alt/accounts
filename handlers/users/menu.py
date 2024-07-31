@@ -17,7 +17,7 @@ router = Router()
 logger = logging.getLogger(__name__)
 
 
-@router.callback_query((F.data == "back_menu") | (F.data == "В главное меню"))
+@router.callback_query((F.data == "back_menu") | (F.data == "В главное меню") | (F.data == "Вернуться в главное меню"))
 @router.message(Command("start"))
 async def start(message: Message | CallbackQuery, state: FSMContext):
     id = message.from_user.id
@@ -46,7 +46,8 @@ async def rules_callback(message: CallbackQuery):
     await bot.send_message(chat_id=id,
                            # message_id=message.message.message_id,
                            text=get_mes("rules"),
-                           reply_markup=Keyboards.back_menu_kb)
+                           reply_markup=Keyboards.back_menu_kb,
+                           parse_mode=ParseMode.MARKDOWN_V2)
 
 
 @router.message(Command("chat_id"))
