@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 router = Router()
 
 
-@router.callback_query(F.data == "Общение с продавцом")
+@router.callback_query(F.data == "Написать продавцу")
 async def start_mailing_to_seller(message: CallbackQuery, state: FSMContext):
     user_id = message.from_user.id
     await state.set_state(UserStates.MailingSeller)

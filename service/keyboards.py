@@ -61,10 +61,10 @@ class Builder:
 
 class Keyboards:
     menu_kb = Builder.create_keyboard(
-        {"🛒 Магазин": "shop",
-         "📜 Правила": "rules",
-         "🛠 Поддержка": link_support,
-         "📦 История покупок": "history_buy"})
+        {"🛒 Перейти в магазин аккаунтов": "shop",
+         "📜 Прочитать правила": "rules",
+         "🛠 Написать в поддержку": link_support,
+         "📦 Посмотреть историю покупок": "history_buy"})
     back_menu_kb = Builder.create_keyboard({"Назад": "back_menu"})
 
     admin_menu_kb = Builder.create_keyboard(
@@ -128,28 +128,45 @@ class Keyboards:
         "Поддержка": link_support})
 
     mark_seller_kb = Builder.create_keyboard({
-        # "0": "0",
+        "0": "0",
         "1": "1",
         "2": "2",
         "3": "3",
         "4": "4",
         "5": "5",
+        "Вернуться в главное меню": "Вернуться в главное меню",
     })
-
-    # confirm_account_user_kb =
 
     @staticmethod
     async def confirm_account_user_kb(deals_id):
         deals_id = [str(id) for id in deals_id]
         return Builder.create_keyboard({
-            "Ок": f"ok_account_{",".join(deals_id)}"
+            "Ок": f"ok_account_{",".join(deals_id)}",
+            "Написать в поддержку": link_support
+
         })
 
     @staticmethod
-    async def shops_kb():
+    async def choice_action():
+        # buttons = await accounts.get_shops()
+        buttons = ["Перейти к выбору категорий", "Общение с продавцом", "Вернуться в главное меню"]
+        logger.info(f"{buttons}")
+        kb = Builder.create_keyboard(buttons)
+        return kb
+
+    @staticmethod
+    async def shop_kb():
         buttons = await accounts.get_shops()
-        buttons.append("Общение с продавцом")
-        buttons.append("В главное меню")
+        buttons.append("Вернуться к выбору действия")
+        buttons.append("Вернуться в главное меню")
+        logger.info(f"{buttons}")
+        kb = Builder.create_keyboard(buttons)
+        return kb
+
+    @staticmethod
+    async def choice_action_name_account():
+        # buttons = await accounts.get_name_accounts_shop(shop)
+        buttons = ["Перейти к выбору товаров", "Написать продавцу", "Вернуться в главное меню"]
         logger.info(f"{buttons}")
         kb = Builder.create_keyboard(buttons)
         return kb
@@ -157,8 +174,10 @@ class Keyboards:
     @staticmethod
     async def name_accounts_shop_kb(shop):
         buttons = await accounts.get_name_accounts_shop(shop)
-        buttons.append("Вернуться к выбору магазина")
-        buttons.append("В главное меню")
+        buttons.append("Вернуться к выбору действия")
+        buttons.append("Вернуться в главное меню")
+        # buttons.append("Вернуться к выбору магазина")
+        # buttons.append("В главное меню")
         logger.info(f"{buttons}")
         kb = Builder.create_keyboard(buttons)
         return kb
