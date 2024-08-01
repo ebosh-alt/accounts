@@ -140,7 +140,7 @@ class Keyboards:
 
     @staticmethod
     async def confirm_account_user_kb(deals_id):
-        deals_idid = [str(id) for id in deals_id]
+        deals_id = [str(id) for id in deals_id]
         return Builder.create_keyboard({
             "Ок": f"ok_account_{",".join(deals_id)}"
         })
