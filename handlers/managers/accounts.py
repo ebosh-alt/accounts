@@ -36,7 +36,7 @@ async def load_accs_end(message: Message, state: FSMContext):
         elif len(message.document) > 1:
             document = message.document[-1]
         file_type = document.file_name.split(".")[-1]
-        if file_type == "xlsx": #Проверка на тип файла
+        if file_type == "xlsx":  # Проверка на тип файла
             path = f"{EXCEL_LOAD_FILE_PATH}/{document.file_name}"
             await bot.download(
                 file=document,
@@ -46,20 +46,20 @@ async def load_accs_end(message: Message, state: FSMContext):
             await bot.send_message(
                 chat_id=message.chat.id,
                 text=get_mes("success_loading_accs"),
-                reply_markup=Keyboards.manager_menu_kb
+                reply_markup=Keyboards.manager_menu_load_kb
             )
         else:
             await bot.send_message(
                 chat_id=message.chat.id,
                 text=get_mes("err_loading_accs"),
-                reply_markup=Keyboards.manager_menu_kb
+                reply_markup=Keyboards.manager_menu_load_kb
             )
     except Exception as er:
         print(er)
         await bot.send_message(
             chat_id=message.chat.id,
             text=get_mes("err_loading_accs"),
-            reply_markup=Keyboards.manager_menu_kb
+            reply_markup=Keyboards.manager_menu_load_kb
         )
     await state.clear()
 

@@ -75,8 +75,14 @@ class Keyboards:
     admin_back_menu_kb = Builder.create_keyboard({"Назад": "admin_back_menu"})
     manager_menu_kb = Builder.create_keyboard(
         {
-            "Выставить счет": "create_deal",
-            "Загрузить аккаунты": "load_accs"
+            "Загрузить аккаунты": "load_accs",
+            "Выставить счет": "create_deal"
+        }
+    )
+    manager_menu_load_kb = Builder.create_keyboard(
+        {
+            "Загрузить ещё аккаунты": "load_accs",
+            "Выставить счет": "create_deal"
         }
     )
     manager_back_menu_kb = Builder.create_keyboard({"Назад": "manager_back_menu"})
@@ -122,12 +128,22 @@ class Keyboards:
         "Поддержка": link_support})
 
     mark_seller_kb = Builder.create_keyboard({
-        "0": "0",
-        "1": "1"
+        # "0": "0",
+        "1": "1",
+        "2": "2",
+        "3": "3",
+        "4": "4",
+        "5": "5",
     })
-    confirm_account_user_kb = Builder.create_keyboard({
-        "Ок": "ok_account"
-    })
+
+    # confirm_account_user_kb =
+
+    @staticmethod
+    async def confirm_account_user_kb(deals_id):
+        deals_idid = [str(id) for id in deals_id]
+        return Builder.create_keyboard({
+            "Ок": f"ok_account_{",".join(deals_id)}"
+        })
 
     @staticmethod
     async def shops_kb():

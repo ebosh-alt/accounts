@@ -17,14 +17,14 @@ def get_excel_dict(file_name) -> dict[str: list[str]]:
 
 async def create_accounts(file_name):
     data = get_excel_dict(file_name)
-    for i in range(len(data["Shop"])):
+    for i in range(len(data["Магазин"])):
         acc = Account(
-            shop=data["Shop"][i],
-            price=data["Price"][i],
-            description=data["Description"][i],
-            data=data["Data"][i],
+            shop=data["Магазин"][i],
+            price=data["Стоимость"][i],
+            description=data["Описание проекта"][i],
+            data=data["Данные"][i],
             view_type=True,
-            name=data["Name"][i]
+            name=data["Название"][i]
         )
         await accounts.new(acc)
 

@@ -5,7 +5,7 @@ class DataDeals(BaseModel):
     id: int
     shop: str
     name: str
-    price: float
+    price: float | int
     description: str
     data: str
     date: str

@@ -2,6 +2,8 @@ import asyncio
 import logging
 from contextlib import suppress
 
+from aiogram.types import BotCommand
+
 from data.config import dp, bot, client_s, SELLER, USERNAME
 
 from handlers import routers
@@ -14,6 +16,10 @@ from multiprocessing import Process
 from service.Background.checker import run_checker
 
 logger = logging.getLogger(__name__)
+
+
+async def set_commands():
+    await bot.set_my_commands(commands=[BotCommand(command="start", description="перезапустить бота")])
 
 
 async def main() -> None:
@@ -29,6 +35,7 @@ async def main() -> None:
     for router in routers:
         dp.include_router(router)
     dp.update.middleware(middleware.Logging())
+    await set_commands()
     await dp.start_polling(bot)
 
 

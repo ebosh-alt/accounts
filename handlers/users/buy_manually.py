@@ -7,7 +7,7 @@ from aiogram.types import CallbackQuery, Message
 from data.config import bot, client_s, SELLER, BOT_ID, CryptoCloud, BASE_PERCENT, PERCENT_GUARANTOR
 from filters.Filters import IsUserMessageValid
 from models.database import chats, Chat, deals, accounts, sellers
-from service.GetMessage import get_mes
+from service.GetMessage import get_mes, rounding_numbers
 from states.states import UserStates
 from service.keyboards import Keyboards
 
@@ -62,9 +62,9 @@ async def payment(message: CallbackQuery, state: FSMContext):
     deal = await deals.get_last_deal(user_id=id)
     account = await accounts.get(deal.account_id)
     if deal.guarantor:
-        price = float("%.2f" % (account.price * (1 + PERCENT_GUARANTOR / 100)))
+        price = rounding_numbers("%.2f" % (account.price * (1 + PERCENT_GUARANTOR / 100)))
     else:
-        price = float("%.2f" % (account.price * (1 + BASE_PERCENT / 100)))
+        price = rounding_numbers("%.2f" % (account.price * (1 + BASE_PERCENT / 100)))
     invoice = CryptoCloud.create_invoice(amount=price)
     uuid = invoice["result"]["uuid"]
     link = invoice["result"]["link"]
@@ -92,57 +92,39 @@ async def complete_payment(message: CallbackQuery, state: FSMContext):
                                     message_id=message.message.message_id,
                                     text=account.data,
                                     reply_markup=Keyboards.support_kb)
-
+        seller = await sellers.get()
         if deal.guarantor is False:
             text = get_mes("mark_seller")
             keyboard = Keyboards.mark_seller_kb
             deal.payment_status = 2
-            seller = await sellers.get()
             seller.balance += account.price
+            seller = await sellers.get()
+            await bot.send_message(chat_id=seller.id,
+                                   test=get_mes("complete_payment",
+                                                user_id=id,
+                                                deal_id=deal.id,
+                                                amount=account.price,
+                                                guarantor="без гаранта")
+                                   )
         else:
             text = get_mes("support_24_hours")
-            keyboard = Keyboards.confirm_account_user_kb
+            keyboard = await Keyboards.confirm_account_user_kb(deal.id)
             deal.payment_status = 1
+            await bot.send_message(chat_id=seller.id,
+                                   test=get_mes("complete_payment",
+                                                user_id=id,
+                                                deal_id=deal.id,
+                                                amount=account.price,
+                                                guarantor="с гарантом")
+                                   )
 
         await deals.update(deal)
         await bot.send_message(chat_id=id,
                                text=text,
                                reply_markup=keyboard)
+        await state.clear()
     else:
         await message.answer("Счет ещё не оплачен! Не уходите с этого этапа")
-
-
-@router.callback_query(UserStates.Manually, F.data == "ok_account")
-async def complete_payment(message: CallbackQuery, state: FSMContext):
-    id = message.from_user.id
-    data = await state.get_data()
-
-    deal_id = data['deal_id']
-    deal = await deals.get(deal_id)
-    deal.payment_status = 2
-    account = await accounts.get(deal.account_id)
-    seller = await sellers.get()
-    seller.balance += account.price
-    await deals.update(deal)
-    await bot.edit_message_text(chat_id=id,
-                                message_id=message.message.message_id,
-                                text=get_mes("mark_seller"),
-                                reply_markup=Keyboards.mark_seller_kb)
-
-
-@router.callback_query((F.data == "0") | (F.data == "1"))
-async def set_mark(message: CallbackQuery, state: FSMContext):
-    id = message.from_user.id
-    mark = int(message.data)
-    seller = await sellers.get()
-    seller.rating += mark
-    await sellers.update(seller)
-    await bot.edit_message_text(chat_id=id,
-                                message_id=message.message.message_id,
-                                text="Спасибо за оценку!",
-                                reply_markup=Keyboards.confirm_payment_kb)
-
-    await state.clear()
 
 
 buy_manually_rt = router

@@ -7,6 +7,7 @@ from typing import List
 from aiogram.fsm.context import FSMContext
 from sqlalchemy import Column, Boolean, BigInteger, ForeignKey, INTEGER, DATETIME, Integer, Float
 
+
 from data.config import SELLER
 from .accounts import Accounts
 
@@ -84,11 +85,12 @@ class Deals(BaseDB):
 
         for deal in deals:
             account = await Accounts().get(deal.account_id)
+            print(account.dict())
             data_deals = DataDeals(
                 id=deal.id,
                 shop=account.shop,
                 name=account.name,
-                price=deal.price,
+                price=float(account.price),
                 description=account.description,
                 data=account.data,
                 date=deal.date.strftime("%d.%m.%Y в %H:%M "),

@@ -23,9 +23,9 @@ async def create_deal_user_id(message: CallbackQuery, state: FSMContext):
     await state.update_data(deal=Deal_())
     await bot.send_message(
         chat_id=message.message.chat.id,
-        text=get_mes("create_deal_data_input", data="user_id"),
+        text=get_mes("create_deal_data_input", data="Напишите айди пользователя в телеграме, кому отправить счет"),
         reply_markup=ForceReply(input_field_placeholder=get_mes("create_deal_input_text", data="user_id")),
-        parse_mode=ParseMode.MARKDOWN_V2
+        # parse_mode=ParseMode.MARKDOWN_V2
     )
 
 
@@ -38,7 +38,7 @@ async def create_deal_shop(message: Message, state: FSMContext):
             deal.user_id = int(message.text)
             await state.update_data(deal=deal)
             await state.set_state(ManagerStates.create_deal_shop)
-            text = get_mes("create_deal_data_input", data="название магазина")
+            text = get_mes("create_deal_data_input", data="Напишите название магазина")
             keyboard = ForceReply(input_field_placeholder=get_mes("create_deal_input_text", data="название магазина"))
         else:
             text = get_mes("create_deal_data_input", er="Нет такого пользователя\!", data="user_id")
@@ -50,7 +50,7 @@ async def create_deal_shop(message: Message, state: FSMContext):
         chat_id=message.chat.id,
         text=text,
         reply_markup=keyboard,
-        parse_mode=ParseMode.MARKDOWN_V2
+        # parse_mode=ParseMode.MARKDOWN_V2
     )
 
 
@@ -63,9 +63,9 @@ async def create_deal_price(message: Message, state: FSMContext):
     await state.set_state(ManagerStates.create_deal_price)
     await bot.send_message(
         chat_id=message.chat.id,
-        text=get_mes("create_deal_data_input", data="стоимость"),
+        text=get_mes("create_deal_data_input", data="Напишите стоимость"),
         reply_markup=ForceReply(input_field_placeholder=get_mes("create_deal_input_text", data="стоимость")),
-        parse_mode=ParseMode.MARKDOWN_V2
+        # parse_mode=ParseMode.MARKDOWN_V2
     )
 
 
@@ -77,7 +77,7 @@ async def create_deal_description(message: Message, state: FSMContext):
         deal.price = float(message.text)
         await state.update_data(deal=deal)
         await state.set_state(ManagerStates.create_deal_description)
-        text = get_mes("create_deal_data_input", data="описание")
+        text = get_mes("create_deal_data_input", data="Напишите описание")
         keyboard = ForceReply(input_field_placeholder=get_mes("create_deal_input_text", data="описание"))
     else:
         text = get_mes("create_deal_data_input", er="Введите число\!", data="стоимость")
@@ -86,7 +86,7 @@ async def create_deal_description(message: Message, state: FSMContext):
         chat_id=message.chat.id,
         text=text,
         reply_markup=keyboard,
-        parse_mode=ParseMode.MARKDOWN_V2
+        # parse_mode=ParseMode.MARKDOWN_V2
     )
 
 
@@ -99,9 +99,9 @@ async def create_deal_data(message: Message, state: FSMContext):
     await state.set_state(ManagerStates.create_deal_data)
     await bot.send_message(
         chat_id=message.chat.id,
-        text=get_mes("create_deal_data_input", data="данные аккаунта"),
+        text=get_mes("create_deal_data_input", data="Напишите данные аккаунта"),
         reply_markup=ForceReply(input_field_placeholder=get_mes("create_deal_input_text", data="данные аккаунта")),
-        parse_mode=ParseMode.MARKDOWN_V2
+        # parse_mode=ParseMode.MARKDOWN_V2
     )
 
 
@@ -114,9 +114,9 @@ async def create_deal_name(message: Message, state: FSMContext):
     await state.set_state(ManagerStates.create_deal_name)
     await bot.send_message(
         chat_id=message.chat.id,
-        text=get_mes("create_deal_data_input", data="название аккаунта"),
+        text=get_mes("create_deal_data_input", data="Напишите название аккаунта"),
         reply_markup=ForceReply(input_field_placeholder=get_mes("create_deal_input_text", data="название аккаунта")),
-        parse_mode=ParseMode.MARKDOWN_V2
+        # parse_mode=ParseMode.MARKDOWN_V2
     )
 
 
@@ -129,9 +129,9 @@ async def create_deal_guarant(message: Message, state: FSMContext):
     await state.set_state(ManagerStates.create_deal_guarant)
     await bot.send_message(
         chat_id=message.chat.id,
-        text=get_mes("create_deal_data_input", data="гарант"),
+        text=get_mes("create_deal_data_input", data="Выберите с гарантом или без него"),
         reply_markup=Keyboards.manager_deal_cr_choose_g_type,
-        parse_mode=ParseMode.MARKDOWN_V2
+        # parse_mode=ParseMode.MARKDOWN_V2
     )
 
 
@@ -151,7 +151,7 @@ async def create_deal_confirm(message: CallbackQuery, state: FSMContext):
         message_id=message.message.message_id,
         text=get_mes("manager_confirm_cr_deal", deal=deal),
         reply_markup=Keyboards.manager_deal_cr_confirm,
-        parse_mode=ParseMode.MARKDOWN_V2
+        # parse_mode=ParseMode.MARKDOWN_V2
     )
 
 

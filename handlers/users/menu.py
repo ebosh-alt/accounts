@@ -42,7 +42,9 @@ async def start(message: Message | CallbackQuery, state: FSMContext):
 @router.callback_query(F.data == "rules")
 async def rules_callback(message: CallbackQuery):
     id = message.from_user.id
+
     await message.message.delete()
+
     await bot.send_message(chat_id=id,
                            # message_id=message.message.message_id,
                            text=get_mes("rules"),

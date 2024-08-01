@@ -83,7 +83,11 @@ async def clear_state_shopping_cart(state: FSMContext, user_id: int):
             if shopping_cart.message_id is not None:
                 await bot.delete_message(chat_id=user_id,
                                          message_id=shopping_cart.message_id)
-            if shopping_cart.deal_id is not None:
-                deal = await deals.get(shopping_cart.deal_id)
+        for deal_id in shopping_cart.deals_id:
+            deal = await deals.get(deal_id)
+            if deal.payment_status == 0:
                 await deals.delete(deal)
+        # if shopping_cart.deals_id is not None:
+        #     deal = await deals.get(shopping_cart.deal_id)
+        #     await deals.delete(deal)
         await state.clear()

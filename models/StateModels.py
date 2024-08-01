@@ -24,6 +24,7 @@ class ShoppingCart(BaseModel):
     deals_id: list = []
     accounts_id: list = []
     uuid: str | None = None
+    payment: bool | None = False
 
 
 class Deal(BaseModel):
