@@ -15,17 +15,19 @@ logger = logging.getLogger(__name__)
 router = Router()
 
 
-@router.callback_query(F.data == "Написать продавцу")
+@router.callback_query(F.data.in_(("Написать продавцу", "Общение с продавцом")))
 async def start_mailing_to_seller(message: CallbackQuery, state: FSMContext):
     user_id = message.from_user.id
     await state.set_state(UserStates.MailingSeller)
-    # Создание чата
     chat = await chats.get_chat_by_user(user_id=user_id)
     if chat is None:
         chat_id, er = await client_s.createChat([SELLER, int(BOT_ID)], title=str(user_id))
     else:
         chat_id = chat.id
         er = True
+        await bot.send_message(chat_id=id,
+                               text="Произошла ошибка!\nНапишите в поддержку",
+                               reply_markup=Keyboards.support_kb)
     if not er:
         chat = Chat(
             id=-chat_id,
@@ -33,12 +35,12 @@ async def start_mailing_to_seller(message: CallbackQuery, state: FSMContext):
             seller_id=SELLER,
         )
         await chats.new(chat=chat)
-    await message.message.delete()
-    await bot.send_message(
-        chat_id=message.from_user.id,
-        # message_id=message.message.message_id,
-        text=get_mes("start_mailing_seller")
-    )
+        await message.message.delete()
+        await bot.send_message(
+            chat_id=message.from_user.id,
+            # message_id=message.message.message_id,
+            text=get_mes("start_mailing_seller")
+        )
 
 
 @router.message(UserStates.MailingSeller, IsUserMessageValid())

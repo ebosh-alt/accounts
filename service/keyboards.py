@@ -149,7 +149,6 @@ class Keyboards:
     async def choice_action():
         # buttons = await accounts.get_shops()
         buttons = ["Перейти к выбору категорий", "Общение с продавцом", "Вернуться в главное меню"]
-        logger.info(f"{buttons}")
         kb = Builder.create_keyboard(buttons)
         return kb
 

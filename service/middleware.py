@@ -11,11 +11,11 @@ class Logging:
                        handler: Callable[[TelegramObject, Dict[str, Any]], Awaitable[Any]],
                        event: TelegramObject,
                        data: Dict[str, Any]) -> None:
-        if type(event.message) is Message:
+        if event.model_dump().get("message"):
             name = "@" + event.message.from_user.username if event.message.from_user.username \
                 else event.message.from_user.first_name
             logging.info(f'{[name, event.message.from_user.id]} - message - {event.message.text}')
-        elif type(event.message) is CallbackQuery:
+        elif event.model_dump().get("callback_query"):
             name = "@" + event.callback_query.from_user.username if event.callback_query.from_user.username \
                 else event.callback_query.from_user.first_name
             logging.info(
