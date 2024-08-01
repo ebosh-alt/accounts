@@ -134,7 +134,6 @@ class Keyboards:
         "3": "3",
         "4": "4",
         "5": "5",
-        "Вернуться в главное меню": "Вернуться в главное меню",
     })
 
     @staticmethod
@@ -159,7 +158,6 @@ class Keyboards:
         buttons = await accounts.get_shops()
         buttons.append("Вернуться к выбору действия")
         buttons.append("Вернуться в главное меню")
-        logger.info(f"{buttons}")
         kb = Builder.create_keyboard(buttons)
         return kb
 
@@ -167,7 +165,6 @@ class Keyboards:
     async def choice_action_name_account():
         # buttons = await accounts.get_name_accounts_shop(shop)
         buttons = ["Перейти к выбору товаров", "Написать продавцу", "Вернуться в главное меню"]
-        logger.info(f"{buttons}")
         kb = Builder.create_keyboard(buttons)
         return kb
 
@@ -206,7 +203,7 @@ class Keyboards:
             return Builder.create_keyboard({
                 "C гарантом": f"yes_guarantor",
                 "Без гаранта": f"no_guarantor",
-                "Вернуться к выбору аккаунта": "back_to_choice_account",
+                "Вернуться к выбору товаров": "Вернуться к выбору товаров",
                 "В главное меню": "В главное меню"
             })
         else:
@@ -215,6 +212,6 @@ class Keyboards:
                 "+1": "add_account",
                 "C гарантом": f"yes_guarantor",
                 "Без гаранта": f"no_guarantor",
-                "Вернуться к выбору аккаунта": "back_to_choice_account",
+                "Вернуться к выбору товаров": "Вернуться к выбору товаров",
                 "В главное меню": "В главное меню"
             }, 2, 2, 1, 1)

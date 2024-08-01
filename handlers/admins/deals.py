@@ -27,7 +27,6 @@ async def show_deals(message: CallbackQuery):
     await SendDeals.send(
         message=message,
         all_data_deals=all_data_deals,
-        fmes_text_path="admin",
         keyboard=Keyboards.admin_menu_kb
     )
 

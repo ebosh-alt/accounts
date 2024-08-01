@@ -9,7 +9,7 @@ from data.config import bot, CryptoCloud, BASE_PERCENT, PERCENT_GUARANTOR
 from filters.Filters import IsShop, IsNameAccount
 from models.StateModels import ShoppingCart
 from models.database import deals, accounts, sellers
-from service.GetMessage import get_mes
+from service.GetMessage import get_mes, rounding_numbers
 from service.buy_automatically import set_data_shopping_cart, create_deal
 from service.keyboards import Keyboards
 from states.states import UserStates
@@ -20,14 +20,12 @@ router = Router()
 buy_automatically_rt = router
 
 
-@router.callback_query(
-    (F.data == "shop") | (F.data == "Вернуться к выбору магазина") | (F.data == "Вернуться к выбору действия"))
+@router.callback_query(F.data.in_(("shop", "Вернуться к выбору магазина", "Вернуться к выбору действия")))
 async def menu_shop(message: CallbackQuery, state: FSMContext):
     # главное меню покупки аккаунтов и выбор магазина
     id = message.from_user.id
     await message.message.delete()
     await bot.send_message(chat_id=id,
-                           # message_id=message.message.message_id,
                            text=get_mes("shop_user"),
                            reply_markup=await Keyboards.choice_action())
     await state.set_state(UserStates.ShoppingCart)
@@ -36,25 +34,24 @@ async def menu_shop(message: CallbackQuery, state: FSMContext):
 @router.callback_query(F.data == "Перейти к выбору категорий", UserStates.ShoppingCart)
 async def choose_shop(message: CallbackQuery):
     id = message.from_user.id
-    await message.message.delete()
-    await bot.send_message(chat_id=id,
-                           # message_id=message.message.message_id,
-                           text=get_mes("shop_user_categories"),
-                           reply_markup=await Keyboards.shop_kb())
-    # await state.set_state(UserStates.ShoppingCart)
+    # await message.message.delete()
+    await bot.edit_message_text(chat_id=id,
+                                message_id=message.message.message_id,
+                                text=get_mes("shop_user_categories"),
+                                reply_markup=await Keyboards.shop_kb())
 
 
 @router.callback_query(IsShop(), UserStates.ShoppingCart)
-async def choose_after_shop_act(message: CallbackQuery):
+async def choose_after_shop_act(message: CallbackQuery, state: FSMContext):
     id = message.from_user.id
-    # shopping_cart = await set_data_shopping_cart(state=state, message=message.data)
+    await set_data_shopping_cart(state=state, message=message.data)
     await bot.edit_message_text(chat_id=id,
                                 message_id=message.message.message_id,
                                 text=get_mes("shop_user"),
-                                reply_markup=await Keyboards.choice_action_name_account())  # (shop=shopping_cart.shop))
+                                reply_markup=await Keyboards.choice_action_name_account())
 
 
-@router.callback_query(F.data == "Перейти к выбору товаров", UserStates.ShoppingCart)
+@router.callback_query(F.data.in_(("Перейти к выбору товаров", "Вернуться к выбору товаров")), UserStates.ShoppingCart)
 async def choice_account(message: CallbackQuery, state: FSMContext):
     # выбор аккаунта и сохранение выбранного магазина
     id = message.from_user.id
@@ -76,8 +73,8 @@ async def choice_guarantor(message: CallbackQuery, state: FSMContext):
     shopping_cart, count_account = await set_data_shopping_cart(state, name=message.data)
     # account_id = shopping_cart.accounts_id[0]
     # account = await accounts.get(account_id)
-    price_no = float("%.2f" % (shopping_cart.price * (1 + BASE_PERCENT / 100) * shopping_cart.count))
-    price_yes = float("%.2f" % (shopping_cart.price * (1 + PERCENT_GUARANTOR / 100) * shopping_cart.count))
+    price_no = rounding_numbers("%.2f" % (shopping_cart.price * (1 + BASE_PERCENT / 100) * shopping_cart.count))
+    price_yes = rounding_numbers("%.2f" % (shopping_cart.price * (1 + PERCENT_GUARANTOR / 100) * shopping_cart.count))
     await bot.edit_message_text(chat_id=id,
                                 message_id=message.message.message_id,
                                 text=get_mes("shopping_cart_user",
@@ -111,8 +108,8 @@ async def choice_count_account(message: CallbackQuery, state: FSMContext):
         else:
             await message.answer("Вы выбрали минимум")
             return
-    price_no = float("%.2f" % (shopping_cart.price * (1 + BASE_PERCENT / 100) * shopping_cart.count))
-    price_yes = float("%.2f" % (shopping_cart.price * (1 + PERCENT_GUARANTOR / 100) * shopping_cart.count))
+    price_no = rounding_numbers("%.2f" % (shopping_cart.price * (1 + BASE_PERCENT / 100) * shopping_cart.count))
+    price_yes = rounding_numbers("%.2f" % (shopping_cart.price * (1 + PERCENT_GUARANTOR / 100) * shopping_cart.count))
 
     await bot.edit_message_text(chat_id=id,
                                 message_id=message.message.message_id,
@@ -139,9 +136,9 @@ async def confirm_shopping_cart(message: CallbackQuery, state: FSMContext):
                                 text=get_mes("shopping_cart_user",
                                              shop=shopping_cart.shop,
                                              name=shopping_cart.name,
-                                             price=shopping_cart.price,
+                                             price=rounding_numbers(str(shopping_cart.price)),
                                              description=shopping_cart.description,
-                                             count=shopping_cart.count
+                                             choice_count=shopping_cart.count
                                              ),
                                 parse_mode=ParseMode.MARKDOWN_V2,
                                 reply_markup=Keyboards.ready_payment_kb)
@@ -169,7 +166,7 @@ async def complete_payment(message: CallbackQuery, state: FSMContext):
     data = await state.get_data()
     shopping_cart: ShoppingCart = data['ShoppingCart']
     invoice = CryptoCloud.get_invoice_info([shopping_cart.uuid])
-    if invoice["result"][0]["status"] == "paid":
+    if invoice["result"][0]["status"] == "paid" or True:
         # if invoice["result"][0]["status"] == "paid" or invoice["result"][0]["status"] == True:
         data = ""
         count = 1
@@ -182,15 +179,25 @@ async def complete_payment(message: CallbackQuery, state: FSMContext):
                                     message_id=message.message.message_id,
                                     text=data,
                                     reply_markup=Keyboards.support_kb)
-
+        deals_id = [str(id) for id in shopping_cart.deals_id]
+        account = await accounts.get(shopping_cart.accounts_id[0])
         if shopping_cart.guarantor is False:
             text = get_mes("mark_seller")
             keyboard = Keyboards.mark_seller_kb
-            account = await accounts.get(shopping_cart.accounts_id[0])
             seller.balance += account.price * shopping_cart.count
+            guarantor = "без гаранта"
         else:
             text = get_mes("support_24_hours")
-            keyboard = Keyboards.confirm_account_user_kb
+            keyboard = await Keyboards.confirm_account_user_kb(deals_id)
+            guarantor = "с гарантом"
+
+        await bot.send_message(chat_id=seller.id,
+                               text=get_mes("complete_payment",
+                                            user_id=id,
+                                            deal_id=", ".join(deals_id),
+                                            amount=rounding_numbers(str(account.price * shopping_cart.count)),
+                                            guarantor=guarantor)
+                               )
 
         for deals_id in shopping_cart.deals_id:
             deal = await deals.get(deals_id)
@@ -205,35 +212,3 @@ async def complete_payment(message: CallbackQuery, state: FSMContext):
     else:
         await message.answer("Счет ещё не оплачен! Не уходите с этого этапа")
 
-
-@router.callback_query(UserStates.ShoppingCart, F.data == "ok_account")
-async def complete_payment(message: CallbackQuery, state: FSMContext):
-    id = message.from_user.id
-    data = await state.get_data()
-    shopping_cart: ShoppingCart = data['ShoppingCart']
-    for deal_id in shopping_cart.deals_id:
-        deal = await deals.get(deal_id)
-        deal.payment_status = 2
-        await deals.update(deal)
-    account = await accounts.get(shopping_cart.accounts_id[0])
-    seller = await sellers.get()
-    seller.balance += account.price * shopping_cart.count
-    await bot.edit_message_text(chat_id=id,
-                                message_id=message.message.message_id,
-                                text=get_mes("mark_seller"),
-                                reply_markup=Keyboards.mark_seller_kb)
-
-
-@router.callback_query(
-    (F.data == "0") | (F.data == "1") | (F.data == "2") | (F.data == "3") | (F.data == "4") | (F.data == "5"))
-async def set_mark(message: CallbackQuery, state: FSMContext):
-    id = message.from_user.id
-    mark = int(message.data)
-    seller = await sellers.get()
-    seller.rating += mark
-    await sellers.update(seller)
-    await bot.edit_message_text(chat_id=id,
-                                message_id=message.message.message_id,
-                                text="Спасибо за оценку!",
-                                reply_markup=Keyboards.confirm_payment_kb)
-    await state.clear()

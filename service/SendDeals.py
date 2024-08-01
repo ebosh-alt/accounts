@@ -6,7 +6,7 @@ from models.models import DataDeals
 from service.GetMessage import get_mes, rounding_numbers
 
 
-async def send(message: CallbackQuery, all_data_deals: list[DataDeals], fmes_text_path: str, keyboard):
+async def send(message: CallbackQuery, all_data_deals: list[DataDeals], keyboard):
     """service.GetMessage.get_mes() использует в качестве аргумента fmes_text_path\n
     fmes_text_path - название файла .md\n
     get_mes(fmes_text_path)"""

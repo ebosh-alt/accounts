@@ -15,7 +15,6 @@ async def shop_callback(message: CallbackQuery):
     await SendDeals.send(
         message=message,
         all_data_deals=user_deals,
-        fmes_text_path="menu",
         keyboard=Keyboards.menu_kb
     )
 
