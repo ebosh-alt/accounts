@@ -8,3 +8,4 @@ gen
 *.db
 диаграмма.drawio
 log.logging
+*.__pycache__

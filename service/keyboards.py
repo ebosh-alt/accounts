@@ -195,9 +195,7 @@ class Keyboards:
         })
 
     @staticmethod
-    async def choice_count_account(name: str = None, shop: str = None, count: int = None):
-        if count is None:
-            count = len(await accounts.get_account_by_name(name, shop))
+    async def choice_count_account(count: int = None):
         if count <= 1:
             return Builder.create_keyboard({
                 "C гарантом": f"yes_guarantor",

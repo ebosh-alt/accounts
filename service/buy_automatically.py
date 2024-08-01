@@ -27,7 +27,6 @@ async def set_data_shopping_cart(state: FSMContext, **kwargs) -> tuple[ShoppingC
         shopping_cart.description = account[0].description
         return shopping_cart, len(account)
     elif guarantor is not None:
-        # account = await accounts.get(shopping_cart.accounts_id[0])
         shopping_cart.guarantor = True if guarantor == "yes_guarantor" else False
         if shopping_cart.guarantor:
             shopping_cart.price = float(
@@ -87,7 +86,4 @@ async def clear_state_shopping_cart(state: FSMContext, user_id: int):
             deal = await deals.get(deal_id)
             if deal.payment_status == 0:
                 await deals.delete(deal)
-        # if shopping_cart.deals_id is not None:
-        #     deal = await deals.get(shopping_cart.deal_id)
-        #     await deals.delete(deal)
         await state.clear()
