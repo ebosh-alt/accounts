@@ -3,6 +3,7 @@
 out
 gen
 .venv
+venv
 /data/.env
 *.session
 *.db

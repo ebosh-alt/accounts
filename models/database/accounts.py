@@ -17,6 +17,7 @@ class Account(Base):
     data: str = Column(String)
     view_type: bool = Column(Boolean)
     name: str = Column(String)
+    deal_id = Column(Integer)
 
     def dict(self):
         return {
@@ -27,6 +28,7 @@ class Account(Base):
             "data": self.data,
             "view_type": self.view_type,
             "name": self.name,
+            "deal_id": self.deal_id,
         }
 
 
@@ -71,7 +73,7 @@ class Accounts(BaseDB):
             if len(i.name) < 65 and i.name not in result:
                 result.append(i.name)
         return result
-    
+
     async def get_last(self) -> Account:
         filters = {}
         data = await self._get_objects(Account, filters)

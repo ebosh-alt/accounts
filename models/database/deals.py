@@ -5,8 +5,7 @@ import logging
 from typing import List
 
 from aiogram.fsm.context import FSMContext
-from sqlalchemy import Column, Boolean, BigInteger, ForeignKey, INTEGER, DATETIME, Integer, Float
-
+from sqlalchemy import Column, Boolean, BigInteger, ForeignKey, INTEGER, DATETIME, Integer, Float, String
 
 from data.config import SELLER
 from .accounts import Accounts
@@ -25,23 +24,25 @@ class Deal(Base):
     id = Column(Integer, autoincrement="auto", primary_key=True)
     buyer_id = Column(BigInteger, ForeignKey("users.id"))
     seller_id = Column(BigInteger, ForeignKey("sellers.id"))
-    account_id = Column(BigInteger, ForeignKey("accounts.id"))
+    # account_id = Column(BigInteger, ForeignKey("accounts.id"))
     price = Column(Float)
+    wallet = Column(String)
     date = Column(DATETIME)
     guarantor = Column(Boolean)
-    payment_status = Column(INTEGER)
-    group_id = Column(BigInteger)
+    payment_status = Column(String)
+
+    # group_id = Column(BigInteger)
 
     def dict(self):
         return {
             "id": self.id,
             "buyer_id": self.buyer_id,
             "seller_id": self.seller_id,
-            "account_id": self.account_id,
+            "price": self.price,
+            "wallet": self.wallet,
             "date": self.date,
             "guarantor": self.guarantor,
             "payment_status": self.payment_status,
-            "group_id": self.group_id,
         }
 
 

@@ -15,12 +15,14 @@ class Seller(Base):
     rating = Column(BigInteger)
     balance = Column(BigInteger)
     username = Column(String)
+    wallet = Column(String)
 
     def dict(self):
         return {"id": self.id,
                 "rating": self.rating,
                 "balance": self.balance,
                 "username": self.username,
+                "wallet": self.wallet,
                 }
 
 
