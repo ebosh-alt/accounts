@@ -10,13 +10,13 @@ env = Env()
 env.read_env()
 
 bot_token = env('BOT_TOKEN')
-# BOT_ID = bot_token.split(":")[0]
 link_support = env('LINK_SUPPORT')
 
 dp = Dispatcher()
 bot = Bot(bot_token)
 BOT_ID = bot.id
 link_to_bot = "https://t.me/selling_accounts_test_bot"
+IP_ADDRESS = env('IP_ADDRESS')
 
 session_path = env('SESSION_PATH')
 api_id = int(env('API_ID'))
@@ -36,7 +36,6 @@ DEFAULT_HEADERS = {
 }
 ResponseType = TypeVar("ResponseType")
 JsonDumps = Callable[..., Any]
-
 
 ADMINS = [int(admin_id) for admin_id in env('ADMINS').split()]
 

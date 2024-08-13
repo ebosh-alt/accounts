@@ -15,3 +15,4 @@ class DataDeals(BaseModel):
     def len(self):
         return len(str(self.id) + str(self.shop) + str(self.name) + str(self.price) + str(self.description) + str(
             self.data) + str(self.date) + str(self.guarantor) + str(self.payment))
+
