@@ -17,46 +17,47 @@ merchant_id = "366fa27a-0c48-4d9f-be3e-94bdb724f10e"
 
 class CreatedWallet(BaseModel):
     status: str
-    tracker_id: str = None
-    token_name: str = None
-    refer: str = None
-    alter_refer: str = None
+    tracker_id: str | None = None
+    token_name: str | None = None
+    refer: str | None = None
+    alter_refer: str | None = None
     description: str | None
     dest_tag: str | None = None
     extra_info: dict | None = None
 
 
 class ReceivedOrder(BaseModel):
-    status: str
-    tracker_id: str
-    amount: float | None
-    payed_amount: float
-    token: str
-    client_transaction_id: str
-    date_create: str
-    date_expire: str
-    amount_delta: float
-    receiver: str
-    hash: str | None
-    dest_tag: str | None
-    callback_url: str
-    fiat_amount: float
-    fiat_currency: str
-    fiat_payed_amount: float
-    fiat_underpayemnt_amount: float
-    underpayemnt_amount: float
-    merchant_uuid: str
-    pay_form_url: str
+    status: str = None
+    description: str = None
+    tracker_id: str | None = None
+    amount: float | None = None
+    payed_amount: float | None = None
+    token: str | None = None
+    client_transaction_id: str | None = None
+    date_create: str | None = None
+    date_expire: str | None = None
+    amount_delta: float | None = None
+    receiver: str | None = None
+    hash: str | None = None
+    dest_tag: str | None = None
+    callback_url: str | None = None
+    fiat_amount: float | None = None
+    fiat_currency: str | None = None
+    fiat_payed_amount: float | None = None
+    fiat_underpayemnt_amount: float | None = None
+    underpayemnt_amount: float | None = None
+    merchant_uuid: str | None = None
+    pay_form_url: str | None = None
 
 
 class CreatedOrder(BaseModel):
     status: str = None
     description: str = None
-    tracker_id: str = None
-    amount: str | None = None
+    tracker_id: str | None = None
+    amount: float | None = None
     dest_tag: str | None = None
-    receiver: str = None
-    date_expire: str = None
+    receiver: str | None = None
+    date_expire: str | None = None
 
 
 class CreatedMerchant(BaseModel):
@@ -95,7 +96,7 @@ class Transaction(BaseModel):
 class ReceivedTransaction(BaseModel):
     status: str
     description: str
-    transaction: Transaction
+    transaction: Transaction | None = None
 
 
 @dataclass
@@ -120,7 +121,7 @@ class ExNode:
         self.__api_public = api_public
         self.__api_private = api_private
 
-    def __generate_signature(self, timestamp: str, body: str = ""):
+    def __generate_signature(self, timestamp: str, body: str):
         message = f"{timestamp}{body}"
         message_bytes = message.encode('utf-8')
         key_bytes = self.__api_private.encode('utf-8')
@@ -150,10 +151,19 @@ class ExNode:
 
     async def __send_get_request(self, body: dict, url: str):
         async with aiohttp.ClientSession() as session:
-            headers, body = self.__headers()
-            response = await session.post(url=url, headers=headers, params=body)
+            timestamp = str(int(time.time()))
+            signature = self.__generate_signature(timestamp=timestamp, body="")
+            headers = {
+                "Timestamp": timestamp,
+                "ApiPublic": self.__api_public,
+                "Signature": signature,
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            }
+            response = await session.get(url=url, headers=headers, params=body)
             data = await response.json()
             await session.close()
+
         return data
 
     async def create_wallet(self, client_transaction_id: str, token: str = "USDTTRC",
@@ -170,19 +180,18 @@ class ExNode:
         return CreatedWallet(**data)
 
     async def create_order(self, client_transaction_id: str, amount: float, merchant_uuid: str,
-                           token: str = "USDTTRC") -> CreatedOrder:
+                           token: str = "USDTTRC", payform: bool = False) -> CreatedOrder:
         body = {
             "token": token,
             "amount": amount,
             "fiat_currency": "USD",
             "client_transaction_id": client_transaction_id,
             "payment_delta": 1,
-            "payform": True,
+            "payform": False,
             "merchant_uuid": merchant_uuid,
             "call_back_url": ApiPoint.webhook_create_order
         }
         data = await self.__send_post_request(body=body, url=ApiPoint.create_order)
-        print(data)
         return CreatedOrder(**data)
 
     async def transfer_merchant_account_balance(self, merchant_uuid: str) -> TransferredMerchantAccountBalance:
@@ -234,14 +243,12 @@ class ExNode:
 
 async def main():
     en = ExNode(api_publi, api_privat)
-    # wallet = await en.create_wallet(client_transaction_id="tres")
-    # print(wallet)
-    order = await en.create_order(client_transaction_id="trses", amount=10.0,
+    order = await en.create_order(client_transaction_id="trassasasess", amount=10.0,
                                   merchant_uuid="ac9db73e-2937-439d-a949-5326e31816ea")
-    print(order)
-    # get_order = await en.get_order(tracker_id=order.tracker_id)
-    # print(get_order)
-
+    # wallet = await en.create_wallet(client_transaction_id="trsess")
+    print(await en.get_order(order.tracker_id))
+    # print(await en.get_order(b))
+# TODO: если ответ приходит с ошибкой, то отправлять ошибку. Иначе формирать BaseModel и оптравлять его
 
 if __name__ == '__main__':
     asyncio.run(main())
