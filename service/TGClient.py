@@ -87,7 +87,6 @@ class TGClient_S:
         # Отправка запроса на получения кода авторизации
         try:
             result_sending_auth_code = await self.client.send_code_request(self.account.phone_number)
-
             result = result_sending_auth_code.phone_code_hash
         except Exception as er:
             logger.info(er)

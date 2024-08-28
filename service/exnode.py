@@ -25,7 +25,6 @@ class CreatedWallet(BaseModel):
     dest_tag: str | None = None
     extra_info: dict | None = None
 
-
 class ReceivedOrder(BaseModel):
     status: str = None
     description: str = None
@@ -248,6 +247,8 @@ async def main():
     # wallet = await en.create_wallet(client_transaction_id="trsess")
     print(await en.get_order(order.tracker_id))
     # print(await en.get_order(b))
+
+
 # TODO: если ответ приходит с ошибкой, то отправлять ошибку. Иначе формирать BaseModel и оптравлять его
 
 if __name__ == '__main__':
