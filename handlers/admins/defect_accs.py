@@ -41,6 +41,8 @@ async def confirm_freezed_deal(message: CallbackQuery, state: FSMContext):
     deal = await deals.get(id=deal_id)
     seller = await sellers.get()
     seller.balance += deal.price
+    #TODO: метод отправки денег продавцу
+    
     deal.payment_status = 2
     await sellers.update(seller=seller)
     await deals.update(deal=deal)
@@ -78,7 +80,7 @@ async def confirm_freezed_deal(message: CallbackQuery, state: FSMContext):
                                 reply_markup=Keyboards.descision_deal_freezing(deal_id=deal.id))
     
 @router.message(AdminStates.enter_buyer_wallet)
-async def confirm_freezed_deal(message: Message, state: FSMContext):
+async def cancel_freezed_deal(message: Message, state: FSMContext):
     id = message.from_user.id
     data = await state.get_data()
     deal_st:Deal_ = data["deal"]
