@@ -78,3 +78,8 @@ class Accounts(BaseDB):
         filters = {}
         data = await self._get_objects(Account, filters)
         return data[-1]
+
+    async def get_by_deal_id(self, deal_id) -> list[Account]:
+        filters = {Account.deal_id: deal_id}
+        result = await self._get_objects(Account, filters)
+        return result

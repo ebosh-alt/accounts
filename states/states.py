@@ -8,11 +8,14 @@ class UserStates(StatesGroup):
 
 
 class AdminStates(StatesGroup):
+    enter_buyer_wallet = State()
+    change_seller_wallet = State()
     cancel_buy = State()
     change_balance = State()
 
 
 class ManagerStates(StatesGroup):
+    change_wallet = State()
     get_excel_file = State()
     create_deal_user_id = State()
     create_deal_shop = State()

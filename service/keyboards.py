@@ -71,12 +71,14 @@ class Keyboards:
         {"Отменить покупку": "cancel_buy",
          "Просмотреть сделки": "show_deals",
          "Просмотреть инфо продавца": "show_seller_info",
-         "Изменить баланс": "change_balance"})
+         "Изменить баланс": "change_balance",
+         "Изменить реквизиты продавца": "change_seller_wallet"})
     admin_back_menu_kb = Builder.create_keyboard({"Назад": "admin_back_menu"})
     manager_menu_kb = Builder.create_keyboard(
         {
             "Загрузить аккаунты": "load_accs",
-            "Выставить счет": "create_deal"
+            "Выставить счет": "create_deal",
+            "Изменить реквизиты": "change_wallet"
         }
     )
     manager_menu_load_kb = Builder.create_keyboard(
@@ -123,6 +125,20 @@ class Keyboards:
     support_kb = Builder.create_keyboard({
         "Поддержка": link_support
     })
+
+    def freeze_deal_kb(deal_id: int):
+        keyboard = Builder.create_keyboard({
+            "Заморозить сделку": f"admin_freeze_deal_{deal_id}",
+        })
+        return keyboard
+
+    def descision_deal_freezing(deal_id: int):
+        keyboard = Builder.create_keyboard({
+            "Подтвердить сделку": f"confirm_freezed_deal_{deal_id}",
+            "Отменить сделку": f"cancel_freezed_deal_{deal_id}",
+        })
+        return keyboard
+
     confirm_payment_kb = Builder.create_keyboard({
         "В главное меню": "В главное меню",
         "Поддержка": link_support})
@@ -140,7 +156,8 @@ class Keyboards:
     async def confirm_account_user_kb(deals_id):
         deals_id = [str(id) for id in deals_id]
         return Builder.create_keyboard({
-            "Ок": f"ok_account_{",".join(deals_id)}",
+            "Ок": f"ok_account_{','.join(deals_id)}",
+            "Не ок": f"defect_account_{','.join(deals_id)}",
             "Написать в поддержку": link_support
 
         })

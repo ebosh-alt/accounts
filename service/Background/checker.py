@@ -18,16 +18,20 @@ async def checking_payment_status():
         logger.info(f"unpaid_deals: {unpaid_deals}")
         for deal in unpaid_deals:
             if datetime.datetime.now() - deal.date >= datetime.timedelta(hours=1):
-                account: Account = await accounts.get(id=deal.account_id)
-                account.view_type = True
-                await accounts.update(account=account)
-                await deals.delete(deal=deal)
+                accs: list[Account] = await accounts.get_by_deal_id(deal_id=deal.id)
+                # account: Account = await accounts.get(id=deal.account_id)
+                for account in accs:
+                    account.view_type = True
+                    await accounts.update(account=account)
+                    await deals.delete(deal=deal)
         guarantor_deals: list[Deal] = await deals.get_guarant_deals()
         for deal in guarantor_deals:
             if datetime.datetime.now() - deal.date >= datetime.timedelta(hours=24):
                 seller: Seller = await sellers.get(id=deal.seller_id)
-                account: Account = await accounts.get(id=deal.account_id)
-                seller.balance += account.price
+                accs: list[Account] = await accounts.get_by_deal_id(deal.id)
+                # account: Account = await accounts.get(id=deal.account_id)
+                for account in accs:
+                    seller.balance += account.price
                 await sellers.update(seller=seller)
                 deal.payment_status = 2
                 await deals.update(deal=deal)

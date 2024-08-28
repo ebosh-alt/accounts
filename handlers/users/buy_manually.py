@@ -61,8 +61,11 @@ async def send_message_seller(message: Message, state: FSMContext):
 @router.callback_query(F.data.contains("payment_manually_"))
 async def payment(message: CallbackQuery, state: FSMContext):
     id = message.from_user.id
-    deal = await deals.get_last_deal(user_id=id)
-    account = await accounts.get(deal.account_id)
+    deal_id = int(message.data.replace("payment_manually_", ""))
+    deal = await deals.get(deal_id)
+    # deal = await deals.get_last_deal(user_id=id)
+    accs = await accounts.get_by_deal_id(deal.id)
+    account = accs[0]
     if deal.guarantor:
         price = rounding_numbers("%.2f" % (account.price * (1 + PERCENT_GUARANTOR / 100)))
     else:
@@ -75,7 +78,6 @@ async def payment(message: CallbackQuery, state: FSMContext):
                                 text=get_mes("rule_payment"),
                                 reply_markup=await Keyboards.payment(link))
     await state.set_state(UserStates.Manually)
-    deal_id = int(message.data.replace("payment_manually_", ""))
     await state.update_data(deal_id=deal_id)
     await state.update_data(uuid=uuid)
 
@@ -89,7 +91,8 @@ async def complete_payment(message: CallbackQuery, state: FSMContext):
     invoice = CryptoCloud.get_invoice_info([uuid])
     if invoice["result"][0]["status"] == "paid":
         deal = await deals.get(deal_id)
-        account = await accounts.get(deal.account_id)
+        accs = await accounts.get_by_deal_id(deal.id)
+        account = accs[0]
         await bot.edit_message_text(chat_id=id,
                                     message_id=message.message.message_id,
                                     text=account.data,
