@@ -38,6 +38,7 @@ ResponseType = TypeVar("ResponseType")
 JsonDumps = Callable[..., Any]
 
 ADMINS = [int(admin_id) for admin_id in env('ADMINS').split()]
+MAIN_ADMIN = int(env('MAIN_ADMIN'))
 
 SELLER = int(env('SELLER'))
 BASE_PERCENT = float(env("BASE_PERCENT"))

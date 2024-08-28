@@ -21,13 +21,14 @@ class ShoppingCart(BaseModel):
     count: int = 1
     guarantor: bool | None = None
     message_id: int | None = None
-    deals_id: list = []
+    deal_id: int | None = None
     accounts_id: list = []
     uuid: str | None = None
     payment: bool | None = False
 
 
 class Deal(BaseModel):
+    id: int = None
     user_id: int = None
     shop: str = None
     price: int = None

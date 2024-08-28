@@ -22,7 +22,8 @@ async def show_seller_info(message: CallbackQuery):
                 user_id=seller.id,
                 balance=seller.balance,
                 rating=seller.rating,
-                username=seller.username
+                username=seller.username,
+                wallet=seller.wallet
             ),
             reply_markup=Keyboards.admin_back_menu_kb
         )

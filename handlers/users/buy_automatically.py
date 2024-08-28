@@ -68,9 +68,9 @@ async def choice_guarantor(message: CallbackQuery, state: FSMContext):
     shopping_cart: ShoppingCart
     count_account: int
     id = message.from_user.id
-    shopping_cart, count_account = await set_data_shopping_cart(state, name=message.data)
-    price_no = rounding_numbers("%.2f" % (shopping_cart.price * (1 + BASE_PERCENT / 100) * shopping_cart.count))
-    price_yes = rounding_numbers("%.2f" % (shopping_cart.price * (1 + PERCENT_GUARANTOR / 100) * shopping_cart.count))
+    shopping_cart, count_account, acc = await set_data_shopping_cart(state, name=message.data)
+    price_no = rounding_numbers("%.2f" % (acc.price * (1 + BASE_PERCENT / 100) * shopping_cart.count))
+    price_yes = rounding_numbers("%.2f" % (acc.price * (1 + PERCENT_GUARANTOR / 100) * shopping_cart.count))
     await bot.edit_message_text(chat_id=id,
                                 message_id=message.message.message_id,
                                 text=get_mes("shopping_cart_user",
@@ -91,7 +91,8 @@ async def choice_count_account(message: CallbackQuery, state: FSMContext):
     id = message.from_user.id
     data = await state.get_data()
     shopping_cart: ShoppingCart = data['ShoppingCart']
-    count_account = len(await accounts.get_account_by_name(name=shopping_cart.name, shop=shopping_cart.shop))
+    accs = await accounts.get_account_by_name(name=shopping_cart.name, shop=shopping_cart.shop)
+    count_account = len(accs)
     if message.data == "add_account":
         if shopping_cart.count + 1 <= count_account:
             shopping_cart.count = shopping_cart.count + 1
@@ -104,8 +105,8 @@ async def choice_count_account(message: CallbackQuery, state: FSMContext):
         else:
             await message.answer("Вы выбрали минимум")
             return
-    price_no = rounding_numbers("%.2f" % (shopping_cart.price * (1 + BASE_PERCENT / 100) * shopping_cart.count))
-    price_yes = rounding_numbers("%.2f" % (shopping_cart.price * (1 + PERCENT_GUARANTOR / 100) * shopping_cart.count))
+    price_no = rounding_numbers("%.2f" % (accs[0].price * (1 + BASE_PERCENT / 100) * shopping_cart.count))
+    price_yes = rounding_numbers("%.2f" % (accs[0].price * (1 + PERCENT_GUARANTOR / 100) * shopping_cart.count))
 
     await bot.edit_message_text(chat_id=id,
                                 message_id=message.message.message_id,
@@ -126,7 +127,7 @@ async def choice_count_account(message: CallbackQuery, state: FSMContext):
 async def confirm_shopping_cart(message: CallbackQuery, state: FSMContext):
     # переход к оплате или отмена и сохранение с или без гаранта
     id = message.from_user.id
-    shopping_cart = await set_data_shopping_cart(state, guarantor=message.data)
+    shopping_cart: ShoppingCart = await set_data_shopping_cart(state, guarantor=message.data)
     await bot.edit_message_text(chat_id=id,
                                 message_id=message.message.message_id,
                                 text=get_mes("shopping_cart_user",
@@ -134,7 +135,7 @@ async def confirm_shopping_cart(message: CallbackQuery, state: FSMContext):
                                              name=shopping_cart.name,
                                              price=rounding_numbers(str(shopping_cart.price)),
                                              description=shopping_cart.description,
-                                             choice_count=shopping_cart.count
+                                             choice_count=shopping_cart.count,
                                              ),
                                 parse_mode=ParseMode.MARKDOWN_V2,
                                 reply_markup=Keyboards.ready_payment_kb)
@@ -174,7 +175,7 @@ async def complete_payment(message: CallbackQuery, state: FSMContext):
                                     message_id=message.message.message_id,
                                     text=data,
                                     reply_markup=Keyboards.support_kb)
-        deals_id = [str(id) for id in shopping_cart.deals_id]
+        deals_id = [str(shopping_cart.deal_id)]
         account = await accounts.get(shopping_cart.accounts_id[0])
         if shopping_cart.guarantor is False:
             text = get_mes("mark_seller")

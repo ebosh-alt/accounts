@@ -1,5 +1,24 @@
 from jinja2 import Environment, PackageLoader, select_autoescape
 
+def get_text(text: str) -> str:
+    text = text.replace("_", r"\_")
+    text = text.replace("{", r"\{")
+    text = text.replace("}", r"\}")
+    text = text.replace("[", r"\[")
+    text = text.replace("]", r"\]")
+    text = text.replace("<", r"\<")
+    text = text.replace(">", r"\>")
+    text = text.replace("(", r"\(")
+    text = text.replace(")", r"\)")
+    text = text.replace("#", "")
+    text = text.replace("+", r"\+")
+    text = text.replace("-", r"\-")
+    text = text.replace(".", r"\.")
+    text = text.replace("!", r"\!")
+    text = text.replace("=", r"\=")
+    text = text.replace("|", r"\|")
+    text = text.replace("**", "*")
+    return text
 
 def get_mes(path: str, **kwargs):
     env = Environment(
@@ -10,7 +29,7 @@ def get_mes(path: str, **kwargs):
     if ".md" not in path:
         path = path + '.md'
     tmpl = env.get_template(path)
-    return tmpl.render(kwargs)
+    return get_text(tmpl.render(kwargs))
 
 
 def rounding_numbers(number: str):

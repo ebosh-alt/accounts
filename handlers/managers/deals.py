@@ -151,7 +151,7 @@ async def create_deal_confirm(message: CallbackQuery, state: FSMContext):
         message_id=message.message.message_id,
         text=get_mes("manager_confirm_cr_deal", deal=deal),
         reply_markup=Keyboards.manager_deal_cr_confirm,
-        # parse_mode=ParseMode.MARKDOWN_V2
+        parse_mode=ParseMode.MARKDOWN_V2
     )
 
 
@@ -161,26 +161,28 @@ async def create_deal_end(message: CallbackQuery, state: FSMContext):
     data: dict = await state.get_data()
     deal: Deal_ = data["deal"]
     if message.data == "cr_deal_success":
-        account = Account(
-            shop=deal.shop,
-            price=deal.price,
-            description=deal.description,
-            data=deal.data,
-            view_type=False,
-            name=deal.name
-        )
-        await accounts.new(account=account)
-        account = await accounts.get_last()
         c_deal = Deal(
             buyer_id=deal.user_id,
             seller_id=message.message.chat.id,
-            account_id=account.id,
+            price=deal.price,
+            # wallet=deal.wallet,
             date=datetime.now(),
             guarantor=deal.guarant_type,
             payment_status=0,
         )
         await deals.new(c_deal)
         deal_bd = await deals.get_last_deal(deal.user_id)
+        account = Account(
+            shop=deal.shop,
+            price=deal.price,
+            description=deal.description,
+            data=deal.data,
+            view_type=False,
+            name=deal.name,
+            deal_id=deal_bd.id,
+        )
+        await accounts.new(account=account)
+        account = await accounts.get_last()
         await bot.send_message(
             chat_id=deal.user_id,
             text=get_mes("created_deal_to_user", deal=deal),
