@@ -1,16 +1,19 @@
 import logging
+from ast import parse
 
 from aiogram import Router, F
 from aiogram.enums import ParseMode
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
 
-from data.config import bot, CryptoCloud, BASE_PERCENT, PERCENT_GUARANTOR
+from data.config import bot, BASE_PERCENT, PERCENT_GUARANTOR, ExNode, MERCHANT_ID
 from filters.Filters import IsShop, IsNameAccount
 from models.StateModels import ShoppingCart
 from models.database import deals, accounts, sellers
+from models.models import CreatedOrder, ReceivedOrder
 from service.GetMessage import get_mes, rounding_numbers
 from service.buy_automatically import set_data_shopping_cart, create_deal
+from service.date import format_date
 from service.keyboards import Keyboards
 from states.states import UserStates
 
@@ -144,17 +147,18 @@ async def confirm_shopping_cart(message: CallbackQuery, state: FSMContext):
 @router.callback_query(UserStates.ShoppingCart, F.data == "payment")
 async def payment(message: CallbackQuery, state: FSMContext):
     id = message.from_user.id
-    data = await state.get_data()
-    shopping_cart: ShoppingCart = data['ShoppingCart']
-    invoice = CryptoCloud.create_invoice(amount=shopping_cart.price)
-    shopping_cart.uuid = invoice["result"]["uuid"]
-    link = invoice["result"]["link"]
+    shopping_cart = await create_deal(state=state, user_id=id, message_id=message.message.message_id)
+
+    order: CreatedOrder = await ExNode.create_order(client_transaction_id=str(shopping_cart.deal_id),
+                                                    amount=shopping_cart.price,
+                                                    merchant_uuid=MERCHANT_ID)
+    shopping_cart.tracker_id = order.tracker_id
     await bot.edit_message_text(chat_id=id,
                                 message_id=message.message.message_id,
-                                text=f"Ниже лежит счет — проведите оплату по нему и нажмите кнопку «Оплачено»\n\nСчет на оплату: {link}",
-                                reply_markup=await Keyboards.payment(link))
+                                text=get_mes("receiver", receiver=order.receiver,
+                                             date_expire=format_date(order.date_expire)),
+                                parse_mode=ParseMode.MARKDOWN_V2)
     await state.update_data(ShoppingCart=shopping_cart)
-    await create_deal(state=state, user_id=id, message_id=message.message.message_id)
 
 
 @router.callback_query(UserStates.ShoppingCart, F.data == "complete_payment")
@@ -162,8 +166,8 @@ async def complete_payment(message: CallbackQuery, state: FSMContext):
     id = message.from_user.id
     data = await state.get_data()
     shopping_cart: ShoppingCart = data['ShoppingCart']
-    invoice = CryptoCloud.get_invoice_info([shopping_cart.uuid])
-    if invoice["result"][0]["status"] == "paid" or True:
+    received_order: ReceivedOrder = await ExNode.get_order(tracker_id=shopping_cart.tracker_id)
+    if received_order.status == "SUCCESS":
         data = ""
         count = 1
         for account_id in shopping_cart.accounts_id:

@@ -2,120 +2,17 @@ import asyncio
 import hashlib
 import hmac
 import json
+import logging
 import time
-from dataclasses import dataclass
-
 import aiohttp
-from pydantic import BaseModel
 
-# from data.config import IP_ADDRESS
-IP_ADDRESS = "0.0.0.0"
-api_publi = "6ou06aogswjhwyzkyxy54ey7cny2olly24wxfh9u8ynffprzb7lv217odtt4yf0a"
-api_privat = "ebho8jloorkzcrzgvqcs0p1ycakcmfr74erudcwhbgminzfxgl8jiy93szxdl6dadgdoam277eoxg3617si0mk49yes2r3874ha8ft0a650rwy2buoqk6okfn26z5wjp"
-merchant_id = "366fa27a-0c48-4d9f-be3e-94bdb724f10e"
+from models.models import CreatedWallet, ApiPoint, CreatedOrder, TransferredMerchantAccountBalance, ReceivedOrder, \
+    ReceivedTransaction, CreatedMerchant
+
+logger = logging.getLogger(__name__)
 
 
-class CreatedWallet(BaseModel):
-    status: str
-    tracker_id: str | None = None
-    token_name: str | None = None
-    refer: str | None = None
-    alter_refer: str | None = None
-    description: str | None
-    dest_tag: str | None = None
-    extra_info: dict | None = None
-
-class ReceivedOrder(BaseModel):
-    status: str = None
-    description: str = None
-    tracker_id: str | None = None
-    amount: float | None = None
-    payed_amount: float | None = None
-    token: str | None = None
-    client_transaction_id: str | None = None
-    date_create: str | None = None
-    date_expire: str | None = None
-    amount_delta: float | None = None
-    receiver: str | None = None
-    hash: str | None = None
-    dest_tag: str | None = None
-    callback_url: str | None = None
-    fiat_amount: float | None = None
-    fiat_currency: str | None = None
-    fiat_payed_amount: float | None = None
-    fiat_underpayemnt_amount: float | None = None
-    underpayemnt_amount: float | None = None
-    merchant_uuid: str | None = None
-    pay_form_url: str | None = None
-
-
-class CreatedOrder(BaseModel):
-    status: str = None
-    description: str = None
-    tracker_id: str | None = None
-    amount: float | None = None
-    dest_tag: str | None = None
-    receiver: str | None = None
-    date_expire: str | None = None
-
-
-class CreatedMerchant(BaseModel):
-    status: str
-    description: str
-
-
-class TransferredMerchantAccountBalance(BaseModel):
-    status: str
-    description: str | None
-
-
-class Transaction(BaseModel):
-    amount: float
-    callback_url: str | None
-    client_transaction_id: str
-    date_create: str
-    date_update: str
-    dest_tag: str | None
-    extra_info: dict | None
-    hash: str
-    receiver: str
-    merchant_uuid: str
-    status: str
-    token: str
-    token_major_name: str
-    tracker_id: str
-    transaction_commission: float
-    transaction_description: str | None
-    type: str
-    amount_usd: float
-    invoice_amount_usd: float
-    course: float
-
-
-class ReceivedTransaction(BaseModel):
-    status: str
-    description: str
-    transaction: Transaction | None = None
-
-
-@dataclass
-class ApiPoint:
-    create_wallet = "https://my.exnode.ru/api/transaction/create/in"
-    webhook_create_wallet = f"https://{IP_ADDRESS}/transaction_wallet"
-    create_invoice = "https://my.exnode.ru/api/crypto/invoice/create"
-    get_order = "https://my.exnode.ru/api/crypto/invoice/get"
-    webhook_get_order = f"https://{IP_ADDRESS}/get_order"
-    token_fetch = "https://my.exnode.ru/user/token/fetch"
-    create_order = "https://my.exnode.ru/api/crypto/invoice/create"
-    webhook_create_order = f"https://{IP_ADDRESS}/create_order"
-    create_merchant = "https://my.exnode.ru/api/merchant/create"
-    transfer_merchant_account_balance = "https://my.exnode.ru/api/merchant/transfer/all"
-    create_withdrawal = "https://my.exnode.ru/api/transaction/create/out"
-    webhook_create_withdrawal = f"https://{IP_ADDRESS}/create_withdrawal"
-    get_transaction = "https://my.exnode.ru/api/transaction/get"
-
-
-class ExNode:
+class ExNodeClient:
     def __init__(self, api_public: str, api_private: str):
         self.__api_public = api_public
         self.__api_private = api_private
@@ -144,6 +41,7 @@ class ExNode:
         async with aiohttp.ClientSession() as session:
             headers, body = self.__headers(body)
             response = await session.post(url=url, headers=headers, data=body)
+            logger.info(await response.text())
             data = await response.json()
             await session.close()
         return data
@@ -173,7 +71,7 @@ class ExNode:
             "client_transaction_id": client_transaction_id,
             "transaction_description": transaction_description,
             "address_type": address_type,
-            "call_back_url": ApiPoint.webhook_create_wallet,
+            # "call_back_url": ApiPoint.webhook_create_wallet,
         }
         data = await self.__send_post_request(body=body, url=ApiPoint.create_wallet)
         return CreatedWallet(**data)
@@ -186,9 +84,9 @@ class ExNode:
             "fiat_currency": "USD",
             "client_transaction_id": client_transaction_id,
             "payment_delta": 1,
-            "payform": False,
+            "payform": payform,
             "merchant_uuid": merchant_uuid,
-            "call_back_url": ApiPoint.webhook_create_order
+            # "call_back_url": ApiPoint.webhook_create_order
         }
         data = await self.__send_post_request(body=body, url=ApiPoint.create_order)
         return CreatedOrder(**data)
@@ -210,7 +108,7 @@ class ExNode:
             "amount": amount,
             "receiver": receiver,
             "transaction_description": transaction_description,
-            "call_back_url": ApiPoint.webhook_create_withdrawal,
+            # "call_back_url": ApiPoint.webhook_create_withdrawal,
             "dest_tag": dest_tag
         }
         data = await self.__send_post_request(body=body, url=ApiPoint.create_withdrawal)
@@ -241,15 +139,17 @@ class ExNode:
 
 
 async def main():
-    en = ExNode(api_publi, api_privat)
-    order = await en.create_order(client_transaction_id="trassasasess", amount=10.0,
+    en = ExNodeClient("6ou06aogswjhwyzkyxy54ey7cny2olly24wxfh9u8ynffprzb7lv217odtt4yf0a",
+                      "ebho8jloorkzcrzgvqcs0p1ycakcmfr74erudcwhbgminzfxgl8jiy93szxdl6dadgdoam277eoxg3617si0mk49yes2r3874ha8ft0a650rwy2buoqk6okfn26z5wjp")
+    order = await en.create_order(client_transaction_id="trasmlmas,,l,l,lsasasess", amount="10.0",
                                   merchant_uuid="ac9db73e-2937-439d-a949-5326e31816ea")
+    print(order)
     # wallet = await en.create_wallet(client_transaction_id="trsess")
-    print(await en.get_order(order.tracker_id))
+    # print(await en.get_order(order.tracker_id))
     # print(await en.get_order(b))
+    ...
 
 
-# TODO: если ответ приходит с ошибкой, то отправлять ошибку. Иначе формирать BaseModel и оптравлять его
 
 if __name__ == '__main__':
     asyncio.run(main())

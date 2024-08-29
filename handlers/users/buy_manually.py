@@ -4,10 +4,12 @@ from aiogram import Router, F
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
 
-from data.config import bot, client_s, SELLER, BOT_ID, CryptoCloud, BASE_PERCENT, PERCENT_GUARANTOR
+from data.config import bot, client_s, SELLER, BOT_ID, BASE_PERCENT, PERCENT_GUARANTOR, ExNode, MERCHANT_ID
 from filters.Filters import IsUserMessageValid
 from models.database import chats, Chat, deals, accounts, sellers
+from models.models import CreatedOrder, ReceivedOrder
 from service.GetMessage import get_mes, rounding_numbers
+from service.date import format_date
 from states.states import UserStates
 from service.keyboards import Keyboards
 
@@ -70,16 +72,20 @@ async def payment(message: CallbackQuery, state: FSMContext):
         price = rounding_numbers("%.2f" % (account.price * (1 + PERCENT_GUARANTOR / 100)))
     else:
         price = rounding_numbers("%.2f" % (account.price * (1 + BASE_PERCENT / 100)))
-    invoice = CryptoCloud.create_invoice(amount=price)
-    uuid = invoice["result"]["uuid"]
-    link = invoice["result"]["link"]
+    # invoice = CryptoCloud.create_invoice(amount=price)
+    # uuid = invoice["result"]["uuid"]
+    # link = invoice["result"]["link"]
+    order: CreatedOrder = await ExNode.create_order(client_transaction_id=str(deal.id),
+                                                    amount=price,
+                                                    merchant_uuid=MERCHANT_ID)
+    # shopping_cart.tracker_id = order.tracker_id
     await bot.edit_message_text(chat_id=id,
                                 message_id=message.message.message_id,
-                                text=get_mes("rule_payment"),
-                                reply_markup=await Keyboards.payment(link))
+                                text=get_mes("receiver"), receiver=order.receiver,
+                                date_expire=format_date(order.date_expire))
     await state.set_state(UserStates.Manually)
     await state.update_data(deal_id=deal_id)
-    await state.update_data(uuid=uuid)
+    await state.update_data(tracker_id=order.tracker_id)
 
 
 @router.callback_query(UserStates.Manually, F.data == "complete_payment")
@@ -87,9 +93,9 @@ async def complete_payment(message: CallbackQuery, state: FSMContext):
     id = message.from_user.id
     data = await state.get_data()
     deal_id = data["deal_id"]
-    uuid = data["uuid"]
-    invoice = CryptoCloud.get_invoice_info([uuid])
-    if invoice["result"][0]["status"] == "paid":
+    tracker_id = data["tracker_id"]
+    received_order: ReceivedOrder = await ExNode.get_order(tracker_id=tracker_id)
+    if received_order.status == "SUCCESS":
         deal = await deals.get(deal_id)
         accs = await accounts.get_by_deal_id(deal.id)
         account = accs[0]

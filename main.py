@@ -24,14 +24,13 @@ async def set_commands():
 
 
 async def create_test_data():
-
     # Добавление записи в таблицу sellers
     if await sellers.in_(id=SELLER):
         pass
     else:
         seller = Seller(id=SELLER, rating=5, balance=0, username=USERNAME, wallet="wallet")
         await sellers.new(seller=seller)
-    
+
     # Добавление записей в таблицу users
     if await users.in_(id=SELLER):
         pass
@@ -41,7 +40,6 @@ async def create_test_data():
 
     # Добавление записей в таблицу accounts
     for i in range(1, 11):
-
         account = Account(
             shop=f"shop_{i}",
             price=100.0 + i,
@@ -49,7 +47,7 @@ async def create_test_data():
             data=f"Data {i}",
             view_type=bool(i % 2),
             name=f"Account {i}",
-            deal_id=i%4+1
+            deal_id=i % 4 + 1
         )
         await accounts.new(account)
 
@@ -62,7 +60,7 @@ async def create_test_data():
             wallet=f"wallet_{i}",
             date=datetime.datetime.now(),
             guarantor=bool(i % 2),
-            payment_status="paid"
+            payment_status=0
         )
         await deals.new(deal)
 
@@ -72,7 +70,7 @@ async def create_test_data():
 
 async def main() -> None:
     await create_async_database()
-    await create_test_data()
+    # await create_test_data()
     # bg_proc = Process(target=run_checker)
     # bg_proc.start()
     if await sellers.in_(id=SELLER):

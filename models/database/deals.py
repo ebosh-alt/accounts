@@ -29,7 +29,7 @@ class Deal(Base):
     wallet = Column(String)
     date = Column(DateTime)
     guarantor = Column(Boolean)
-    payment_status = Column(String)
+    payment_status = Column(Integer)
 
     # group_id = Column(BigInteger)
 

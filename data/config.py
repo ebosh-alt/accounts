@@ -4,7 +4,7 @@ from aiogram import Dispatcher, Bot
 from environs import Env
 
 from service.TGClient import TG_Acc, TGClient_S
-from service.cryptocloud import CryptoCloudClient
+from service.exnode import ExNodeClient
 
 env = Env()
 env.read_env()
@@ -16,7 +16,6 @@ dp = Dispatcher()
 bot = Bot(bot_token)
 BOT_ID = bot.id
 link_to_bot = "https://t.me/selling_accounts_test_bot"
-IP_ADDRESS = env('IP_ADDRESS')
 
 session_path = env('SESSION_PATH')
 api_id = int(env('API_ID'))
@@ -46,6 +45,11 @@ PERCENT_GUARANTOR = float(env('PERCENT_GUARANTOR'))
 EXCEL_TEMPLATE_PATH = env('EXCEL_TEMPLATE_PATH')
 EXCEL_LOAD_FILE_PATH = env('EXCEL_LOAD_FILE_PATH')
 USERNAME = env("USERNAME")
-CRYPTO_API = env("CRYPTO_API")
-CRYPTO_SHOP_ID = env("CRYPTO_SHOP_ID")
-CryptoCloud: CryptoCloudClient = CryptoCloudClient(CRYPTO_API, CRYPTO_SHOP_ID)
+# CRYPTO_API = env("CRYPTO_API")
+# CRYPTO_SHOP_ID = env("CRYPTO_SHOP_ID")
+# CryptoCloud: CryptoCloudClient = CryptoCloudClient(CRYPTO_API, CRYPTO_SHOP_ID)
+EXNODE_PUBLIC = env('EXNODE_PUBLIC')
+EXNODE_PRIVATE = env('EXNODE_PRIVATE')
+IP_ADDRESS = env('IP_ADDRESS')
+MERCHANT_ID = env('MERCHANT_ID')
+ExNode = ExNodeClient(EXNODE_PUBLIC, EXNODE_PRIVATE)

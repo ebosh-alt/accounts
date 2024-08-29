@@ -43,7 +43,7 @@ async def set_data_shopping_cart(state: FSMContext, **kwargs) -> tuple[ShoppingC
     return shopping_cart
 
 
-async def create_deal(user_id: int, message_id: int, state: FSMContext):
+async def create_deal(user_id: int, message_id: int, state: FSMContext) -> ShoppingCart:
     data = await state.get_data()
     shopping_cart: ShoppingCart = data["ShoppingCart"]
     list_accounts: list[Account] = await accounts.get_account_by_name(shop=shopping_cart.shop, name=shopping_cart.name)
@@ -57,7 +57,6 @@ async def create_deal(user_id: int, message_id: int, state: FSMContext):
             date=datetime.datetime.now(),
             guarantor=shopping_cart.guarantor,
             payment_status=0,
-            # group_id=group_id
         ),
     )
     for account in list_accounts:
@@ -70,7 +69,7 @@ async def create_deal(user_id: int, message_id: int, state: FSMContext):
         shopping_cart.deal_id = deal.id
     shopping_cart.message_id = message_id
     await state.update_data(ShoppingCart=shopping_cart)
-
+    return shopping_cart
 
 async def clear_state_shopping_cart(state: FSMContext, user_id: int):
     data = await state.get_data()

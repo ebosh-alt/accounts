@@ -23,7 +23,7 @@ class ShoppingCart(BaseModel):
     message_id: int | None = None
     deal_id: int | None = None
     accounts_id: list = []
-    uuid: str | None = None
+    tracker_id: str | None = None
     payment: bool | None = False
 
 
