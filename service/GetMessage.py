@@ -1,5 +1,6 @@
 from jinja2 import Environment, PackageLoader, select_autoescape
 
+
 def get_text(text: str) -> str:
     text = text.replace("_", r"\_")
     text = text.replace("{", r"\{")
@@ -19,6 +20,7 @@ def get_text(text: str) -> str:
     text = text.replace("|", r"\|")
     text = text.replace("**", "*")
     return text
+
 
 def get_mes(path: str, **kwargs):
     env = Environment(

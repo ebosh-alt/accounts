@@ -1,16 +1,16 @@
 import logging
-from ast import parse
 
 from aiogram import Router, F
 from aiogram.enums import ParseMode
 from aiogram.fsm.context import FSMContext
-from aiogram.types import CallbackQuery
+from aiogram.types import CallbackQuery, Message
 
-from data.config import bot, BASE_PERCENT, PERCENT_GUARANTOR, ExNode, MERCHANT_ID
+from data.config import bot, BASE_PERCENT, PERCENT_GUARANTOR, ExNode, MERCHANT_ID, link_to_bot
 from filters.Filters import IsShop, IsNameAccount
 from models.StateModels import ShoppingCart
 from models.database import deals, accounts, sellers
 from models.models import CreatedOrder, ReceivedOrder
+from service import cryptography
 from service.GetMessage import get_mes, rounding_numbers
 from service.buy_automatically import set_data_shopping_cart, create_deal
 from service.date import format_date
@@ -46,7 +46,7 @@ async def choose_shop(message: CallbackQuery):
 @router.callback_query(IsShop(), UserStates.ShoppingCart)
 async def choose_after_shop_act(message: CallbackQuery, state: FSMContext):
     id = message.from_user.id
-    await set_data_shopping_cart(state=state, message=message.data)
+    await set_data_shopping_cart(state=state, shop=message.data)
     await bot.edit_message_text(chat_id=id,
                                 message_id=message.message.message_id,
                                 text=get_mes("shop_user"),
@@ -66,27 +66,42 @@ async def choice_account(message: CallbackQuery, state: FSMContext):
 
 
 @router.callback_query(UserStates.ShoppingCart, IsNameAccount())
-async def choice_guarantor(message: CallbackQuery, state: FSMContext):
+async def choice_guarantor(message: CallbackQuery | Message, state: FSMContext, shop: str = None, name: str = None):
     # сохранение имени выбранного аккаунта и выбор количества аккаунтов
     shopping_cart: ShoppingCart
     count_account: int
     id = message.from_user.id
-    shopping_cart, count_account, acc = await set_data_shopping_cart(state, name=message.data)
+    logger.info(f"{shop}, {name}")
+    if name is None:
+        name = message.data
+    shopping_cart, count_account, acc = await set_data_shopping_cart(state, name=name, shop=shop)
     price_no = rounding_numbers("%.2f" % (acc.price * (1 + BASE_PERCENT / 100) * shopping_cart.count))
     price_yes = rounding_numbers("%.2f" % (acc.price * (1 + PERCENT_GUARANTOR / 100) * shopping_cart.count))
-    await bot.edit_message_text(chat_id=id,
-                                message_id=message.message.message_id,
-                                text=get_mes("shopping_cart_user",
-                                             shop=shopping_cart.shop,
-                                             name=shopping_cart.name,
-                                             price_no=price_no,
-                                             price_yes=price_yes,
-                                             description=shopping_cart.description,
-                                             count=count_account,
-                                             choice_count=shopping_cart.count
-                                             ),
-                                parse_mode=ParseMode.MARKDOWN_V2,
-                                reply_markup=await Keyboards.choice_count_account(count=count_account))
+    link = f"{link_to_bot}?start={cryptography.encode(shopping_cart.shop + "%" + shopping_cart.name)}"
+    reply_markup = await Keyboards.choice_count_account(count=count_account)
+    text = get_mes("shopping_cart_user",
+                   shop=shopping_cart.shop,
+                   name=shopping_cart.name,
+                   price_no=price_no,
+                   price_yes=price_yes,
+                   description=shopping_cart.description,
+                   count=count_account,
+                   choice_count=shopping_cart.count,
+                   link=link
+                   )
+    if type(message) is Message:
+        await bot.send_message(chat_id=id,
+                               text=text,
+                               reply_markup=reply_markup,
+                               parse_mode=ParseMode.MARKDOWN_V2,
+                               )
+    else:
+        await bot.edit_message_text(chat_id=id,
+                                    message_id=message.message.message_id,
+                                    text=text,
+                                    reply_markup=reply_markup,
+                                    parse_mode=ParseMode.MARKDOWN_V2,
+                                    )
 
 
 @router.callback_query(UserStates.ShoppingCart, F.data.in_(["add_account", "remove_account"]))
@@ -110,7 +125,7 @@ async def choice_count_account(message: CallbackQuery, state: FSMContext):
             return
     price_no = rounding_numbers("%.2f" % (accs[0].price * (1 + BASE_PERCENT / 100) * shopping_cart.count))
     price_yes = rounding_numbers("%.2f" % (accs[0].price * (1 + PERCENT_GUARANTOR / 100) * shopping_cart.count))
-
+    link = f"{link_to_bot}?start={cryptography.encode(shopping_cart.shop + "%" + shopping_cart.name)}"
     await bot.edit_message_text(chat_id=id,
                                 message_id=message.message.message_id,
                                 text=get_mes("shopping_cart_user",
@@ -120,7 +135,8 @@ async def choice_count_account(message: CallbackQuery, state: FSMContext):
                                              price_yes=price_yes,
                                              description=shopping_cart.description,
                                              count=count_account,
-                                             choice_count=shopping_cart.count
+                                             choice_count=shopping_cart.count,
+                                             link=link
                                              ),
                                 parse_mode=ParseMode.MARKDOWN_V2,
                                 reply_markup=await Keyboards.choice_count_account(count=count_account))
@@ -131,6 +147,7 @@ async def confirm_shopping_cart(message: CallbackQuery, state: FSMContext):
     # переход к оплате или отмена и сохранение с или без гаранта
     id = message.from_user.id
     shopping_cart: ShoppingCart = await set_data_shopping_cart(state, guarantor=message.data)
+    link = f"{link_to_bot}?start={cryptography.encode(shopping_cart.shop + "%" + shopping_cart.name)}"
     await bot.edit_message_text(chat_id=id,
                                 message_id=message.message.message_id,
                                 text=get_mes("shopping_cart_user",
@@ -139,6 +156,7 @@ async def confirm_shopping_cart(message: CallbackQuery, state: FSMContext):
                                              price=rounding_numbers(str(shopping_cart.price)),
                                              description=shopping_cart.description,
                                              choice_count=shopping_cart.count,
+                                             link=link
                                              ),
                                 parse_mode=ParseMode.MARKDOWN_V2,
                                 reply_markup=Keyboards.ready_payment_kb)

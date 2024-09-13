@@ -1,6 +1,7 @@
 from typing import Callable, TypeVar, Any
 
 from aiogram import Dispatcher, Bot
+from aiogram.enums import ParseMode
 from environs import Env
 
 from service.TGClient import TG_Acc, TGClient_S
@@ -13,9 +14,9 @@ bot_token = env('BOT_TOKEN')
 link_support = env('LINK_SUPPORT')
 
 dp = Dispatcher()
-bot = Bot(bot_token)
+bot = Bot(bot_token, parse_mode=ParseMode.MARKDOWN_V2)
 BOT_ID = bot.id
-link_to_bot = "https://t.me/selling_accounts_test_bot"
+link_to_bot = "https://t.me/Sale_of_account_bot"
 
 session_path = env('SESSION_PATH')
 api_id = int(env('API_ID'))

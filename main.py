@@ -1,20 +1,18 @@
 import asyncio
+import datetime
 import logging
 from contextlib import suppress
+from multiprocessing import Process
 
 from aiogram.types import BotCommand
 
-from data.config import dp, bot, client_s, SELLER, USERNAME
-
+from data.config import dp, bot, SELLER, USERNAME, ExNode, MERCHANT_ID, client_s
 from handlers import routers
+from models.database import sellers, Seller, users, User, deals, Deal, accounts, Account
 from models.database.base import create_async_database
 from service import middleware
-from tests.test import new_data
-from service.TGClient import startTGClient
-from models.database import sellers, Seller, users, User, deals, Deal, chats, Chat, accounts, Account
-from multiprocessing import Process
 from service.Background.checker import run_checker
-import datetime
+from service.TGClient import startTGClient
 
 logger = logging.getLogger(__name__)
 
@@ -70,15 +68,15 @@ async def create_test_data():
 
 async def main() -> None:
     await create_async_database()
-    # await create_test_data()
-    # bg_proc = Process(target=run_checker)
-    # bg_proc.start()
+    await create_test_data()
+    bg_proc = Process(target=run_checker)
+    bg_proc.start()
     if await sellers.in_(id=SELLER):
         pass
     else:
         seller = Seller(id=SELLER, rating=5, balance=0, username=USERNAME, wallet="wallet")
         await sellers.new(seller=seller)
-    # await startTGClient(client_s=client_s)
+    await startTGClient(client_s=client_s)
     for router in routers:
         dp.include_router(router)
     dp.update.middleware(middleware.Logging())

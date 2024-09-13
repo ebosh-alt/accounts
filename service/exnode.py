@@ -4,6 +4,7 @@ import hmac
 import json
 import logging
 import time
+
 import aiohttp
 
 from models.models import CreatedWallet, ApiPoint, CreatedOrder, TransferredMerchantAccountBalance, ReceivedOrder, \
@@ -76,6 +77,10 @@ class ExNodeClient:
         data = await self.__send_post_request(body=body, url=ApiPoint.create_wallet)
         return CreatedWallet(**data)
 
+    async def token_list(self):
+        data = await self.__send_get_request(body={}, url=ApiPoint.token_list)
+        return data
+
     async def create_order(self, client_transaction_id: str, amount: float, merchant_uuid: str,
                            token: str = "USDTTRC", payform: bool = False) -> CreatedOrder:
         body = {
@@ -137,6 +142,9 @@ class ExNodeClient:
         data = await self.__send_post_request(body=body, url=ApiPoint.create_merchant)
         return CreatedMerchant(**data)
 
+    async def get_balance(self):
+        data = await self.__send_post_request(body={}, url=ApiPoint.balance)
+        return data
 
 async def main():
     en = ExNodeClient("6ou06aogswjhwyzkyxy54ey7cny2olly24wxfh9u8ynffprzb7lv217odtt4yf0a",

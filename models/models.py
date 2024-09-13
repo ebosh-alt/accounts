@@ -3,7 +3,6 @@ from dataclasses import dataclass
 from pydantic import BaseModel
 
 
-
 class DataDeals(BaseModel):
     id: int
     shop: str
@@ -119,3 +118,5 @@ class ApiPoint:
     create_withdrawal = "https://my.exnode.ru/api/transaction/create/out"
     # webhook_create_withdrawal = f"https://{IP_ADDRESS}/create_withdrawal"
     get_transaction = "https://my.exnode.ru/api/transaction/get"
+    token_list = "https://my.exnode.ru/user/token/fetch"
+    balance = "https://my.exnode.ru/api/token/balance"

@@ -1,25 +1,26 @@
-import logging
 import datetime
-from typing import Tuple
+import logging
 
 from aiogram.fsm.context import FSMContext
 
 from data.config import bot, SELLER, BASE_PERCENT, PERCENT_GUARANTOR
 from models.StateModels import ShoppingCart
 from models.database import accounts, deals, Account, Deal
+from states.states import UserStates
 
 logger = logging.getLogger(__name__)
 
 
 async def set_data_shopping_cart(state: FSMContext, **kwargs) -> tuple[ShoppingCart, int, Account] | ShoppingCart:
-    # message: str = None, name: str = None, guarantor: str = None
     data = await state.get_data()
+    shop = kwargs.get('shop')
     message = kwargs.get('message')
     name = kwargs.get('name')
     guarantor = kwargs.get('guarantor')
     shopping_cart: ShoppingCart | None = data.get("ShoppingCart")
     if shopping_cart is None:
-        shopping_cart = ShoppingCart(shop=message)
+        await state.set_state(UserStates.ShoppingCart)
+        shopping_cart = ShoppingCart(shop=shop)
     if name is not None:
         shopping_cart.name = name
         accs = await accounts.get_account_by_name(name, shopping_cart.shop)
