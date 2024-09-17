@@ -1,6 +1,7 @@
 from aiogram.filters import Filter
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, User, CallbackQuery
+
 from data.config import ADMINS, SELLER
 from models.database import accounts, chats
 
@@ -40,10 +41,12 @@ class IsNameAccount(Filter):
                 return True
         return False
 
+
 class IsUserMessageValid(Filter):
     async def __call__(self, message: Message, event_from_user: User) -> bool:
         print("ervdfnjkew")
         return True
+
 
 class IsManagerMessageValid(Filter):
     async def __call__(self, message: Message, event_from_user: User) -> bool:
@@ -53,7 +56,7 @@ class IsManagerMessageValid(Filter):
             if chat.id == event_from_user.id:
                 return True
         return False
-    
+
 # class IsCommunicationMessage(Filter):
 #     async def __call__(self, message: Message, event_from_user: User) -> bool:
 #         pass

@@ -68,9 +68,9 @@ async def create_test_data():
 
 async def main() -> None:
     await create_async_database()
-    await create_test_data()
-    bg_proc = Process(target=run_checker)
-    bg_proc.start()
+    # await create_test_data()
+    # bg_proc = Process(target=run_checker)
+    # bg_proc.start()
     if await sellers.in_(id=SELLER):
         pass
     else:

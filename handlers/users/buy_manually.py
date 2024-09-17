@@ -10,8 +10,8 @@ from models.database import chats, Chat, deals, accounts, sellers
 from models.models import CreatedOrder, ReceivedOrder
 from service.GetMessage import get_mes, rounding_numbers
 from service.date import format_date
-from states.states import UserStates
 from service.keyboards import Keyboards
+from states.states import UserStates
 
 logger = logging.getLogger(__name__)
 router = Router()
@@ -22,27 +22,32 @@ async def start_mailing_to_seller(message: CallbackQuery, state: FSMContext):
     user_id = message.from_user.id
     await state.set_state(UserStates.MailingSeller)
     chat = await chats.get_chat_by_user(user_id=user_id)
+    logger.info(chat)
     if chat is None:
         chat_id, er = await client_s.createChat([SELLER, int(BOT_ID)], title=str(user_id))
     else:
         chat_id = chat.id
-        er = True
-        await bot.send_message(chat_id=id,
-                               text="Произошла ошибка!\nНапишите в поддержку",
-                               reply_markup=Keyboards.support_kb)
+        er = False
+
     if not er:
-        chat = Chat(
-            id=-chat_id,
-            user_id=user_id,
-            seller_id=SELLER,
-        )
-        await chats.new(chat=chat)
+        if chat is None:
+            chat = Chat(
+                id=-chat_id,
+                user_id=user_id,
+                seller_id=SELLER,
+            )
+            await chats.new(chat=chat)
         await message.message.delete()
         await bot.send_message(
             chat_id=message.from_user.id,
-            # message_id=message.message.message_id,
             text=get_mes("start_mailing_seller")
         )
+    else:
+        await bot.send_message(chat_id=user_id,
+                               text="Произошла ошибка!\nНапишите в поддержку",
+                               reply_markup=Keyboards.support_kb,
+                               parse_mode=None)
+
 
 
 @router.message(UserStates.MailingSeller, IsUserMessageValid())

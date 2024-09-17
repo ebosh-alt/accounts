@@ -1,7 +1,6 @@
 import logging
 
 from sqlalchemy import Column, BigInteger, ForeignKey
-from sqlalchemy.orm import relationship
 
 from .base import Base, BaseDB
 
@@ -45,7 +44,7 @@ class Chats(BaseDB):
     async def get_chat_by_user(self, user_id: int) -> Chat | None:
         filters = {Chat.user_id: user_id}
         result: list[Chat] = await self._get_objects(Chat, filters=filters)
-        if len(result)>0:
+        if len(result) > 0:
             chat = result[0]
             return chat
         return None
