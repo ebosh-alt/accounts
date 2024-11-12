@@ -2,6 +2,7 @@ import logging
 
 from aiogram import types
 from aiogram.utils.keyboard import InlineKeyboardBuilder, ReplyKeyboardBuilder
+
 from data.config import link_support
 from models.database import accounts
 
@@ -72,19 +73,28 @@ class Keyboards:
          "Просмотреть сделки": "show_deals",
          "Просмотреть инфо продавца": "show_seller_info",
          "Изменить баланс": "change_balance",
-         "Изменить реквизиты продавца": "change_seller_wallet"})
+         "Изменить реквизиты продавца": "change_seller_wallet",
+         "Изменить название магазина": "change_name_shop",
+         "Изменить описание продавца": "change_description_seller",
+         })
+
     admin_back_menu_kb = Builder.create_keyboard({"Назад": "admin_back_menu"})
+
     manager_menu_kb = Builder.create_keyboard(
         {
             "Загрузить аккаунты": "load_accs",
             "Выставить счет": "create_deal",
-            "Изменить реквизиты": "change_wallet"
+            "Изменить реквизиты": "change_wallet",
+            "Изменить название магазина": "change_name_shop",
+            "Изменить описание продавца": "change_description_seller",
         }
     )
     manager_menu_load_kb = Builder.create_keyboard(
         {
             "Загрузить ещё аккаунты": "load_accs",
-            "Выставить счет": "create_deal"
+            "Выставить счет": "create_deal",
+            "Изменить название магазина": "change_name_shop",
+            "Изменить описание продавца": "change_description_seller",
         }
     )
     manager_back_menu_kb = Builder.create_keyboard({"Назад": "manager_back_menu"})
@@ -205,9 +215,8 @@ class Keyboards:
         return confirm_cr_deal_by_user
 
     @staticmethod
-    async def payment(link: str):
+    async def payment(link: str = None):
         return Builder.create_keyboard({
-            "Оплатить": link,
             "Оплатил": "complete_payment"
         })
 

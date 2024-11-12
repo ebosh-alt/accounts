@@ -65,12 +65,13 @@ async def create_deal(user_id: int, message_id: int, state: FSMContext) -> Shopp
         deal = await deals.get_last_deal(user_id)
         account.deal_id = deal.id
         await accounts.update(account)
-        
+
         shopping_cart.accounts_id.append(account.id)
         shopping_cart.deal_id = deal.id
     shopping_cart.message_id = message_id
     await state.update_data(ShoppingCart=shopping_cart)
     return shopping_cart
+
 
 async def clear_state_shopping_cart(state: FSMContext, user_id: int):
     data = await state.get_data()
@@ -90,4 +91,4 @@ async def clear_state_shopping_cart(state: FSMContext, user_id: int):
         if deal is not None:
             if deal.payment_status == 0:
                 await deals.delete(deal)
-        await state.clear()
+    await state.clear()

@@ -83,11 +83,12 @@ class ExNodeClient:
 
     async def create_order(self, client_transaction_id: str, amount: float, merchant_uuid: str,
                            token: str = "USDTTRC", payform: bool = False) -> CreatedOrder:
+        logger.info(f"generate_unique_value: {client_transaction_id} -  {self.generate_unique_value(client_transaction_id)}")
         body = {
             "token": token,
             "amount": amount,
             "fiat_currency": "USD",
-            "client_transaction_id": client_transaction_id,
+            "client_transaction_id": self.generate_unique_value(client_transaction_id),
             "payment_delta": 1,
             "payform": payform,
             "merchant_uuid": merchant_uuid,
@@ -146,10 +147,18 @@ class ExNodeClient:
         data = await self.__send_post_request(body={}, url=ApiPoint.balance)
         return data
 
-async def main():
+    @staticmethod
+    def generate_unique_value(value):
+        # Конкатенируем значения
+        # Создаем хэш с помощью SHA-256
+        unique_value = hashlib.sha256(value.encode()).hexdigest()
+        return unique_value
+
+
+async def test():
     en = ExNodeClient("6ou06aogswjhwyzkyxy54ey7cny2olly24wxfh9u8ynffprzb7lv217odtt4yf0a",
                       "ebho8jloorkzcrzgvqcs0p1ycakcmfr74erudcwhbgminzfxgl8jiy93szxdl6dadgdoam277eoxg3617si0mk49yes2r3874ha8ft0a650rwy2buoqk6okfn26z5wjp")
-    order = await en.create_order(client_transaction_id="trasmlmas,,l,l,lsasasess", amount="10.0",
+    order = await en.create_order(client_transaction_id="trasmlmas,,l,l,lsasasess", amount=10.0,
                                   merchant_uuid="ac9db73e-2937-439d-a949-5326e31816ea")
     print(order)
     # wallet = await en.create_wallet(client_transaction_id="trsess")
@@ -158,6 +167,11 @@ async def main():
     ...
 
 
-
 if __name__ == '__main__':
-    asyncio.run(main())
+    logging.basicConfig(
+        level=logging.INFO,
+        # filename="log.logging",
+        format=u'%(filename)s:%(lineno)d #%(levelname)-3s [%(asctime)s] - %(message)s',
+        filemode="w",
+        encoding='utf-8')
+    # asyncio.run(main())

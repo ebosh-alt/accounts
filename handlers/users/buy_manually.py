@@ -4,7 +4,7 @@ from aiogram import Router, F
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
 
-from data.config import bot, client_s, SELLER, BOT_ID, BASE_PERCENT, PERCENT_GUARANTOR, ExNode, MERCHANT_ID
+from data.config import bot, client_s, SELLER, BOT_ID, BASE_PERCENT, PERCENT_GUARANTOR, ExNode, MERCHANT_ID, LIMIT_PRICE
 from filters.Filters import IsUserMessageValid
 from models.database import chats, Chat, deals, accounts, sellers
 from models.models import CreatedOrder, ReceivedOrder
@@ -77,17 +77,30 @@ async def payment(message: CallbackQuery, state: FSMContext):
         price = rounding_numbers("%.2f" % (account.price * (1 + PERCENT_GUARANTOR / 100)))
     else:
         price = rounding_numbers("%.2f" % (account.price * (1 + BASE_PERCENT / 100)))
+    if price < LIMIT_PRICE:
+        await message.answer(f"Сумма минимального заказа {LIMIT_PRICE} USDT. "
+                             f"Стоимость покупки изменена до минимальной стоимости",
+                             show_alert=True)
+        price = LIMIT_PRICE
+        # await state.update_data(ShoppingCart=shopping_cart)
     # invoice = CryptoCloud.create_invoice(amount=price)
     # uuid = invoice["result"]["uuid"]
     # link = invoice["result"]["link"]
     order: CreatedOrder = await ExNode.create_order(client_transaction_id=str(deal.id),
-                                                    amount=price,
+                                                    amount=float(price),
                                                     merchant_uuid=MERCHANT_ID)
     # shopping_cart.tracker_id = order.tracker_id
-    await bot.edit_message_text(chat_id=id,
-                                message_id=message.message.message_id,
-                                text=get_mes("receiver"), receiver=order.receiver,
-                                date_expire=format_date(order.date_expire))
+    if order.date_expire:
+        date_expire = format_date(order.date_expire)
+        await bot.edit_message_text(chat_id=id,
+                                    message_id=message.message.message_id,
+                                    text=get_mes("receiver", price=price, receiver=order.receiver, date_expire=date_expire),
+                                    reply_markup=await Keyboards.payment())
+    else:
+        await bot.edit_message_text(chat_id=id,
+                                    message_id=message.message.message_id,
+                                    text=get_mes("receiver", price=price, receiver=order.receiver),
+                                    reply_markup=await Keyboards.payment())
     await state.set_state(UserStates.Manually)
     await state.update_data(deal_id=deal_id)
     await state.update_data(tracker_id=order.tracker_id)

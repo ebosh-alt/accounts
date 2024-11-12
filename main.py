@@ -13,6 +13,7 @@ from models.database.base import create_async_database
 from service import middleware
 from service.Background.checker import run_checker
 from service.TGClient import startTGClient
+from service.exnode import test
 
 logger = logging.getLogger(__name__)
 
@@ -76,7 +77,7 @@ async def main() -> None:
     else:
         seller = Seller(id=SELLER, rating=5, balance=0, username=USERNAME, wallet="wallet")
         await sellers.new(seller=seller)
-    await startTGClient(client_s=client_s)
+    # await startTGClient(client_s=client_s)
     for router in routers:
         dp.include_router(router)
     dp.update.middleware(middleware.Logging())

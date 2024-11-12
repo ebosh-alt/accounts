@@ -16,9 +16,7 @@ class IsAdmin(Filter):
 class IsManager(Filter):
     async def __call__(self, message: Message, event_from_user: User) -> bool:
         if event_from_user.id == SELLER:
-            print("Manager True")
             return True
-        print("Manager False")
         return False
 
 

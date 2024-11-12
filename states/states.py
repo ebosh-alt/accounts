@@ -12,6 +12,7 @@ class AdminStates(StatesGroup):
     change_seller_wallet = State()
     cancel_buy = State()
     change_balance = State()
+    change_about_shop = State()
 
 
 class ManagerStates(StatesGroup):

@@ -15,7 +15,7 @@ async def checking_payment_status():
     await create_async_database()
     while True:
         unpaid_deals: list[Deal] = await deals.get_unpaid_deals()
-        logger.info(f"unpaid_deals: {unpaid_deals}")
+        # logger.info(f"unpaid_deals: {unpaid_deals}")
         for deal in unpaid_deals:
             if datetime.datetime.now() - deal.date >= datetime.timedelta(hours=1):
                 accs: list[Account] = await accounts.get_by_deal_id(deal_id=deal.id)

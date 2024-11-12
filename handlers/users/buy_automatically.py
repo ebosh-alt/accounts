@@ -1,11 +1,12 @@
 import logging
+from datetime import datetime
 
 from aiogram import Router, F
 from aiogram.enums import ParseMode
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
 
-from data.config import bot, BASE_PERCENT, PERCENT_GUARANTOR, ExNode, MERCHANT_ID, link_to_bot
+from data.config import bot, BASE_PERCENT, PERCENT_GUARANTOR, ExNode, MERCHANT_ID, link_to_bot, LIMIT_PRICE
 from filters.Filters import IsShop, IsNameAccount
 from models.StateModels import ShoppingCart
 from models.database import deals, accounts, sellers
@@ -31,6 +32,7 @@ async def menu_shop(message: CallbackQuery, state: FSMContext):
     await bot.send_message(chat_id=id,
                            text=get_mes("shop_user"),
                            reply_markup=await Keyboards.choice_action())
+    await state.clear()
     await state.set_state(UserStates.ShoppingCart)
 
 
@@ -147,6 +149,7 @@ async def confirm_shopping_cart(message: CallbackQuery, state: FSMContext):
     # переход к оплате или отмена и сохранение с или без гаранта
     id = message.from_user.id
     shopping_cart: ShoppingCart = await set_data_shopping_cart(state, guarantor=message.data)
+
     link = f"{link_to_bot}?start={cryptography.encode(shopping_cart.shop + "%" + shopping_cart.name)}"
     await bot.edit_message_text(chat_id=id,
                                 message_id=message.message.message_id,
@@ -165,17 +168,39 @@ async def confirm_shopping_cart(message: CallbackQuery, state: FSMContext):
 @router.callback_query(UserStates.ShoppingCart, F.data == "payment")
 async def payment(message: CallbackQuery, state: FSMContext):
     id = message.from_user.id
-    shopping_cart = await create_deal(state=state, user_id=id, message_id=message.message.message_id)
+    data = await state.get_data()
+    shopping_cart: ShoppingCart = data['ShoppingCart']
+    if shopping_cart.price < LIMIT_PRICE:
+        await message.answer(f"Сумма минимального заказа {LIMIT_PRICE} USDT. "
+                             f"Стоимость покупки изменена до минимальной стоимости",
+                             show_alert=True)
+        shopping_cart.price = LIMIT_PRICE
+        await state.update_data(ShoppingCart=shopping_cart)
 
-    order: CreatedOrder = await ExNode.create_order(client_transaction_id=str(shopping_cart.deal_id),
-                                                    amount=shopping_cart.price,
+    shopping_cart = await create_deal(state=state, user_id=id, message_id=message.message.message_id)
+    client_transaction_id = f"{shopping_cart.deal_id}-{id}-{shopping_cart.price}-{datetime.now().timestamp()}"
+    order: CreatedOrder = await ExNode.create_order(client_transaction_id=client_transaction_id,
+                                                    amount=float(shopping_cart.price),
                                                     merchant_uuid=MERCHANT_ID)
+
     shopping_cart.tracker_id = order.tracker_id
-    await bot.edit_message_text(chat_id=id,
-                                message_id=message.message.message_id,
-                                text=get_mes("receiver", receiver=order.receiver,
-                                             date_expire=format_date(order.date_expire)),
-                                parse_mode=ParseMode.MARKDOWN_V2)
+    if order.date_expire:
+        date_expire = format_date(order.date_expire)
+        await bot.edit_message_text(chat_id=id,
+                                    message_id=message.message.message_id,
+                                    text=get_mes("receiver", price=shopping_cart.price, receiver=order.receiver,
+                                                 date_expire=date_expire),
+                                    parse_mode=ParseMode.MARKDOWN_V2,
+                                    reply_markup=await Keyboards.payment()
+                                    )
+    else:
+        await bot.edit_message_text(chat_id=id,
+                                    message_id=message.message.message_id,
+                                    text=get_mes("receiver", price=shopping_cart.price, receiver=order.receiver),
+                                    parse_mode=ParseMode.MARKDOWN_V2,
+                                    reply_markup=await Keyboards.payment()
+                                    )
+
     await state.update_data(ShoppingCart=shopping_cart)
 
 

@@ -22,7 +22,7 @@ def get_text(text: str) -> str:
     return text
 
 
-def get_mes(path: str, **kwargs):
+def get_mes(path: str, **kwargs, ):
     env = Environment(
         loader=PackageLoader(package_name='main', package_path="messages", encoding="utf-8"),
         autoescape=select_autoescape(['html', 'xml'])
