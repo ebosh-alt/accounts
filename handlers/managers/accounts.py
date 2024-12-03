@@ -5,7 +5,7 @@ from aiogram.types import Message, CallbackQuery, FSInputFile, Document
 from data.config import EXCEL_TEMPLATE_PATH, EXCEL_LOAD_FILE_PATH
 from data.config import bot
 from filters.Filters import IsManager
-from service.Excel.service import create_accounts
+# from service.Excel.service import create_accounts
 from service.GetMessage import get_mes
 from service.keyboards import Keyboards
 from states.states import ManagerStates
@@ -42,7 +42,7 @@ async def load_accs_end(message: Message, state: FSMContext):
                 file=document,
                 destination=path
             )
-            await create_accounts(file_name=path)
+            # await create_accounts(file_name=path)
             await bot.send_message(
                 chat_id=message.chat.id,
                 text=get_mes("success_loading_accs"),

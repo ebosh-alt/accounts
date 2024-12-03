@@ -1,7 +1,6 @@
 import logging
-from typing import Any
-
 from sqlalchemy import Column, String, Boolean, FLOAT, Integer
+from typing import Any
 
 from .base import Base, BaseDB
 
@@ -17,7 +16,8 @@ class Account(Base):
     data: str = Column(String)
     view_type: bool = Column(Boolean)
     name: str = Column(String)
-    deal_id = Column(Integer)
+    deal_id: int = Column(Integer)
+    uid: int = Column(Integer)
 
     def dict(self):
         return {
@@ -29,6 +29,7 @@ class Account(Base):
             "view_type": self.view_type,
             "name": self.name,
             "deal_id": self.deal_id,
+            "uid": self.uid,
         }
 
 

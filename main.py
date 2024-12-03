@@ -1,5 +1,6 @@
 import asyncio
 import datetime
+import json
 import logging
 from contextlib import suppress
 from multiprocessing import Process
@@ -12,6 +13,7 @@ from models.database import sellers, Seller, users, User, deals, Deal, accounts,
 from models.database.base import create_async_database
 from service import middleware
 from service.Background.checker import run_checker
+from service.Excel.service import parse_account_data
 from service.TGClient import startTGClient
 from service.exnode import test
 
@@ -94,4 +96,6 @@ if __name__ == "__main__":
         encoding='utf-8')
 
     with suppress(KeyboardInterrupt):
-        asyncio.run(main())
+        # asyncio.run(main())
+        account_data = parse_account_data(r"D:\tg_bots\accounts\service\Excel\template_new.xlsx")
+        print(account_data)

@@ -18,7 +18,8 @@ bot_token = env('BOT_TOKEN')
 link_support = env('LINK_SUPPORT')
 
 dp = Dispatcher()
-bot = Bot(bot_token, parse_mode=ParseMode.MARKDOWN_V2)
+bot = Bot(bot_token)
+# bot = Bot(bot_token, parse_mode=ParseMode.MARKDOWN_V2)
 BOT_ID = bot.id
 link_to_bot = "https://t.me/Sale_of_account_bot"
 path_to_logo = "data/main.jpg"

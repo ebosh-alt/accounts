@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Optional
 
 from pydantic import BaseModel
 
@@ -120,3 +121,12 @@ class ApiPoint:
     get_transaction = "https://my.exnode.ru/api/transaction/get"
     token_list = "https://my.exnode.ru/user/token/fetch"
     balance = "https://my.exnode.ru/api/token/balance"
+
+
+class AccountExcel(BaseModel):
+    type_account: str
+    name: str
+    price: float
+    description: str
+    data: Optional[str] = None
+    uid: Optional[int] = None
