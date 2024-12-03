@@ -1,10 +1,9 @@
 import json
 import logging
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Callable, TypeVar, Any
 
 from aiogram import Dispatcher, Bot
-from aiogram.enums import ParseMode
 from environs import Env
 
 from service.TGClient import TG_Acc, TGClient_S
@@ -65,6 +64,7 @@ class Config:
     """Класс для работы с конфигурацией."""
     name_shop: str = ""
     description_seller: str = ""
+    acceptable_account_types: list = field(default_factory=list)
 
     def __post_init__(self) -> None:
         """Загружает конфигурацию из файла при инициализации экземпляра."""
@@ -75,12 +75,14 @@ class Config:
     def set_config(self, config_data: dict[str, Any]) -> None:
         self.name_shop = config_data.get('name_shop', self.name_shop)
         self.description_seller = config_data.get('description_seller', self.description_seller)
+        self.acceptable_account_types = config_data.get('acceptable_account_types', self.acceptable_account_types)
 
     def save_config(self) -> None:
         """Сохраняет обновленные параметры в конфигурационный файл."""
         config_json = {
             "name_shop": self.name_shop,
             "description_seller": self.description_seller,
+            "acceptable_account_types": self.acceptable_account_types,
         }
         with open(CONFIG_FILE, 'w') as f:
             json.dump(config_json, f, indent=4)

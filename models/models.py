@@ -126,7 +126,7 @@ class ApiPoint:
 class AccountExcel(BaseModel):
     type_account: str
     name: str
-    price: float
-    description: str
+    price: Optional[float] = None
+    description: Optional[str] = None
     data: Optional[str] = None
-    uid: Optional[int] = None
+    uid: int
