@@ -1,21 +1,13 @@
 import asyncio
 import datetime
-import json
 import logging
 from contextlib import suppress
-from multiprocessing import Process
 
 from aiogram.types import BotCommand
 
-from data.config import dp, bot, SELLER, USERNAME, ExNode, MERCHANT_ID, client_s
-from handlers import routers
+from data.config import bot, SELLER, USERNAME
 from models.database import sellers, Seller, users, User, deals, Deal, accounts, Account
 from models.database.base import create_async_database
-from service import middleware
-from service.Background.checker import run_checker
-from service.Excel.excel import get_account_data
-from service.TGClient import startTGClient
-from service.exnode import test
 
 logger = logging.getLogger(__name__)
 
@@ -48,7 +40,8 @@ async def create_test_data():
             data=f"Data {i}",
             view_type=bool(i % 2),
             name=f"Account {i}",
-            deal_id=i % 4 + 1
+            uid=i,
+            # deal_id=i % 4 + 1
         )
         await accounts.new(account)
 
@@ -69,23 +62,32 @@ async def create_test_data():
     ### Нет необходимости в тестовых значениях
 
 
+async def nn():
+    s = await accounts.delete_from_catalog(path=r"D:\tg_bots\accounts\service\Excel\template_del.xlsx")
+    logger.info(s)
+    # await accounts.change_catalog(path=r"D:\tg_bots\accounts\service\Excel\template_add_new.xlsx")
 async def main() -> None:
     await create_async_database()
+    await nn()
     # await create_test_data()
     # bg_proc = Process(target=run_checker)
     # bg_proc.start()
-    if await sellers.in_(id=SELLER):
-        pass
-    else:
-        seller = Seller(id=SELLER, rating=5, balance=0, username=USERNAME, wallet="wallet")
-        await sellers.new(seller=seller)
-    # await startTGClient(client_s=client_s)
-    for router in routers:
-        dp.include_router(router)
-    dp.update.middleware(middleware.Logging())
-    await set_commands()
-    await dp.start_polling(bot)
+    # if await sellers.in_(id=SELLER):
+    #     pass
+    # else:
+    #     seller = Seller(id=SELLER, rating=5, balance=0, username=USERNAME, wallet="wallet")
+    #     await sellers.new(seller=seller)
+    # # await startTGClient(client_s=client_s)
+    # for router in routers:
+    #     dp.include_router(router)
+    # dp.update.middleware(middleware.Logging())
+    # await set_commands()
+    # await dp.start_polling(bot)
 
+
+async def test_uid():
+    s = await accounts.in_uid(0)
+    logger.info(s)
 
 if __name__ == "__main__":
     logging.basicConfig(
@@ -96,6 +98,7 @@ if __name__ == "__main__":
         encoding='utf-8')
 
     with suppress(KeyboardInterrupt):
-        # asyncio.run(main())
-        account_data = get_account_data(r"D:\tg_bots\accounts\service\Excel\template_del.xlsx")
-        print(account_data)
+        asyncio.run(main())
+        # account_data = get_account_data(r"D:\tg_bots\accounts\service\Excel\template_del.xlsx")
+        # print(account_data)
+        #

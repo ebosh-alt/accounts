@@ -130,3 +130,8 @@ class AccountExcel(BaseModel):
     description: Optional[str] = None
     data: Optional[str] = None
     uid: int
+
+
+class Response(BaseModel):
+    status: int
+    description: str

@@ -34,7 +34,6 @@ def get_account_data(file_path: str) -> list[AccountExcel]:
 
     # Загружаем данные из файла
     data = get_excel_dict(file_path)
-    print(data)
     # Инициализируем текущие общие данные
     current_general_data = {
         "type_account": None,
@@ -62,7 +61,7 @@ def get_account_data(file_path: str) -> list[AccountExcel]:
                 "type_account": current_general_data["type_account"],
                 "name": current_general_data["name"],
                 "price": current_general_data["price"],
-                "description": current_general_data["description"],
+                "description": str(current_general_data["description"]),
                 "data": data.get("data", [None])[i]
                 if i < len(data.get("data", [])) and not (
                         isinstance(data["data"][i], float) and math.isnan(data["data"][i])

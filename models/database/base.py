@@ -83,3 +83,26 @@ class BaseDB:
             sql = select(obj).column(attribute)
             result = await session.execute(sql)
             return result.all()
+
+    async def _in(self, obj, attribute, values: list):
+        async with await self._get_session() as session:
+            sql = select(obj).where(attribute.in_(values))
+            result = await session.execute(sql)
+            return result.scalars().all()
+
+    async def _update_all_values(self, obj, attribute, value):
+        async with await self._get_session() as session:
+            query = update(obj).values({attribute: value})
+            await session.execute(query)
+            await session.commit()
+
+    async def _bulk_add(self, instances: list[Any]):
+        if not instances:
+            logger.info("Empty list provided for bulk add")
+            return False
+
+        async with await self._get_session() as session:
+            session.add_all(instances)
+            logger.info(f"Adding {len(instances)} {instances[0].__class__.__name__} to the database")
+            await session.commit()
+            return True
