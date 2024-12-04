@@ -13,7 +13,8 @@ class AdminStates(StatesGroup):
     cancel_buy = State()
     change_balance = State()
     change_about_shop = State()
-
+    enter_new_acc_type = State()
+    enter_acc_type_to_del = State()
 
 class ManagerStates(StatesGroup):
     change_wallet = State()

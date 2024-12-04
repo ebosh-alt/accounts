@@ -76,13 +76,15 @@ class Keyboards:
          "Изменить реквизиты продавца": "change_seller_wallet",
          "Изменить название магазина": "change_name_shop",
          "Изменить описание продавца": "change_description_seller",
+         "Добавить тип аккаунтов": "add_acc_type",
+         "Удалить тип аккаунтов": "delete_acc_type",
          })
 
     admin_back_menu_kb = Builder.create_keyboard({"Назад": "admin_back_menu"})
 
     manager_menu_kb = Builder.create_keyboard(
         {
-            "Загрузить аккаунты": "load_accs",
+            "Изменить каталог": "load_accs",
             "Выставить счет": "create_deal",
             "Изменить реквизиты": "change_wallet",
             "Изменить название магазина": "change_name_shop",
@@ -97,6 +99,16 @@ class Keyboards:
             "Изменить описание продавца": "change_description_seller",
         }
     )
+
+    manager_loads_accs_tree_kb = Builder.create_keyboard(
+        {
+            "Заменить каталог": "new_catalog",
+            "Изменить каталог": "change_catalog",
+            "Удалить из каталога": "delete_from_catalog",
+            "Назад": "manager_back_menu",
+        }
+    )
+
     manager_back_menu_kb = Builder.create_keyboard({"Назад": "manager_back_menu"})
 
     # def manager_create_deal_input_filed_guarant(text:str) :

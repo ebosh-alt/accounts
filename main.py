@@ -5,15 +5,22 @@ from contextlib import suppress
 
 from aiogram.types import BotCommand
 
-from data.config import bot, SELLER, USERNAME
+from data.config import dp, bot, SELLER, USERNAME, Config
 from models.database import sellers, Seller, users, User, deals, Deal, accounts, Account
 from models.database.base import create_async_database
+
+from handlers import routers
+from service import middleware
 
 logger = logging.getLogger(__name__)
 
 
 async def set_commands():
-    await bot.set_my_commands(commands=[BotCommand(command="start", description="перезапустить бота")])
+    await bot.set_my_commands(commands=[
+        BotCommand(command="start", description="перезапустить бота"), 
+        BotCommand(command="admin", description="АДМИН"), 
+        BotCommand(command="manager", description="МЕНЕДЖЕР")
+        ])
 
 
 async def create_test_data():
@@ -68,7 +75,7 @@ async def nn():
     # await accounts.change_catalog(path=r"D:\tg_bots\accounts\service\Excel\template_add_new.xlsx")
 async def main() -> None:
     await create_async_database()
-    await nn()
+    # await nn()
     # await create_test_data()
     # bg_proc = Process(target=run_checker)
     # bg_proc.start()
@@ -78,11 +85,11 @@ async def main() -> None:
     #     seller = Seller(id=SELLER, rating=5, balance=0, username=USERNAME, wallet="wallet")
     #     await sellers.new(seller=seller)
     # # await startTGClient(client_s=client_s)
-    # for router in routers:
-    #     dp.include_router(router)
-    # dp.update.middleware(middleware.Logging())
-    # await set_commands()
-    # await dp.start_polling(bot)
+    for router in routers:
+        dp.include_router(router)
+    dp.update.middleware(middleware.Logging())
+    await set_commands()
+    await dp.start_polling(bot)
 
 
 async def test_uid():
@@ -96,6 +103,10 @@ if __name__ == "__main__":
         format=u'%(filename)s:%(lineno)d #%(levelname)-3s [%(asctime)s] - %(message)s',
         filemode="w",
         encoding='utf-8')
+
+    # cn = Config()
+    # cn.load_config()
+    # print(cn)
 
     with suppress(KeyboardInterrupt):
         asyncio.run(main())

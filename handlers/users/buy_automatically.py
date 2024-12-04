@@ -79,7 +79,7 @@ async def choice_guarantor(message: CallbackQuery | Message, state: FSMContext, 
     shopping_cart, count_account, acc = await set_data_shopping_cart(state, name=name, shop=shop)
     price_no = rounding_numbers("%.2f" % (acc.price * (1 + BASE_PERCENT / 100) * shopping_cart.count))
     price_yes = rounding_numbers("%.2f" % (acc.price * (1 + PERCENT_GUARANTOR / 100) * shopping_cart.count))
-    link = f"{link_to_bot}?start={cryptography.encode(shopping_cart.shop + "%" + shopping_cart.name)}"
+    link = f"{link_to_bot}?start={cryptography.encode(shopping_cart.shop + '%' + shopping_cart.name)}"
     reply_markup = await Keyboards.choice_count_account(count=count_account)
     text = get_mes("shopping_cart_user",
                    shop=shopping_cart.shop,
@@ -127,7 +127,7 @@ async def choice_count_account(message: CallbackQuery, state: FSMContext):
             return
     price_no = rounding_numbers("%.2f" % (accs[0].price * (1 + BASE_PERCENT / 100) * shopping_cart.count))
     price_yes = rounding_numbers("%.2f" % (accs[0].price * (1 + PERCENT_GUARANTOR / 100) * shopping_cart.count))
-    link = f"{link_to_bot}?start={cryptography.encode(shopping_cart.shop + "%" + shopping_cart.name)}"
+    link = f"{link_to_bot}?start={cryptography.encode(shopping_cart.shop + '%' + shopping_cart.name)}"
     await bot.edit_message_text(chat_id=id,
                                 message_id=message.message.message_id,
                                 text=get_mes("shopping_cart_user",
@@ -150,7 +150,7 @@ async def confirm_shopping_cart(message: CallbackQuery, state: FSMContext):
     id = message.from_user.id
     shopping_cart: ShoppingCart = await set_data_shopping_cart(state, guarantor=message.data)
 
-    link = f"{link_to_bot}?start={cryptography.encode(shopping_cart.shop + "%" + shopping_cart.name)}"
+    link = f"{link_to_bot}?start={cryptography.encode(shopping_cart.shop + '%' + shopping_cart.name)}"
     await bot.edit_message_text(chat_id=id,
                                 message_id=message.message.message_id,
                                 text=get_mes("shopping_cart_user",
