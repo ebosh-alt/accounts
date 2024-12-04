@@ -129,7 +129,7 @@ class AccountExcel(BaseModel):
     price: Optional[float] = None
     description: Optional[str] = None
     data: Optional[str] = None
-    uid: int
+    uid: str
 
 
 class Response(BaseModel):

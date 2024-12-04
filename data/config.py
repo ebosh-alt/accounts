@@ -4,6 +4,7 @@ from dataclasses import dataclass, field
 from typing import Callable, TypeVar, Any
 
 from aiogram import Dispatcher, Bot
+from aiogram.enums import ParseMode
 from environs import Env
 
 from service.TGClient import TG_Acc, TGClient_S
@@ -17,8 +18,8 @@ bot_token = env('BOT_TOKEN')
 link_support = env('LINK_SUPPORT')
 
 dp = Dispatcher()
-bot = Bot(bot_token)
-# bot = Bot(bot_token, parse_mode=ParseMode.MARKDOWN_V2)
+# bot = Bot(bot_token)
+bot = Bot(bot_token, parse_mode=ParseMode.MARKDOWN_V2)
 BOT_ID = bot.id
 link_to_bot = "https://t.me/Sale_of_account_bot"
 path_to_logo = "data/main.jpg"
@@ -48,8 +49,9 @@ MAIN_ADMIN = int(env('MAIN_ADMIN'))
 SELLER = int(env('SELLER'))
 BASE_PERCENT = float(env("BASE_PERCENT"))
 PERCENT_GUARANTOR = float(env('PERCENT_GUARANTOR'))
-EXCEL_TEMPLATE_PATH = env('EXCEL_TEMPLATE_PATH')
-EXCEL_LOAD_FILE_PATH = env('EXCEL_LOAD_FILE_PATH')
+EXCEL_TEMPLATE_PATH_REPLACE_CHANGE = "service/Excel/template.xlsx"
+EXCEL_TEMPLATE_PATH_DELETE = "service/Excel/template_del.xlsx"
+EXCEL_LOAD_FILE_PATH = "service/Excel"
 USERNAME = env("USERNAME")
 
 EXNODE_PUBLIC = env('EXNODE_PUBLIC')

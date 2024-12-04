@@ -16,6 +16,7 @@ class AdminStates(StatesGroup):
     enter_new_acc_type = State()
     enter_acc_type_to_del = State()
 
+
 class ManagerStates(StatesGroup):
     change_wallet = State()
     get_excel_file = State()
@@ -27,5 +28,6 @@ class ManagerStates(StatesGroup):
     create_deal_name = State()
     create_deal_guarant = State()
     create_deal_end = State()
-
-
+    replace_catalog = State()
+    change_catalog = State()
+    delete_from_catalog = State()

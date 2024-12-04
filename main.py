@@ -5,11 +5,10 @@ from contextlib import suppress
 
 from aiogram.types import BotCommand
 
-from data.config import dp, bot, SELLER, USERNAME, Config
+from data.config import dp, bot, SELLER, USERNAME
+from handlers import routers
 from models.database import sellers, Seller, users, User, deals, Deal, accounts, Account
 from models.database.base import create_async_database
-
-from handlers import routers
 from service import middleware
 
 logger = logging.getLogger(__name__)
@@ -73,6 +72,8 @@ async def nn():
     s = await accounts.delete_from_catalog(path=r"D:\tg_bots\accounts\service\Excel\template_del.xlsx")
     logger.info(s)
     # await accounts.change_catalog(path=r"D:\tg_bots\accounts\service\Excel\template_add_new.xlsx")
+
+
 async def main() -> None:
     await create_async_database()
     # await nn()

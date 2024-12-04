@@ -21,7 +21,7 @@ class Account(Base):
     view_type: bool = Column(Boolean)
     name: str = Column(String)
     deal_id: int = Column(Integer)
-    uid: int = Column(Integer, unique=True)
+    uid: str = Column(String, unique=True)
 
     def dict(self):
         return {

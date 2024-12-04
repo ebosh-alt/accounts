@@ -84,7 +84,7 @@ class Keyboards:
 
     manager_menu_kb = Builder.create_keyboard(
         {
-            "Изменить каталог": "load_accs",
+            "Работа с каталогом": "work_catalog",
             "Выставить счет": "create_deal",
             "Изменить реквизиты": "change_wallet",
             "Изменить название магазина": "change_name_shop",
@@ -93,7 +93,7 @@ class Keyboards:
     )
     manager_menu_load_kb = Builder.create_keyboard(
         {
-            "Загрузить ещё аккаунты": "load_accs",
+            "Работа с каталогом": "work_catalog",
             "Выставить счет": "create_deal",
             "Изменить название магазина": "change_name_shop",
             "Изменить описание продавца": "change_description_seller",
@@ -102,7 +102,7 @@ class Keyboards:
 
     manager_loads_accs_tree_kb = Builder.create_keyboard(
         {
-            "Заменить каталог": "new_catalog",
+            "Заменить каталог": "replace_catalog",
             "Изменить каталог": "change_catalog",
             "Удалить из каталога": "delete_from_catalog",
             "Назад": "manager_back_menu",

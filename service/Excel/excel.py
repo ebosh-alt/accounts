@@ -67,7 +67,7 @@ def get_account_data(file_path: str) -> list[AccountExcel]:
                         isinstance(data["data"][i], float) and math.isnan(data["data"][i])
                 )
                 else None,
-                "uid": int(data["uid"][i])
+                "uid": str(data["uid"][i])
                 if "uid" in data and i < len(data["uid"]) and not (
                         isinstance(data["uid"][i], float) and math.isnan(data["uid"][i])
                 )
