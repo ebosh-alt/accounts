@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 from pydantic import BaseModel
 
@@ -13,14 +13,14 @@ class Account(BaseModel):
 
 
 class Catalog(BaseModel):
-    accounts: List[Account]
+    accounts: Optional[List[Account]] = []
 
 
 class Message(BaseModel):
-    accounts: List[Account]
+    catalog: List[Account]
     status: str
+    detail: str
 
 
 class Response(BaseModel):
-    status_code: int
     message: Message
