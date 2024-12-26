@@ -16,6 +16,9 @@ __factory: sessionmaker | None = None
 logger = logging.getLogger(__name__)
 
 
+async def close_database():
+    __factory.close_all()
+
 async def create_async_database():
     global __factory
     engine = create_async_engine(SQLALCHEMY_DATABASE_URI)
@@ -106,3 +109,12 @@ class BaseDB:
             logger.info(f"Adding {len(instances)} {instances[0].__class__.__name__} to the database")
             await session.commit()
             return True
+
+    async def _exist(self, obj, filters: dict = None) -> bool:
+        async with await self._get_session() as session:
+            sql = select(obj)
+            if filters is not None:
+                for key, value in filters.items():
+                    sql = sql.where(key == value)
+            result = await session.execute(sql)
+            return result.scalars().first() is not None

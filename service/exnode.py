@@ -7,6 +7,7 @@ import time
 
 import aiohttp
 
+from data.config import EXNODE_PUBLIC, EXNODE_PRIVATE
 from models.models import CreatedWallet, ApiPoint, CreatedOrder, TransferredMerchantAccountBalance, ReceivedOrder, \
     ReceivedTransaction, CreatedMerchant
 
@@ -158,13 +159,15 @@ class ExNodeClient:
 async def test():
     en = ExNodeClient("6ou06aogswjhwyzkyxy54ey7cny2olly24wxfh9u8ynffprzb7lv217odtt4yf0a",
                       "ebho8jloorkzcrzgvqcs0p1ycakcmfr74erudcwhbgminzfxgl8jiy93szxdl6dadgdoam277eoxg3617si0mk49yes2r3874ha8ft0a650rwy2buoqk6okfn26z5wjp")
-    order = await en.create_order(client_transaction_id="trasmlmas,,l,l,lsasasess", amount=10.0,
+    order = await en.create_order(client_transaction_id="trasmlmascsacas,,l,l,lsasasess", amount=10.0,
                                   merchant_uuid="ac9db73e-2937-439d-a949-5326e31816ea")
     print(order)
     # wallet = await en.create_wallet(client_transaction_id="trsess")
     # print(await en.get_order(order.tracker_id))
     # print(await en.get_order(b))
     ...
+
+ExNode = ExNodeClient(EXNODE_PUBLIC, EXNODE_PRIVATE)
 
 
 if __name__ == '__main__':
@@ -174,4 +177,4 @@ if __name__ == '__main__':
         format=u'%(filename)s:%(lineno)d #%(levelname)-3s [%(asctime)s] - %(message)s',
         filemode="w",
         encoding='utf-8')
-    # asyncio.run(main())
+    asyncio.run(test())

@@ -5,20 +5,23 @@ from contextlib import suppress
 
 from aiogram.types import BotCommand
 
-from data.config import dp, bot, SELLER, USERNAME
+from data.config import dp, bot, SELLER, USERNAME, API_HOST, API_PORT, NAME_SHOP, LOCAL_PORT, LOCAL_HOST
 from handlers import routers
 from models.database import sellers, Seller, users, User, deals, Deal, accounts, Account
 from models.database.base import create_async_database
+from models.schemas.Shop import Shop
 from service import middleware
+from service.FastApi.events import create_fastapi, start_fastapi
+from service.FastApi.services.Create import create_shop
 
 logger = logging.getLogger(__name__)
 
 
 async def set_commands():
     await bot.set_my_commands(commands=[
-        BotCommand(command="start", description="перезапустить бота"), 
-        BotCommand(command="admin", description="АДМИН"), 
-        BotCommand(command="manager", description="МЕНЕДЖЕР")
+        BotCommand(command="start", description="перезапустить бота")
+        # BotCommand(command="admin", description="АДМИН"),
+        # BotCommand(command="manager", description="МЕНЕДЖЕР")
         ])
 
 
@@ -46,7 +49,7 @@ async def create_test_data():
             data=f"Data {i}",
             view_type=bool(i % 2),
             name=f"Account {i}",
-            uid=i,
+            uid=str(i),
             # deal_id=i % 4 + 1
         )
         await accounts.new(account)
@@ -64,38 +67,31 @@ async def create_test_data():
         )
         await deals.new(deal)
 
-    # Добавление записей в таблицу chats
-    ### Нет необходимости в тестовых значениях
-
-
-async def nn():
-    s = await accounts.delete_from_catalog(path=r"D:\tg_bots\accounts\service\Excel\template_del.xlsx")
-    logger.info(s)
-    # await accounts.change_catalog(path=r"D:\tg_bots\accounts\service\Excel\template_add_new.xlsx")
-
 
 async def main() -> None:
     await create_async_database()
-    # await nn()
+    await create_shop(shop=Shop(
+        host=LOCAL_HOST,
+        port=LOCAL_PORT,
+        name=NAME_SHOP
+    ))
+    app = create_fastapi()
+    task = asyncio.create_task(start_fastapi(app))
     # await create_test_data()
     # bg_proc = Process(target=run_checker)
     # bg_proc.start()
-    # if await sellers.in_(id=SELLER):
-    #     pass
-    # else:
-    #     seller = Seller(id=SELLER, rating=5, balance=0, username=USERNAME, wallet="wallet")
-    #     await sellers.new(seller=seller)
-    # # await startTGClient(client_s=client_s)
+    if await sellers.in_(id=SELLER):
+        pass
+    else:
+        seller = Seller(id=SELLER, rating=5, balance=0, username=USERNAME, wallet="wallet")
+        await sellers.new(seller=seller)
+    # await startTGClient(client_s=client_s)
     for router in routers:
         dp.include_router(router)
     dp.update.middleware(middleware.Logging())
     await set_commands()
     await dp.start_polling(bot)
 
-
-async def test_uid():
-    s = await accounts.in_uid(0)
-    logger.info(s)
 
 if __name__ == "__main__":
     logging.basicConfig(
@@ -105,12 +101,5 @@ if __name__ == "__main__":
         filemode="w",
         encoding='utf-8')
 
-    # cn = Config()
-    # cn.load_config()
-    # print(cn)
-
     with suppress(KeyboardInterrupt):
         asyncio.run(main())
-        # account_data = get_account_data(r"D:\tg_bots\accounts\service\Excel\template_del.xlsx")
-        # print(account_data)
-        #

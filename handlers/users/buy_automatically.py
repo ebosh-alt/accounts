@@ -6,7 +6,7 @@ from aiogram.enums import ParseMode
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
 
-from data.config import bot, BASE_PERCENT, PERCENT_GUARANTOR, ExNode, MERCHANT_ID, link_to_bot, LIMIT_PRICE
+from data.config import bot, BASE_PERCENT, PERCENT_GUARANTOR, MERCHANT_ID, link_to_bot, LIMIT_PRICE
 from filters.Filters import IsShop, IsNameAccount
 from models.StateModels import ShoppingCart
 from models.database import deals, accounts, sellers
@@ -15,6 +15,7 @@ from service import cryptography
 from service.GetMessage import get_mes, rounding_numbers
 from service.buy_automatically import set_data_shopping_cart, create_deal
 from service.date import format_date
+from service.exnode import ExNode
 from service.keyboards import Keyboards
 from states.states import UserStates
 
@@ -209,6 +210,7 @@ async def complete_payment(message: CallbackQuery, state: FSMContext):
     id = message.from_user.id
     data = await state.get_data()
     shopping_cart: ShoppingCart = data['ShoppingCart']
+    logger.info(shopping_cart)
     received_order: ReceivedOrder = await ExNode.get_order(tracker_id=shopping_cart.tracker_id)
     if received_order.status == "SUCCESS":
         data = ""
@@ -221,7 +223,8 @@ async def complete_payment(message: CallbackQuery, state: FSMContext):
         await bot.edit_message_text(chat_id=id,
                                     message_id=message.message.message_id,
                                     text=data,
-                                    reply_markup=Keyboards.support_kb)
+                                    reply_markup=Keyboards.support_kb,
+                                    parse_mode=None)
         deals_id = [str(shopping_cart.deal_id)]
         account = await accounts.get(shopping_cart.accounts_id[0])
         if shopping_cart.guarantor is False:
@@ -242,13 +245,12 @@ async def complete_payment(message: CallbackQuery, state: FSMContext):
                                             guarantor=guarantor)
                                )
 
-        for deals_id in shopping_cart.deals_id:
-            deal = await deals.get(deals_id)
-            if shopping_cart.guarantor is False:
-                deal.payment_status = 2
-            else:
-                deal.payment_status = 1
-            await deals.update(deal)
+        deal = await deals.get(shopping_cart.deal_id)
+        if shopping_cart.guarantor is False:
+            deal.payment_status = 2
+        else:
+            deal.payment_status = 1
+        await deals.update(deal)
         await bot.send_message(chat_id=id,
                                text=text,
                                reply_markup=keyboard)

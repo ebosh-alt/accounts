@@ -8,7 +8,7 @@ from aiogram.enums import ParseMode
 from environs import Env
 
 from service.TGClient import TG_Acc, TGClient_S
-from service.exnode import ExNodeClient
+# from service.exnode import ExNodeClient
 
 logger = logging.getLogger(__name__)
 env = Env()
@@ -18,10 +18,10 @@ bot_token = env('BOT_TOKEN')
 link_support = env('LINK_SUPPORT')
 
 dp = Dispatcher()
-# bot = Bot(bot_token)
 bot = Bot(bot_token, parse_mode=ParseMode.MARKDOWN_V2)
 BOT_ID = bot.id
-link_to_bot = "https://t.me/Sale_of_account_bot"
+link_to_bot = "https://t.me/best_acc_seller_bot"
+USERNAME_BOT = "@best_acc_seller_bot"
 path_to_logo = "data/main.jpg"
 session_path = env('SESSION_PATH')
 api_id = int(env('API_ID'))
@@ -58,8 +58,15 @@ EXNODE_PUBLIC = env('EXNODE_PUBLIC')
 EXNODE_PRIVATE = env('EXNODE_PRIVATE')
 IP_ADDRESS = env('IP_ADDRESS')
 MERCHANT_ID = env('MERCHANT_ID')
-ExNode = ExNodeClient(EXNODE_PUBLIC, EXNODE_PRIVATE)
+# ExNode = ExNodeClient(EXNODE_PUBLIC, EXNODE_PRIVATE)
 
+LOCAL_HOST = env("LOCAL_HOST")
+LOCAL_PORT = env("LOCAL_PORT")
+NAME_SHOP = "accounts"
+
+API_HOST = env("API_HOST")
+API_PORT = env("API_PORT")
+SECRET_KEY = env("SECRET_KEY")
 
 @dataclass
 class Config:

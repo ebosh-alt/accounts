@@ -1,10 +1,8 @@
 import logging
 
 from telethon import TelegramClient
-from sqlalchemy.ext.asyncio import AsyncSession
-import asyncio
-from telethon.tl.types import Chat, Updates, InputUser
 from telethon.tl.functions.messages import CreateChatRequest
+from telethon.tl.types import Chat, Updates, InputUser
 
 # from telethon.client import DialogMethods
 # from db.db import session_db
@@ -123,7 +121,7 @@ class TGClient_S:
         except Exception as er:
             logger.info(er)
 
-    async def createChat(self, users: list[int | str], title: str) -> tuple[int, bool]:
+    async def createChat(self, users: list[int | str], username_bot: str, title: str) -> tuple[int, bool]:
         chat_id = 0
         err = False
         try:
@@ -133,16 +131,18 @@ class TGClient_S:
             err = True
         try:
             users_entity = []
+            bot_entity = await self.client.get_entity(username_bot)
             for user in users:
                 user = await self.client.get_entity(user)
                 users_entity.append(InputUser(user_id=user.id, access_hash=user.access_hash))
+            users_entity.append(InputUser(user_id=bot_entity.id, access_hash=bot_entity.access_hash))
             data: Updates = await self.client(CreateChatRequest(users=users_entity, title=title))
             chat: Chat = data.chats[0]
             chat_id = chat.id
             try:
                 await self.client.edit_admin(
                     chat,
-                    users[1],
+                    bot_entity.id,
                     is_admin=True,
                 )
             except Exception as er:

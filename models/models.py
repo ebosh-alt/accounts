@@ -3,6 +3,8 @@ from typing import Optional
 
 from pydantic import BaseModel
 
+from data.config import API_HOST, API_PORT
+
 
 class DataDeals(BaseModel):
     id: int
@@ -121,6 +123,7 @@ class ApiPoint:
     get_transaction = "https://my.exnode.ru/api/transaction/get"
     token_list = "https://my.exnode.ru/user/token/fetch"
     balance = "https://my.exnode.ru/api/token/balance"
+    get_shop = f"{API_HOST}:{API_PORT}/api/shop/create"
 
 
 class AccountExcel(BaseModel):

@@ -4,7 +4,9 @@ from aiogram import Router, F
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
 
-from data.config import bot, SELLER, MAIN_ADMIN, ExNode, MERCHANT_ID
+from data.config import bot, SELLER, MAIN_ADMIN,  MERCHANT_ID
+from service.exnode import ExNode
+
 from models.database import deals, accounts, sellers
 from models.models import TransferredMerchantAccountBalance
 from service.GetMessage import get_mes
@@ -89,6 +91,7 @@ async def set_mark(message: CallbackQuery, state: FSMContext):
     await bot.edit_message_text(chat_id=id,
                                 message_id=message.message.message_id,
                                 text="Спасибо за оценку!",
-                                reply_markup=Keyboards.confirm_payment_kb)
+                                reply_markup=Keyboards.confirm_payment_kb,
+                                parse_mode=None)
 
     await state.clear()

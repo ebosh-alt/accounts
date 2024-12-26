@@ -7,6 +7,7 @@ from data.config import Config
 from service.Excel.excel import get_account_data
 from .base import Base, BaseDB
 from ..models import Response
+from ..schemas.Catalog import Catalog
 
 logger = logging.getLogger(__name__)
 
@@ -171,3 +172,34 @@ class Accounts(BaseDB):
             return Response(status=404, description="new accounts empty")
         else:
             return Response(status=200, description="success delete from catalog")
+
+    async def get_unique_accounts_with_count(self) -> Catalog:
+        """
+        Получить список уникальных аккаунтов с view_type=True,
+        сгруппированных по (shop, name), а также количество
+        аккаунтов для каждой группы.
+        """
+        # Фильтр для выборки только активных аккаунтов
+        filters = {Account.view_type: True}
+        accounts = await self._get_objects(Account, filters=filters)
+
+        # Словарь для группировки аккаунтов
+        grouped_accounts = {}
+        for account in accounts:
+            key = (account.shop, account.name)  # Уникальный ключ: (shop, name)
+            if key not in grouped_accounts:
+                grouped_accounts[key] = {
+                    "category": account.shop,
+                    "name": account.name,
+                    "description": account.description,
+                    "price": account.price,
+                    "uid": account.uid,
+                    "count": 0,
+                }
+
+            grouped_accounts[key]["count"] += 1
+
+        data = {"accounts": list(grouped_accounts.values())}
+        logger.info(data)
+        catalog = Catalog(**data)
+        return catalog

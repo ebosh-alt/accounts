@@ -10,3 +10,6 @@ venv
 диаграмма.drawio
 log.logging
 *.__pycache__
+server.crt
+server.csr
+server.key
