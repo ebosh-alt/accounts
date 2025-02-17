@@ -6,6 +6,7 @@ import uvicorn
 from fastapi import FastAPI
 
 from api import routers
+from data.config import LOCAL_HOST, LOCAL_PORT
 from models.database.base import create_async_database, close_database
 
 logger = logging.getLogger(__name__)
@@ -46,8 +47,8 @@ def create_fastapi() -> FastAPI:
 async def start_fastapi(app=FastAPI):
     # Запускаем Uvicorn сервер
     config = uvicorn.Config(app,
-                            host="127.0.0.1",
-                            port=8000,
+                            host=LOCAL_HOST.replace("https://", ""),
+                            port=LOCAL_PORT,
                             ssl_keyfile="server.key",
                             ssl_certfile="server.crt"
                             )

@@ -1,0 +1,11 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: bot_and_fastapi
+    volumes:
+      - ./data/database.db:/data/database.db
+    ports:
+      - "8000:8000"
+    restart: unless-stopped

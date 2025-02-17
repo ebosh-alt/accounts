@@ -22,15 +22,18 @@ async def post(url: str, headers, data):
 
 
 async def create_shop(shop: Shop):
-    headers = {
-        "accept": "application/json",
-        "auth_key": SECRET_KEY,
-        "Content-Type": "application/json"
-    }
-    data = {
-        "name": shop.name,
-        "host": shop.host,
-        "port": shop.port,
-    }
-    data = await post(ApiPoint.get_shop, headers, data)
-    logger.info(data)
+    try:
+        headers = {
+            "accept": "application/json",
+            "auth_key": SECRET_KEY,
+            "Content-Type": "application/json"
+        }
+        data = {
+            "name": shop.name,
+            "host": shop.host,
+            "port": shop.port,
+        }
+        data = await post(ApiPoint.get_shop, headers, data)
+        logger.info(data)
+    except Exception as e:
+        logger.error(f"Error send request to create chop: \n{e}")

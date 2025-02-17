@@ -1,0 +1,12 @@
+dispatcher.py:527 #INFO [2024-12-22 23:04:34,689] - Start polling
+dispatcher.py:341 #INFO [2024-12-22 23:04:34,784] - Run polling for bot @best_acc_seller_bot id=7729524287 - 'ZU97F0CNZA'
+dispatcher.py:219 #ERROR [2024-12-22 23:04:38,925] - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+dispatcher.py:221 #WARNING [2024-12-22 23:04:38,925] - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 7729524287)
+dispatcher.py:219 #ERROR [2024-12-22 23:04:44,332] - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+dispatcher.py:221 #WARNING [2024-12-22 23:04:44,333] - Sleep for 1.314312 seconds and try again... (tryings = 1, bot id = 7729524287)
+dispatcher.py:219 #ERROR [2024-12-22 23:04:50,455] - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+dispatcher.py:221 #WARNING [2024-12-22 23:04:50,455] - Sleep for 1.708536 seconds and try again... (tryings = 2, bot id = 7729524287)
+dispatcher.py:219 #ERROR [2024-12-22 23:04:57,524] - Failed to fetch updates - TelegramConflictError: Telegram server says - Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+dispatcher.py:221 #WARNING [2024-12-22 23:04:57,524] - Sleep for 2.190190 seconds and try again... (tryings = 3, bot id = 7729524287)
+dispatcher.py:554 #INFO [2024-12-22 23:05:00,051] - Polling stopped
+dispatcher.py:359 #INFO [2024-12-22 23:05:00,303] - Polling stopped for bot @best_acc_seller_bot id=7729524287 - 'ZU97F0CNZA'

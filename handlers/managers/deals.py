@@ -41,10 +41,10 @@ async def create_deal_shop(message: Message, state: FSMContext):
             text = get_mes("create_deal_data_input", data="Напишите название магазина")
             keyboard = ForceReply(input_field_placeholder=get_mes("create_deal_input_text", data="название магазина"))
         else:
-            text = get_mes("create_deal_data_input", er="Нет такого пользователя\!", data="user_id")
+            text = get_mes("create_deal_data_input", er="Нет такого пользователя!", data="user_id")
             keyboard = ForceReply(input_field_placeholder=get_mes("create_deal_input_text", data="user_id"))
     else:
-        text = get_mes("create_deal_data_input", er="Введите число\!", data="user_id")
+        text = get_mes("create_deal_data_input", er="Введите число!", data="user_id")
         keyboard = ForceReply(input_field_placeholder=get_mes("create_deal_input_text", data="user_id"))
     await bot.send_message(
         chat_id=message.chat.id,
@@ -80,7 +80,7 @@ async def create_deal_description(message: Message, state: FSMContext):
         text = get_mes("create_deal_data_input", data="Напишите описание")
         keyboard = ForceReply(input_field_placeholder=get_mes("create_deal_input_text", data="описание"))
     else:
-        text = get_mes("create_deal_data_input", er="Введите число\!", data="стоимость")
+        text = get_mes("create_deal_data_input", er="Введите число!", data="стоимость")
         keyboard = ForceReply(input_field_placeholder=get_mes("create_deal_input_text", data="стоимость"))
     await bot.send_message(
         chat_id=message.chat.id,

@@ -18,7 +18,7 @@ bot_token = env('BOT_TOKEN')
 link_support = env('LINK_SUPPORT')
 
 dp = Dispatcher()
-bot = Bot(bot_token, parse_mode=ParseMode.MARKDOWN_V2)
+bot = Bot(bot_token)
 BOT_ID = bot.id
 link_to_bot = "https://t.me/best_acc_seller_bot"
 USERNAME_BOT = "@best_acc_seller_bot"
@@ -61,51 +61,9 @@ MERCHANT_ID = env('MERCHANT_ID')
 # ExNode = ExNodeClient(EXNODE_PUBLIC, EXNODE_PRIVATE)
 
 LOCAL_HOST = env("LOCAL_HOST")
-LOCAL_PORT = env("LOCAL_PORT")
+LOCAL_PORT = int(env("LOCAL_PORT"))
 NAME_SHOP = "accounts"
 
 API_HOST = env("API_HOST")
-API_PORT = env("API_PORT")
+API_PORT = int(env("API_PORT"))
 SECRET_KEY = env("SECRET_KEY")
-
-@dataclass
-class Config:
-    """Класс для работы с конфигурацией."""
-    name_shop: str = ""
-    description_seller: str = ""
-    acceptable_account_types: list = field(default_factory=list)
-
-    def __post_init__(self) -> None:
-        """Загружает конфигурацию из файла при инициализации экземпляра."""
-        config_data = self.load_config()
-        if config_data:  # Загружаем данные, если файл существует и не пустой
-            self.set_config(config_data)
-
-    def set_config(self, config_data: dict[str, Any]) -> None:
-        self.name_shop = config_data.get('name_shop', self.name_shop)
-        self.description_seller = config_data.get('description_seller', self.description_seller)
-        self.acceptable_account_types = config_data.get('acceptable_account_types', self.acceptable_account_types)
-
-    def save_config(self) -> None:
-        """Сохраняет обновленные параметры в конфигурационный файл."""
-        config_json = {
-            "name_shop": self.name_shop,
-            "description_seller": self.description_seller,
-            "acceptable_account_types": self.acceptable_account_types,
-        }
-        with open(CONFIG_FILE, 'w') as f:
-            json.dump(config_json, f, indent=4)
-
-    @staticmethod
-    def load_config() -> dict | None:
-        """Загружает параметры конфигурации из файла, если файл существует."""
-        try:
-            with open(CONFIG_FILE, 'r') as f:
-                config_json = json.load(f)
-                return config_json
-        except FileNotFoundError:
-            logger.info(f"Файл конфигурации '{CONFIG_FILE}' не найден. Используются значения по умолчанию.")
-            return None
-        except json.JSONDecodeError:
-            logger.info("Ошибка чтения конфигурационного файла. Проверьте его формат.")
-            return None

@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 
-from models.database import accounts
-from models.schemas.Catalog import Response
+from entities.database import accounts
+from entities.schemas.Catalog import Response
 
 router = APIRouter(prefix='/api/catalog', tags=['Каталог'])
 

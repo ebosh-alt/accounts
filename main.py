@@ -2,17 +2,20 @@ import asyncio
 import datetime
 import logging
 from contextlib import suppress
+from multiprocessing import Process
 
 from aiogram.types import BotCommand
 
-from data.config import dp, bot, SELLER, USERNAME, API_HOST, API_PORT, NAME_SHOP, LOCAL_PORT, LOCAL_HOST
+from data.config import dp, bot, SELLER, USERNAME, API_HOST, API_PORT, NAME_SHOP, LOCAL_PORT, LOCAL_HOST, client_s
 from handlers import routers
 from models.database import sellers, Seller, users, User, deals, Deal, accounts, Account
 from models.database.base import create_async_database
 from models.schemas.Shop import Shop
 from service import middleware
+from service.Background.checker import run_checker
 from service.FastApi.events import create_fastapi, start_fastapi
 from service.FastApi.services.Create import create_shop
+from service.TGClient import startTGClient
 
 logger = logging.getLogger(__name__)
 
@@ -76,16 +79,16 @@ async def main() -> None:
         name=NAME_SHOP
     ))
     app = create_fastapi()
-    task = asyncio.create_task(start_fastapi(app))
+    _ = asyncio.create_task(start_fastapi(app))
     # await create_test_data()
-    # bg_proc = Process(target=run_checker)
-    # bg_proc.start()
+    bg_proc = Process(target=run_checker)
+    bg_proc.start()
     if await sellers.in_(id=SELLER):
         pass
     else:
         seller = Seller(id=SELLER, rating=5, balance=0, username=USERNAME, wallet="wallet")
         await sellers.new(seller=seller)
-    # await startTGClient(client_s=client_s)
+    await startTGClient(client_s=client_s)
     for router in routers:
         dp.include_router(router)
     dp.update.middleware(middleware.Logging())

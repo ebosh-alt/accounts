@@ -1,15 +1,67 @@
+# Byte-compiled Python files
+*.pyc
+
+*.pyo
+*.pyd
+
+# C extensions
+*.so
+
+# Virtual environment directories
+env/
+venv/
+.venv/
+
+# Python cache directories
+__pycache__/
+*/__pycache__/
+**/__pycache__/*
+
+# Игнорировать все файлы с расширением .pyc в директориях __pycache__
+**/__pycache__/*.pyc
+*.pyc
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Logs and debug files
+*.log
+*.out
+*.err
+
+# Unit test and coverage reports
+.coverage
+*.cover
+coverage.xml
+htmlcov/
+
+# MyPy cache
+.mypy_cache/
+
+# Pyre type checker
+.pyre/
+
+# PyLint reports
+.pylint.d/
+
+# Pytest cache
+.pytest_cache/
+
+# Packaging files
+*.egg-info/
+*.egg
+dist/
+build/
+
+# Secrets or config files (be cautious about adding real secrets here)
+*.env
+
+*.xml
 .idea
-*.iml
-out
-gen
-.venv
-venv
-/data/.env
-*.session
-*.db
-диаграмма.drawio
-log.logging
-*.__pycache__
-server.crt
-server.csr
-server.key
+
+data/database.db
+poetry.lock
+photos/*
+
+redisdata/
+data/tgclient.session
+!*.pyc
