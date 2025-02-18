@@ -22,18 +22,21 @@ class Chat(Base):
 
 
 class Chats(BaseDB):
-    async def new(self, chat: Chat):
-        await self._add_obj(chat)
+    def __init__(self):
+        super().__init__(Chat)
+
+    async def new(self, instance: Chat):
+        await self._add_obj(instance)
 
     async def get(self, id: int) -> Chat | None:
-        result = await self._get_object(Chat, id)
+        result = await self._get_object(id)
         return result
 
-    async def update(self, chat: Chat) -> None:
-        await self._update_obj(instance=chat, obj=Chat)
+    async def update(self, instance: Chat) -> None:
+        await self._update_obj(instance=instance)
 
-    async def delete(self, chat: Chat) -> None:
-        await self._delete_obj(instance=chat)
+    async def delete(self, instance: Chat) -> None:
+        await self._delete_obj(instance=instance)
 
     async def in_(self, id: int) -> Chat | bool:
         result = await self.get(id)
@@ -43,7 +46,7 @@ class Chats(BaseDB):
     
     async def get_chat_by_user(self, user_id: int) -> Chat | None:
         filters = {Chat.user_id: user_id}
-        result: list[Chat] = await self._get_objects(Chat, filters=filters)
+        result: list[Chat] = await self._get_objects(filters=filters)
         if len(result) > 0:
             chat = result[0]
             return chat

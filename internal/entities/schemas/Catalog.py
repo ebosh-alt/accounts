@@ -2,15 +2,17 @@ from typing import List, Optional
 
 from pydantic import BaseModel
 
-### TODO: edit logic 
+
+### TODO: edit logic
 
 class Account(BaseModel):
-    category: str
-    name: str
-    description: str
-    price: float
-    uid: str
-    count: int
+    category: Optional[str] = None
+    subcategory: Optional[str] = None
+    name: Optional[str] = None
+    description: Optional[str] = None
+    price: Optional[float] = None
+    uid: Optional[str] = None
+    count: Optional[int] = None
 
 
 class Catalog(BaseModel):

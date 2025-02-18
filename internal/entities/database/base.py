@@ -21,6 +21,7 @@ async def close_database():
 
 async def create_async_database():
     global __factory
+    logger.info(config.db.link_connect)
     engine = create_async_engine(config.db.link_connect)
     if __factory:
         return
@@ -33,7 +34,7 @@ async def create_async_database():
 async def create_factory():
     global __factory
     engine = create_async_engine(config.db.link_connect)
-    __factory = sessionmaker(bind=engine, expire_on_commit=True, class_=AsyncSession)
+    __factory = sessionmaker(bind=engine, expire_on_commit=False, class_=AsyncSession)
 
 
 def get_factory():
@@ -42,6 +43,9 @@ def get_factory():
 
 
 class BaseDB:
+    def __init__(self, obj):
+        self.obj = obj
+
     @staticmethod  # __table__ = "accounts"
     async def _get_session() -> AsyncSession:
         async with get_factory() as session:
@@ -50,74 +54,42 @@ class BaseDB:
     async def _add_obj(self, instance):
         async with await self._get_session() as session:
             session.add(instance)
+            await session.flush()
+            await session.refresh(instance)  # Обновляем объект
             logger.info(f"add new {instance.__class__.__name__}: {instance.dict()}")
+            # self.update_json(instance) // сохранение данные в json
+            instance_id = instance.id
             await session.commit()
+        await session.bind.dispose()
+        return instance_id
 
-    async def _get_object(self, obj, id):
+    async def _get_object(self, id: int | str):
         async with await self._get_session() as session:
-            res = await session.get(obj, id)
-            return res
+            sql = select(self.obj).where(self.obj.id == id)
+            for ref in self.obj.refs:
+                sql = sql.options(selectinload(ref))
+            result = await session.execute(sql)
+            result = result.fetchone()
+            if result:
+                result = result[0]
+        await session.bind.dispose()
+        return result
 
-    async def _get_objects(self, obj, filters: dict = None):
+    async def _get_objects(self, filters: dict | list = None):
         async with await self._get_session() as session:
-            sql = select(obj)
-            if filters is not None:
+            sql = select(self.obj)
+            if isinstance(filters, dict):
                 for key in filters:
                     sql = sql.where(key == filters[key])
+            elif isinstance(filters, list):
+                for flt in filters:
+                    sql = sql.where(flt)
+            for ref in self.obj.refs:
+                sql = sql.options(selectinload(ref))
             result = await session.execute(sql)
-            return result.scalars().all()
-
-    async def _update_obj(self, obj, instance):
-        async with await self._get_session() as session:
-            query = update(obj).where(obj.id == instance.id).values(**instance.dict())
-            await session.execute(query)
-            logger.info(f"update data {instance.__class__.__name__}: {instance.dict()}")
-            await session.commit()
-
-    async def _delete_obj(self, instance):
-        async with await self._get_session() as session:
-            await session.delete(instance)
-            logger.info(f"delete {instance.__class__.__name__}: {instance.dict()}")
-            await session.commit()
-
-    async def _get_attributes(self, obj, attribute: str) -> Sequence[Row[tuple[Any, ...] | Any]]:
-        # получение всех значений конкретного атрибута сущности
-        async with await self._get_session() as session:
-            sql = select(obj).column(attribute)
-            result = await session.execute(sql)
-            return result.all()
-
-    async def _in(self, obj, attribute, values: list):
-        async with await self._get_session() as session:
-            sql = select(obj).where(attribute.in_(values))
-            result = await session.execute(sql)
-            return result.scalars().all()
-
-    async def _update_all_values(self, obj, attribute, value):
-        async with await self._get_session() as session:
-            query = update(obj).values({attribute: value})
-            await session.execute(query)
-            await session.commit()
-
-    async def _bulk_add(self, instances: list[Any]):
-        if not instances:
-            logger.info("Empty list provided for bulk add")
-            return False
-
-        async with await self._get_session() as session:
-            session.add_all(instances)
-            logger.info(f"Adding {len(instances)} {instances[0].__class__.__name__} to the database")
-            await session.commit()
-            return True
-
-    async def _exist(self, obj, filters: dict = None) -> bool:
-        async with await self._get_session() as session:
-            sql = select(obj)
-            if filters is not None:
-                for key, value in filters.items():
-                    sql = sql.where(key == value)
-            result = await session.execute(sql)
-            return result.scalars().first() is not None
+            result = result.scalars().all()
+        await session.bind.dispose()
+        return result
 
     async def __aiter__(self) -> AsyncIterator[Any]:
         """
@@ -131,3 +103,55 @@ class BaseDB:
 
             async for instance in await session.stream(query):
                 yield instance[0]
+
+    async def _update_obj(self, instance):
+        async with await self._get_session() as session:
+            query = (
+                update(self.obj)
+                .where(self.obj.id == instance.id)
+                .values(**instance.dict())
+            )
+            await session.execute(query)
+            # id = instance.id
+            logger.info(f"update data {instance.__class__.__name__}: {instance.dict()}")
+            await session.commit()
+
+    async def _delete_obj(self, instance):
+        async with await self._get_session() as session:
+            await session.delete(instance)
+            logger.info(f"delete {instance.__class__.__name__}: {instance.dict()}")
+            await session.commit()
+
+    async def _get_attributes(
+            self, attribute: str
+    ) -> Sequence[Row[tuple[Any, ...] | Any]]:
+        # получение всех значений конкретного атрибута сущности
+        async with await self._get_session() as session:
+            sql = select(self.obj).column(attribute)
+            result = await session.execute(sql)
+            return result.all()
+
+    async def _in(self, attribute, values: list):
+        async with await self._get_session() as session:
+            sql = select(self.obj).where(attribute.in_(values))
+            result = await session.execute(sql)
+            return result.scalars().all()
+
+    async def _update_all_values(self, attribute, value):
+        async with await self._get_session() as session:
+            query = update(self.obj).values({attribute: value})
+            await session.execute(query)
+            await session.commit()
+
+    async def _bulk_add(self, instances: list[Any]):
+        if not instances:
+            logger.info("Empty list provided for bulk add")
+            return False
+
+        async with await self._get_session() as session:
+            session.add_all(instances)
+            logger.info(
+                f"Adding {len(instances)} {instances[0].__class__.__name__} to the database"
+            )
+            await session.commit()
+            return True

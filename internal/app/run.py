@@ -1,10 +1,9 @@
-
 import logging
 from config.config import config
 from internal.handlers import routers
-from internal.entities.database import sellers, Seller
+from internal.entities.database import sellers, Seller, shops, Shop
 from internal.entities.database.base import create_async_database
-from internal.entities.schemas.Shop import Shop
+from internal.entities.schemas.Shop import Shop as SchemaShop
 
 from service import middleware
 from service.Background.checker import run_checker
@@ -22,12 +21,13 @@ from tests.test import create_test_data
 
 logger = logging.getLogger(__name__)
 
-async def run(self):
+async def run():
     await create_async_database()
-    await create_shop(shop=Shop(
+    shop = await shops.get(1)
+    await create_shop(shop=SchemaShop(
         host=config.server.host,
         port=config.server.port,
-        name=config.shop.name,
+        name=shop.name,
     ))
     
     app = create_fastapi()

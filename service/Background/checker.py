@@ -24,7 +24,7 @@ async def checking_payment_status():
                     account.view_type = True
                     await accounts.update(account=account)
                     await deals.delete(deal=deal)
-        guarantor_deals: list[Deal] = await deals.get_guarant_deals()
+        guarantor_deals: list[Deal] = await deals.get_guarantor_deals()
         for deal in guarantor_deals:
             if datetime.datetime.now() - deal.date >= datetime.timedelta(hours=24):
                 seller: Seller = await sellers.get(id=deal.seller_id)

@@ -128,12 +128,14 @@ class ApiPoint:
 ### TODO: edit logic 
 
 class AccountExcel(BaseModel):
-    type_account: str
-    name: str
+    category: Optional[str] = None
+    subcategory: Optional[str] = None
+    type_account: Optional[str] = None
+    name: Optional[str] = None
     price: Optional[float] = None
     description: Optional[str] = None
     data: Optional[str] = None
-    uid: str
+    uid: Optional[str] = None
 
 
 class Response(BaseModel):

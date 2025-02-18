@@ -78,6 +78,12 @@ $$
             description text,
             path_photo  text
         );
+
+        create table acceptable_account_categories
+        (
+            id   int PRIMARY KEY,
+            name text
+        );
         
         RAISE NOTICE 'Таблицы успешно созданы.';
     EXCEPTION

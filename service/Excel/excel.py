@@ -1,4 +1,3 @@
-import json
 import math
 
 import pandas as pd
@@ -8,11 +7,12 @@ from internal.entities.models import AccountExcel
 ### TODO: edit logic 
 
 columns_name = {
-    "Тип аккаунта": "type_account",
+    "Категория аккаунта": "category",
+    "Подкатегория аккаунта": "subcategory",
+    "Название": "name",
     "Стоимость аккаунта": "price",
     "Описание  аккаунта": "description",
     "Данные аккаунта": "data",
-    "Название": "name",
     "UIID": "uid"
 }
 
@@ -38,10 +38,14 @@ def get_account_data(file_path: str) -> list[AccountExcel]:
     data = get_excel_dict(file_path)
     # Инициализируем текущие общие данные
     current_general_data = {
+        "category": None,
+        "subcategory": None,
         "type_account": None,
         "name": None,
         "price": None,
-        "description": None
+        "description": None,
+        "data": None,
+        "uid": None
     }
 
     # Основной цикл
@@ -60,6 +64,8 @@ def get_account_data(file_path: str) -> list[AccountExcel]:
                 for key in ["data", "uid"]
         ):
             account = {
+                "category": current_general_data["subcategory"],
+                "subcategory": current_general_data["subcategory"],
                 "type_account": current_general_data["type_account"],
                 "name": current_general_data["name"],
                 "price": current_general_data["price"],

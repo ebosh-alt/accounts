@@ -1,18 +1,12 @@
 from __future__ import annotations
 
-import datetime
 import logging
-from typing import List
 
-from aiogram.fsm.context import FSMContext
-from sqlalchemy import Column, Boolean, BigInteger, ForeignKey, INTEGER, DATETIME, Integer, Float, String, DateTime
+from sqlalchemy import Column, Boolean, BigInteger, ForeignKey, Integer, Float, String, DateTime
 
-from config.config import config
+from internal.entities.models import DataDeals
 from .accounts import Accounts
-
 from .base import Base, BaseDB
-from .accounts import Accounts
-from ..models import DataDeals
 
 logger = logging.getLogger(__name__)
 
@@ -23,14 +17,11 @@ class Deal(Base):
     id = Column(Integer, autoincrement="auto", primary_key=True)
     buyer_id = Column(BigInteger, ForeignKey("users.id"))
     seller_id = Column(BigInteger, ForeignKey("sellers.id"))
-    # account_id = Column(BigInteger, ForeignKey("accounts.id"))
     price = Column(Float)
     wallet = Column(String)
     date = Column(DateTime)
     guarantor = Column(Boolean)
     payment_status = Column(Integer)
-
-    # group_id = Column(BigInteger)
 
     def dict(self):
         return {
@@ -46,24 +37,26 @@ class Deal(Base):
 
 
 class Deals(BaseDB):
-    async def new(self, deal: Deal):
-        await self._add_obj(deal)
+    def __init__(self):
+        super().__init__(Deal)
+
+    async def new(self, instance: Deal):
+        await self._add_obj(instance)
 
     async def get(self, id: int) -> Deal | None:
-        result = await self._get_object(Deal, id)
+        result = await self._get_object(id)
         return result
 
-    async def update(self, deal: Deal) -> None:
-        await self._update_obj(instance=deal, obj=Deal)
+    async def update(self, instance: Deal) -> None:
+        await self._update_obj(instance=instance)
 
-    async def delete(self, deal: Deal) -> None:
-        await self._delete_obj(instance=deal)
+    async def delete(self, instance: Deal) -> None:
+        await self._delete_obj(instance=instance)
 
 
     async def get_data_deals(self) -> list[DataDeals]:
-        all_deals: list[Deal] = await self._get_objects(Deal, {})
         result = list()
-        for deal in all_deals:
+        async for deal in self:
             accs = await Accounts().get_by_deal_id(deal_id=deal.id)
             for account in accs:
                 result.append(DataDeals(
@@ -81,7 +74,7 @@ class Deals(BaseDB):
 
     async def get_user_deals(self, id: int) -> list[DataDeals]:
         filters = {Deal.buyer_id: id}
-        deals = await self._get_objects(Deal, filters=filters)
+        deals = await self._get_objects(filters=filters)
         result = list()
 
         for deal in deals:
@@ -111,18 +104,18 @@ class Deals(BaseDB):
 
     async def get_last_deal(self, user_id) -> Deal:
         filters = {Deal.buyer_id: user_id}
-        data = await self._get_objects(Deal, filters)
+        data = await self._get_objects(filters)
         return data[-1]
 
     async def get_unpaid_deals(self) -> list[Deal]:
         filters = {Deal.payment_status: 0}
-        data = await self._get_objects(Deal, filters)
+        data = await self._get_objects(filters)
         return data
 
-    async def get_guarant_deals(self) -> list[Deal]:
+    async def get_guarantor_deals(self) -> list[Deal]:
         filters = {Deal.guarantor: True}
-        data = await self._get_objects(Deal, filters)
+        data = await self._get_objects(filters)
         return data
 
     async def get_all(self):
-        return await self._get_objects(Deal, {})
+        return await self._get_objects({})
