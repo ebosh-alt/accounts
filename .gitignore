@@ -19,7 +19,6 @@ __pycache__/
 
 # Игнорировать все файлы с расширением .pyc в директориях __pycache__
 **/__pycache__/*.pyc
-*.pyc
 # Jupyter Notebook checkpoints
 .ipynb_checkpoints/
 
@@ -60,8 +59,9 @@ build/
 
 data/database.db
 poetry.lock
-photos/*
+reports/*.pdf
 
 redisdata/
+log.logging
 data/tgclient.session
 !*.pyc

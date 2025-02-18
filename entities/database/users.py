@@ -23,8 +23,7 @@ class User(Base):
     def dict(self):
         return {"id": self.id,
                 "username": self.username,
-                }
-
+            }  
 
 class Users(BaseDB):
     async def new(self, user: User):

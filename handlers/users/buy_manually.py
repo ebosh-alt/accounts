@@ -4,7 +4,7 @@ from aiogram import Router, F
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
 
-from data.config import bot, client_s, SELLER, BOT_ID, BASE_PERCENT, PERCENT_GUARANTOR,  MERCHANT_ID, \
+from data.config import bot, client_s, SELLER, BASE_PERCENT, PERCENT_GUARANTOR,  MERCHANT_ID, \
     LIMIT_PRICE, USERNAME_BOT
 from filters.Filters import IsUserMessageValid
 from models.database import chats, Chat, deals, accounts, sellers
