@@ -4,20 +4,6 @@ from telethon import TelegramClient
 from telethon.tl.functions.messages import CreateChatRequest
 from telethon.tl.types import Chat, Updates, InputUser
 
-# from telethon.client import DialogMethods
-# from db.db import session_db
-# from db.models import Accounts, Messages, Chats, Acc_Chat, Admins
-
-# from config import delays_f_mailing
-# from j_class import load_data
-
-# from funcs.files import get_message_text_f_file
-# session = "sender"
-# api_id = 25464761
-# api_hash = "b8c5b56c39d1002f687f7462cc1a1465"
-
-# import threading
-# import time
 logger = logging.getLogger(__name__)
 
 

@@ -3,8 +3,8 @@ import datetime
 import logging
 import time
 
-from models.database import sellers, Seller, deals, Deal, accounts, Account
-from models.database.base import create_async_database
+from internal.entities.database import sellers, Seller, deals, Deal, accounts, Account
+from internal.entities.database.base import create_async_database
 
 
 logger = logging.getLogger(__name__)

@@ -1,8 +1,8 @@
 from aiogram.enums import ParseMode
 from aiogram.types import CallbackQuery
 
-from data.config import bot
-from models.models import DataDeals
+from internal.app.app import bot
+from internal.entities.models import DataDeals
 from service.GetMessage import get_mes, rounding_numbers
 
 

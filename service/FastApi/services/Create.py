@@ -2,9 +2,10 @@ import logging
 
 import aiohttp
 
-from data.config import SECRET_KEY
-from models.models import ApiPoint
-from models.schemas.Shop import Shop
+# from config.config import SECRET_KEY
+from config.config import config
+from internal.entities.models import ApiPoint
+from internal.entities.schemas.Shop import Shop
 
 logger = logging.getLogger(__name__)
 
@@ -25,7 +26,7 @@ async def create_shop(shop: Shop):
     try:
         headers = {
             "accept": "application/json",
-            "auth_key": SECRET_KEY,
+            "auth_key": config.fastapi.private_key,
             "Content-Type": "application/json"
         }
         data = {

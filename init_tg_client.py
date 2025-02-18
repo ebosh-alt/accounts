@@ -1,7 +1,7 @@
 import asyncio
 import logging
 
-from data.config import client_s
+from internal.app.app import client_s
 from service.TGClient import startTGClient
 
 

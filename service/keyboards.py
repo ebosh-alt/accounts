@@ -3,8 +3,8 @@ import logging
 from aiogram import types
 from aiogram.utils.keyboard import InlineKeyboardBuilder, ReplyKeyboardBuilder
 
-from data.config import link_support
-from models.database import accounts
+from config.config import config
+from internal.entities.database import accounts
 
 logger = logging.getLogger(__name__)
 
@@ -64,7 +64,7 @@ class Keyboards:
     menu_kb = Builder.create_keyboard(
         {"🛒 Перейти в магазин аккаунтов": "shop",
          "📜 Прочитать правила": "rules",
-         "🛠 Написать в поддержку": link_support,
+         "🛠 Написать в поддержку": config.manager.link_support,
          "📦 Посмотреть историю покупок": "history_buy"})
     back_menu_kb = Builder.create_keyboard({"Назад": "back_menu"})
 
@@ -145,7 +145,7 @@ class Keyboards:
         "Оплатил": "complete_payment"
     })
     support_kb = Builder.create_keyboard({
-        "Поддержка": link_support
+        "Поддержка": config.manager.link_support
     })
 
     def freeze_deal_kb(deal_id: int):
@@ -163,7 +163,7 @@ class Keyboards:
 
     confirm_payment_kb = Builder.create_keyboard({
         "В главное меню": "В главное меню",
-        "Поддержка": link_support})
+        "Поддержка": config.manager.link_support})
 
     mark_seller_kb = Builder.create_keyboard({
         "0": "0",
@@ -180,7 +180,7 @@ class Keyboards:
         return Builder.create_keyboard({
             "Ок": f"ok_account_{','.join(deals_id)}",
             "Не ок": f"defect_account_{','.join(deals_id)}",
-            "Написать в поддержку": link_support
+            "Написать в поддержку": config.manager.link_support
 
         })
 
