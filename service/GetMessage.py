@@ -24,7 +24,7 @@ def get_text(text: str) -> str:
 
 def get_mes(path: str, **kwargs, ):
     env = Environment(
-        loader=PackageLoader(package_name='main', package_path="messages", encoding="utf-8"),
+        loader=PackageLoader(package_name='main', package_path="internal/messages", encoding="utf-8"),
         autoescape=select_autoescape(['html', 'xml'])
     )
 

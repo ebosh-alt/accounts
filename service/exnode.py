@@ -7,8 +7,9 @@ import time
 
 import aiohttp
 
-from data.config import EXNODE_PUBLIC, EXNODE_PRIVATE
-from models.models import CreatedWallet, ApiPoint, CreatedOrder, TransferredMerchantAccountBalance, ReceivedOrder, \
+# from config.config import EXNODE_PUBLIC, EXNODE_PRIVATE
+from config.config import config
+from internal.entities.models import CreatedWallet, ApiPoint, CreatedOrder, TransferredMerchantAccountBalance, ReceivedOrder, \
     ReceivedTransaction, CreatedMerchant
 
 logger = logging.getLogger(__name__)
@@ -167,7 +168,7 @@ async def test():
     # print(await en.get_order(b))
     ...
 
-ExNode = ExNodeClient(EXNODE_PUBLIC, EXNODE_PRIVATE)
+ExNode = ExNodeClient(config.exnode.public_key, config.exnode.private_key)
 
 
 if __name__ == '__main__':

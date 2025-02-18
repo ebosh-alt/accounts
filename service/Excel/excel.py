@@ -3,7 +3,9 @@ import math
 
 import pandas as pd
 
-from models.models import AccountExcel
+from internal.entities.models import AccountExcel
+
+### TODO: edit logic 
 
 columns_name = {
     "Тип аккаунта": "type_account",

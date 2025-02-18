@@ -3,10 +3,12 @@ import logging
 
 from aiogram.fsm.context import FSMContext
 
-from data.config import bot, SELLER, BASE_PERCENT, PERCENT_GUARANTOR
-from models.StateModels import ShoppingCart
-from models.database import accounts, deals, Account, Deal
-from states.states import UserStates
+from config.config import config
+
+from internal.app.app import bot
+from internal.entities.states.StateModels import ShoppingCart
+from internal.entities.database import accounts, deals, Account, Deal
+from internal.entities.states.states import UserStates
 
 logger = logging.getLogger(__name__)
 
@@ -31,9 +33,9 @@ async def set_data_shopping_cart(state: FSMContext, **kwargs) -> tuple[ShoppingC
         shopping_cart.guarantor = True if guarantor == "yes_guarantor" else False
         if shopping_cart.guarantor:
             shopping_cart.price = float(
-                "%.2f" % (shopping_cart.price * (1 + PERCENT_GUARANTOR / 100) * shopping_cart.count))
+                "%.2f" % (shopping_cart.price * (1 + config.shop.percent_guarantor / 100) * shopping_cart.count))
         else:
-            shopping_cart.price = float("%.2f" % (shopping_cart.price * (1 + BASE_PERCENT / 100) * shopping_cart.count))
+            shopping_cart.price = float("%.2f" % (shopping_cart.price * (1 + config.shop.base_percent / 100) * shopping_cart.count))
     elif message == "back_to_choice_account":
         shop = shopping_cart.shop
         shopping_cart = ShoppingCart(shop=shop)
@@ -52,7 +54,7 @@ async def create_deal(user_id: int, message_id: int, state: FSMContext) -> Shopp
     await deals.new(
         Deal(
             buyer_id=user_id,
-            seller_id=SELLER,
+            seller_id=config.manager.seller_id,
             # account_id=account.id,
             price=shopping_cart.price,
             date=datetime.datetime.now(),
