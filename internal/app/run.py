@@ -1,23 +1,20 @@
+import asyncio
 import logging
+from multiprocessing import Process
+
+from aiogram.types import BotCommand
+
 from config.config import config
-from internal.handlers import routers
-from internal.entities.database import sellers, Seller, shops, Shop
+from internal.app.app import bot, dp
+from internal.entities.database import sellers, Seller, shops
 from internal.entities.database.base import create_async_database
 from internal.entities.schemas.Shop import Shop as SchemaShop
-
+from internal.handlers import routers
 from service import middleware
 from service.Background.checker import run_checker
 from service.FastApi.events import create_fastapi, start_fastapi
 from service.FastApi.services.Create import create_shop
-
-from multiprocessing import Process
-
-import asyncio
-from internal.app.app import bot, dp
-from aiogram.types import BotCommand
-
 from tests.test import create_test_data
-
 
 logger = logging.getLogger(__name__)
 
@@ -29,7 +26,7 @@ async def run():
         port=config.server.port,
         name=shop.name,
     ))
-    
+
     app = create_fastapi()
     _ = asyncio.create_task(start_fastapi(app))
 
@@ -48,7 +45,6 @@ async def run():
 async def run_test():
     await create_async_database()
     await create_test_data()
-
     for router in routers:
         dp.include_router(router)
     dp.update.middleware(middleware.Logging())

@@ -3,10 +3,9 @@ from typing import Any
 
 from sqlalchemy import Column, String, Boolean, FLOAT, Integer, ForeignKey
 
-from internal.entities.models import Response, AccountExcel
+from internal.entities.database.categories import Categories
+from internal.entities.database.subcategories import Subcategories
 from internal.entities.schemas.Catalog import Catalog
-from service.Excel.excel import get_account_data
-from . import categories, subcategories, acceptable_account_categories
 from .base import Base, BaseDB
 
 logger = logging.getLogger(__name__)
@@ -29,19 +28,19 @@ class Account(Base):
 
     @property
     async def category(self):
-        subcategory = await subcategories.get(self.subcategory_id)
-        category = await categories.get(subcategory.category_id)
+        subcategory = await Subcategories().get(self.subcategory_id)
+        category = await Categories().get(subcategory.category_id)
         return category.name
 
     @property
     async def subcategory(self):
-        subcategory = await subcategories.get(self.subcategory_id)
+        subcategory = await Subcategories().get(self.subcategory_id)
         return subcategory.name
 
     def dict(self):
         return {
             "id": self.id,
-            "sub_category_id": self.subcategory_id,
+            "subcategory_id": self.subcategory_id,
             "price": self.price,
             "description": self.description,
             "data": self.data,
@@ -82,15 +81,14 @@ class Accounts(BaseDB):
         [result.append(i.shop) for i in data if i.shop not in result]
         return result
 
-    # TODO: edit logic
-    async def get_instance_by_name(self, name: str, category_id: int):
-        filters = {Account.name: name, Account.category_id: category_id, Account.view_type: True}
+    async def get_instance_by_name(self, name: str, subcategory_id: int):
+        filters = {Account.name: name, Account.subcategory_id: subcategory_id, Account.view_type: True}
         result: list[Account] = await self._get_objects(filters=filters)
         instance = result
         return instance
 
-    async def get_name_instances_shop(self, category_id: int):
-        filters = {Account.category_id: category_id, Account.view_type: True}
+    async def get_name_instances_shop(self, subcategory_id: int):
+        filters = {Account.subcategory_id: subcategory_id, Account.view_type: True}
         request = await self._get_objects(filters=filters)
         result = []
         for i in request:
@@ -114,92 +112,6 @@ class Accounts(BaseDB):
             return False
         return result[0]
 
-    ### TODO: edit logic
-
-    async def replace_catalog(self, path) -> Response:
-        """
-        Замена всего каталога
-        """
-        instances_mds: list[AccountExcel] = get_account_data(path)
-        instances = []
-        er = False
-        acceptable_types_names = await acceptable_account_categories.get_all_name_types()
-
-        for instance_md in instances_mds:
-            if await self.in_uid(instance_md.uid) is False:
-                if instance_md.type_account in acceptable_types_names:
-                    subcategory = await subcategories.get_by_name(instance_md.subcategory)
-                    instances.append(Account(
-                        subcategory_id=subcategory.id,
-                        price=instance_md.price,
-                        description=instance_md.description,
-                        data=instance_md.data,
-                        view_type=True,
-                        name=instance_md.name,
-                        uid=instance_md.uid
-                    ))
-                else:
-                    return Response(status=402, description="the instance type is not allowed")
-            else:
-                er = True
-        if er:
-            return Response(status=403, description="uid in db")
-        await self._update_all_values(Account.view_type, False)
-        er = not await self._bulk_add(instances)
-        if er:
-            return Response(status=404, description="new instances empty")
-        else:
-            return Response(status=200, description="success replace catalog")
-
-    async def change_catalog(self, path) -> Response:
-        """
-        Изменение каталога
-        """
-        instance: Account
-        instances_mds: list[AccountExcel] = get_account_data(path)
-        acceptable_types_names = await acceptable_account_categories.get_all_name_types()
-        for instance_md in instances_mds:
-            if instance := await self.in_uid(instance_md.uid):
-                if not instance.deal_id:
-                    if instance_md.type_account in acceptable_types_names:
-                        category = await categories.get_by_name(instance_md.category)
-                        subcategory = await subcategories.get_by_name(instance_md.subcategory)
-
-                        instance.category_id = category.id
-                        instance.subcategory_id = subcategory.id
-                        instance.shop = instance_md.type_account
-                        instance.price = instance_md.price
-                        instance.description = instance_md.description
-                        instance.data = instance_md.data
-                        instance.view_type = True
-                        instance.name = instance_md.name
-                        instance.uid = instance_md.uid
-
-                        await self.update(instance)
-                    else:
-                        return Response(status=403, description="the instance type is not allowed")
-                else:
-                    return Response(status=404, description="deal has been created for the instance")
-        return Response(status=200, description="success change catalog")
-
-    async def delete_from_catalog(self, path) -> Response:
-        """
-        Удаление из каталога
-        """
-        instances_mds = get_account_data(path)
-        instances = []
-        for instance_md in instances_mds:
-            if instance := await self.in_uid(instance_md.uid):
-                instance.view_type = False
-                instances.append(instance)
-            else:
-                return Response(status=403, description="uid not in db")
-        er = not await self._bulk_add(instances)
-        if er:
-            return Response(status=404, description="new instances empty")
-        else:
-            return Response(status=200, description="success delete from catalog")
-
     async def get_unique_instances_with_count(self) -> Catalog:
         """
         Получить список уникальных аккаунтов с view_type=True,
@@ -208,15 +120,16 @@ class Accounts(BaseDB):
         """
         # Фильтр для выборки только активных аккаунтов
         filters = {Account.view_type: True}
-        instances = await self._get_objects(filters=filters)
+        instances: list[Account] = await self._get_objects(filters=filters)
 
         # Словарь для группировки аккаунтов
         grouped_instances = {}
         for instance in instances:
-            key = (instance.shop, instance.name)  # Уникальный ключ: (shop, name)
+            key = (await instance.category, await instance.subcategory, instance.name)  # Уникальный ключ: (shop, name)
             if key not in grouped_instances:
                 grouped_instances[key] = {
-                    "category": instance.shop,
+                    "category": await instance.category,
+                    "subcategory": await instance.subcategory,
                     "name": instance.name,
                     "description": instance.description,
                     "price": instance.price,
@@ -226,7 +139,13 @@ class Accounts(BaseDB):
 
             grouped_instances[key]["count"] += 1
 
-        data = {"instances": list(grouped_instances.values())}
-        logger.info(data)
+        data = {"accounts": list(grouped_instances.values())}
         catalog = Catalog(**data)
         return catalog
+
+    async def get_by_uid(self, uid) -> Account | bool:
+        filters = {Account.uid: uid}
+        result = await self._get_objects(filters)
+        if len(result) == 0:
+            return False
+        return result[0]

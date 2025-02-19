@@ -49,5 +49,7 @@ class Subcategories(BaseDB):
     async def get_by_name(self, name):
         filters = {Subcategory.name: name}
         result = await self._get_objects(filters)
-        if result:
-            return result[0]
+        if not result:
+            return False
+        return result[0]
+
