@@ -13,6 +13,8 @@ class User(Base):
     id = Column(BigInteger,  primary_key=True)
     username = Column(String)
 
+    refs = []
+
     def dict(self):
         return {"id": self.id,
                 "username": self.username,

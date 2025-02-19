@@ -15,6 +15,8 @@ class Shop(Base):
     description = Column(String)
     path_photo = Column(String)
 
+    refs = []
+
     def dict(self):
         return {"id": self.id,
                 "name": self.name,

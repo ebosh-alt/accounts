@@ -14,6 +14,8 @@ class Chat(Base):
     user_id: int = Column(BigInteger, ForeignKey("users.id"))
     seller_id: int = Column(BigInteger, ForeignKey("sellers.id"))
 
+    refs = []
+
     def dict(self):
         return {"id": self.id,
                 "user_id": self.user_id,

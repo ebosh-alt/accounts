@@ -13,6 +13,8 @@ class Category(Base):
     id = Column(Integer, autoincrement=True, primary_key=True)
     name = Column(String)
 
+    refs = []
+
     def dict(self):
         return {"id": self.id,
                 "name": self.name,

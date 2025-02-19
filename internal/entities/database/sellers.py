@@ -17,6 +17,8 @@ class Seller(Base):
     username = Column(String)
     wallet = Column(String)
 
+    refs = []
+
     def dict(self):
         return {"id": self.id,
                 "rating": self.rating,

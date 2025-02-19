@@ -16,7 +16,6 @@ class Account(Base):
     __tablename__ = "accounts"
 
     id: int = Column(Integer, autoincrement=True, primary_key=True)
-    category_id: str = Column(Integer, ForeignKey("categories.id"))
     subcategory_id: str = Column(Integer, ForeignKey("subcategories.id"))
     price: float = Column(FLOAT)
     description: str = Column(String)
@@ -26,9 +25,12 @@ class Account(Base):
     deal_id: int = Column(Integer)
     uid: str = Column(String, unique=True)
 
+    refs = []
+
     @property
     async def category(self):
-        category = await categories.get(self.category_id)
+        subcategory = await subcategories.get(self.subcategory_id)
+        category = await categories.get(subcategory.category_id)
         return category.name
 
     @property
@@ -39,7 +41,6 @@ class Account(Base):
     def dict(self):
         return {
             "id": self.id,
-            "category_id": self.category_id,
             "sub_category_id": self.subcategory_id,
             "price": self.price,
             "description": self.description,
@@ -81,6 +82,7 @@ class Accounts(BaseDB):
         [result.append(i.shop) for i in data if i.shop not in result]
         return result
 
+    # TODO: edit logic
     async def get_instance_by_name(self, name: str, category_id: int):
         filters = {Account.name: name, Account.category_id: category_id, Account.view_type: True}
         result: list[Account] = await self._get_objects(filters=filters)
@@ -126,10 +128,8 @@ class Accounts(BaseDB):
         for instance_md in instances_mds:
             if await self.in_uid(instance_md.uid) is False:
                 if instance_md.type_account in acceptable_types_names:
-                    category = await categories.get_by_name(instance_md.category)
                     subcategory = await subcategories.get_by_name(instance_md.subcategory)
                     instances.append(Account(
-                        category_id=category.id,
                         subcategory_id=subcategory.id,
                         price=instance_md.price,
                         description=instance_md.description,

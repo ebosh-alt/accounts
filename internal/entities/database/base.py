@@ -34,6 +34,7 @@ async def create_async_database():
 async def create_factory():
     global __factory
     engine = create_async_engine(config.db.link_connect)
+    # engine = create_async_engine("postgresql+asyncpg://postgres:n164838i@127.0.0.1:5432/accounts")
     __factory = sessionmaker(bind=engine, expire_on_commit=False, class_=AsyncSession)
 
 

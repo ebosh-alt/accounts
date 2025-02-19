@@ -14,6 +14,8 @@ class Subcategory(Base):
     name = Column(String)
     category_id = Column(Integer, ForeignKey("categories.id"))
 
+    refs = []
+
     def dict(self):
         return {"id": self.id,
                 "name": self.name,

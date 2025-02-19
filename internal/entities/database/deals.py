@@ -23,6 +23,8 @@ class Deal(Base):
     guarantor = Column(Boolean)
     payment_status = Column(Integer)
 
+    refs = []
+
     def dict(self):
         return {
             "id": self.id,
