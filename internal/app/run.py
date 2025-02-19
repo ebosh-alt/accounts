@@ -43,15 +43,18 @@ async def run():
     dp.update.middleware(middleware.Logging())
     await set_commands()
 
+async def run_api():
+    await create_async_database()
+    app = create_fastapi()
+    await start_fastapi(app)
+
 async def run_test():
     await create_async_database()
-    await Excel.delete_from_catalog("service/Excel/del1.xlsx")
-    # await create_test_data()
-    # for router in routers:
-    #     dp.include_router(router)
-    # dp.update.middleware(middleware.Logging())
-    # await set_commands()
-
+    await create_test_data()
+    for router in routers:
+        dp.include_router(router)
+    dp.update.middleware(middleware.Logging())
+    await set_commands()
     await dp.start_polling(bot)
 
 

@@ -46,11 +46,12 @@ def create_fastapi() -> FastAPI:
 
 async def start_fastapi(app=FastAPI):
     # Запускаем Uvicorn сервер
+
     cfg = uvicorn.Config(app,
                             host=config.server.host.replace("https://", ""),
                             port=config.server.port,
-                            ssl_keyfile="server.key",
-                            ssl_certfile="server.crt"
+                            ssl_keyfile="data/server.key",
+                            ssl_certfile="data/server.crt"
                             )
     server = uvicorn.Server(cfg)
     await server.serve()
