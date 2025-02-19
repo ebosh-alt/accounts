@@ -12,6 +12,7 @@ from internal.entities.schemas.Shop import Shop as SchemaShop
 from internal.handlers import routers
 from service import middleware
 from service.Background.checker import run_checker
+from service.Excel.excel import Excel
 from service.FastApi.events import create_fastapi, start_fastapi
 from service.FastApi.services.Create import create_shop
 from tests.test import create_test_data
@@ -44,11 +45,12 @@ async def run():
 
 async def run_test():
     await create_async_database()
-    await create_test_data()
-    for router in routers:
-        dp.include_router(router)
-    dp.update.middleware(middleware.Logging())
-    await set_commands()
+    await Excel.delete_from_catalog("service/Excel/del1.xlsx")
+    # await create_test_data()
+    # for router in routers:
+    #     dp.include_router(router)
+    # dp.update.middleware(middleware.Logging())
+    # await set_commands()
 
     await dp.start_polling(bot)
 
