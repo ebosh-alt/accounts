@@ -1,8 +1,13 @@
 import logging
 
-from sqlalchemy import Column, String, Integer
+from sqlalchemy import Column, String, Integer, select
 
 from .base import Base, BaseDB
+
+from .subcategories import Subcategory
+from .accounts import Account
+
+
 logger = logging.getLogger(__name__)
 
 
@@ -42,6 +47,70 @@ class Categories(BaseDB):
         if type(result) is Category:
             return result
         return False
+    
+    async def get_viewed_categories(self):
+        # Запрос для получения категорий с хотя бы одним аккаунтом с view_type = True
+        async with await self._get_session() as session:
+            result = await session.execute(
+                select(Category).distinct(
+                    ).join(Subcategory, Subcategory.category_id == Category.id
+                    ).join(Account, Account.subcategory_id == Subcategory.id
+                    ).filter(Account.view_type == True)
+            )
+
+            categories_with_view_type_true = result.scalars().all()
+        return [cat.name for cat in categories_with_view_type_true]
+
+
+    async def get_viewed_subcategories_by_category(self, category):
+        # Запрос для получения категорий с хотя бы одним аккаунтом с view_type = True
+        async with await self._get_session() as session:
+            result = await session.execute(
+                select(Subcategory).distinct(
+                    ).join(Category, Category.id == Subcategory.category_id
+                    ).join(Account, Account.subcategory_id == Subcategory.id
+                    ).filter(Account.view_type == True
+                    ).filter(Category.name == category)
+            )
+
+            subcategories_with_view_type_by_category = result.scalars().all()
+        return [sub.name for sub in subcategories_with_view_type_by_category]
+
+
+    async def get_viewed_accs_by_category_subcategory(self, category, subcategory):
+        # Запрос для получения категорий с хотя бы одним аккаунтом с view_type = True
+        async with await self._get_session() as session:
+            result = await session.execute(
+                select(Account).distinct(
+                    ).join(Subcategory, Account.subcategory_id == Subcategory.id
+                    ).join(Category, Subcategory.category_id == Category.id
+                    ).filter(Account.view_type == True
+                    ).filter(Subcategory.name == subcategory
+                    ).filter(Category.name == category
+                )
+            )
+
+            accs_with_view_type_by_category_subcategory = result.scalars().all()
+        return [acc.name for acc in accs_with_view_type_by_category_subcategory], accs_with_view_type_by_category_subcategory
+        # return accs_with_view_type_by_category_subcategory
+
+    async def get_viewed_accs_by_category_subcategory_acc(self, category, subcategory, acc):
+        # Запрос для получения категорий с хотя бы одним аккаунтом с view_type = True
+        async with await self._get_session() as session:
+            result = await session.execute(
+                select(Account).distinct(
+                    ).join(Subcategory, Account.subcategory_id == Subcategory.id
+                    ).join(Category, Category.id == Subcategory.category_id
+                    ).filter(Account.view_type == True
+                    ).filter(Category.name == category
+                    ).filter(Subcategory.name == subcategory
+                    ).filter(Account.name == acc)
+            )
+
+            accs_with_view_type_by_category_subcategory = result.scalars().all()
+        # return [acc.name for acc in accs_with_view_type_by_category_subcategory]
+        return accs_with_view_type_by_category_subcategory
+
 
     async def get_by_name(self, name):
         filters = {Category.name: name}

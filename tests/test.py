@@ -1,49 +1,18 @@
 from config.config import config
 
-from internal.entities.database import sellers, Seller, users, User, accounts, Account, deals, Deal, subcategories, \
-    Subcategory, categories, Category, shops, Shop
+from internal.entities.database import sellers, Seller, users, User, accounts, Account, deals, Deal, subcategories, Subcategory, categories, Category, shops, Shop
 
 import datetime
 
-async def create_seller():
-    if await sellers.in_(id=config.manager.seller_id):
-        pass
-    else:
-        seller = Seller(id=config.manager.seller_id, rating=5, balance=0, username=config.manager.username, wallet="wallet")
-        await sellers.new(seller=seller)
-
-    # Добавление записей в таблицу users
-    if await users.in_(id=config.manager.seller_id):
-        pass
-    else:
-        user = User(id=config.manager.seller_id, username=config.manager.username)
-        await users.new(user)
 
 async def create_test_data():
-    await shops.new(Shop(
-        name='',
-        description='',
-        path_photo='',
-    ))
-    # Добавление записи в таблицу sellers
-    if await sellers.in_(id=config.manager.seller_id):
-        pass
-    else:
-        seller = Seller(id=config.manager.seller_id, rating=5, balance=0, username=config.manager.username, wallet="wallet")
-        await sellers.new(seller=seller)
 
-    # Добавление записей в таблицу users
-    if await users.in_(id=config.manager.seller_id):
-        pass
-    else:
-        user = User(id=config.manager.seller_id, username=config.manager.username)
-        await users.new(user)
 
     # Добавление записей в таблицу categories
     for i in range(1, 11):
         category = Category(
             id=i,
-            name=f"Name{i}",
+            name=f"Category Name {i}",
         )
         await categories.new(category)
 
@@ -51,7 +20,7 @@ async def create_test_data():
     for i in range(1, 11):
         subcategory = Subcategory(
             id=i,
-            name=f"Name{i}",
+            name=f"Subcategory Name {i}",
             category_id=i,
         )
         await subcategories.new(subcategory)
@@ -80,6 +49,19 @@ async def create_test_data():
             name=f"Account {i}",
             uid=str(i),
             deal_id=i % 4 + 1
+        )
+        await accounts.new(account)
+    
+    for i in range(11, 21):
+        account = Account(
+            subcategory_id=5,
+            price=100.0 + i,
+            description=f"Description {i}",
+            data=f"Data {i}",
+            view_type=True,
+            name=f"Account {i}",
+            uid=str(i),
+            deal_id=None
         )
         await accounts.new(account)
 

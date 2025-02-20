@@ -4,7 +4,7 @@ from aiogram import types
 from aiogram.utils.keyboard import InlineKeyboardBuilder, ReplyKeyboardBuilder
 
 from config.config import config
-from internal.entities.database import accounts
+from internal.entities.database import accounts, categories
 
 logger = logging.getLogger(__name__)
 
@@ -135,12 +135,12 @@ class Keyboards:
     choice_guarantor_kb = Builder.create_keyboard({
         "C гарантом": f"yes_guarantor",
         "Без гаранта": f"no_guarantor",
-        "Вернуться к выбору аккаунта": "back_to_choice_account",
+        "Вернуться к выбору подкатегорий": "Вернуться к выбору подкатегорий",
         "В главное меню": "В главное меню"
     })
     ready_payment_kb = Builder.create_keyboard({
         "Оплата": "payment",
-        "Вернуться к выбору аккаунта": "back_to_choice_account",
+        "Вернуться к выбору подкатегорий": "Вернуться к выбору подкатегорий",
         "В главное меню": "В главное меню"
     })
 
@@ -195,13 +195,31 @@ class Keyboards:
         return kb
 
     @staticmethod
-    async def shop_kb():
-        buttons = await accounts.get_shops()
+    async def categories_kb():
+        # buttons = await accounts.get_shops()
+        buttons = await categories.get_viewed_categories()
+        buttons.append("Вернуться к выбору действия")
+        buttons.append("Вернуться в главное меню")
+        kb = Builder.create_keyboard(buttons)
+        return kb
+    
+    @staticmethod
+    async def subcategories_kb(category):
+        # buttons = await accounts.get_shops()
+        buttons = await categories.get_viewed_subcategories_by_category(category)
         buttons.append("Вернуться к выбору действия")
         buttons.append("Вернуться в главное меню")
         kb = Builder.create_keyboard(buttons)
         return kb
 
+    @staticmethod
+    async def choice_action_subcategories_account():
+        # buttons = await accounts.get_name_accounts_shop(shop)
+        # buttons = ["Перейти к выбору товаров", "Написать продавцу", "Вернуться в главное меню"]
+        buttons = ["Перейти к выбору подкатегорий", "Написать продавцу", "Вернуться в главное меню"]
+        kb = Builder.create_keyboard(buttons)
+        return kb
+    
     @staticmethod
     async def choice_action_name_account():
         # buttons = await accounts.get_name_accounts_shop(shop)
@@ -210,14 +228,17 @@ class Keyboards:
         return kb
 
     @staticmethod
-    async def name_accounts_shop_kb(shop):
-        buttons = await accounts.get_name_accounts_shop(shop)
-        buttons.append("Вернуться к выбору действия")
-        buttons.append("Вернуться в главное меню")
+    def name_accounts_slider_kb():
+        # acc_names, accs = await categories.get_viewed_accs_by_category_subcategory(category, subcategory)
+        buttons = [
+            "<",
+            ">",
+            "Вернуться к выбору подкатегорий",
+        ]
         # buttons.append("Вернуться к выбору магазина")
         # buttons.append("В главное меню")
         logger.info(f"{buttons}")
-        kb = Builder.create_keyboard(buttons)
+        kb = Builder.create_keyboard(buttons, 2, 1)
         return kb
 
     @staticmethod
@@ -241,7 +262,7 @@ class Keyboards:
             return Builder.create_keyboard({
                 "C гарантом": f"yes_guarantor",
                 "Без гаранта": f"no_guarantor",
-                "Вернуться к выбору товаров": "Вернуться к выбору товаров",
+                "Вернуться к выбору подкатегорий": "Вернуться к выбору подкатегорий",
                 "В главное меню": "В главное меню"
             })
         else:
@@ -250,6 +271,6 @@ class Keyboards:
                 "+1": "add_account",
                 "C гарантом": f"yes_guarantor",
                 "Без гаранта": f"no_guarantor",
-                "Вернуться к выбору товаров": "Вернуться к выбору товаров",
+                "Вернуться к выбору подкатегорий": "Вернуться к выбору подкатегорий",
                 "В главное меню": "В главное меню"
             }, 2, 2, 1, 1)

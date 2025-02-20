@@ -17,4 +17,4 @@ remove:
 restart:
 	make remove
 	make test_db
-	make start
+	python main.py test_data

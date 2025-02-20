@@ -7,10 +7,9 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, CallbackQuery, FSInputFile
 
 from internal.app.app import bot
-### TODO: edit logic 
-# path_to_logo, Config
+### TODO: test logic 
 from internal.handlers.users.buy_automatically import choice_guarantor
-from internal.entities.database import users, User
+from internal.entities.database import users, User, shops
 from service import cryptography
 from service.GetMessage import get_mes
 from service.buy_automatically import clear_state_shopping_cart
@@ -29,10 +28,9 @@ async def start(message: Message | CallbackQuery, state: FSMContext):
     if user is False:
         user = User(id=id, username=message.from_user.username)
         await users.new(user)
-    # config = Config()
-    config = None
-    caption = get_mes("menu", name_shop=config.name_shop, description_seller=config.description_seller)
-    photo = FSInputFile("path_to_logo")
+    shop = await shops.get(1)
+    caption = get_mes("menu", name_shop=shop.name, description_seller=shop.description)
+    photo = FSInputFile(shop.path_photo)
     try:
         if type(message) is CallbackQuery:
             await message.message.delete()
@@ -40,16 +38,22 @@ async def start(message: Message | CallbackQuery, state: FSMContext):
         if type(message) is Message:
             if " " in message.text:
                 data = message.text.split(" ")[-1]
-                shop, name = cryptography.decode(data).split("%")
-                logger.info(f"Buy by link; shop={shop}, name={name}")
-                return await choice_guarantor(message, state, shop, name)
+                category, subcategory, name = cryptography.decode(data).split("%")
+                logger.info(category)
+                logger.info(subcategory)
+                logger.info(name)
+                data = await state.get_data()
+                logger.info(data.get("ShoppingCart"))
+
+                logger.info(f"Buy by link; category={category}, subcategory={subcategory}, name={name}")
+                return await choice_guarantor(message, state, category, subcategory, name)
         if await state.get_state() == UserStates.ShoppingCart:
             await clear_state_shopping_cart(state, user_id=id)
         await state.clear()
         await bot.send_photo(chat_id=id,
-                             photo=photo,
-                             caption=caption,
-                             reply_markup=Keyboards.menu_kb)
+                                photo=photo,
+                                caption=caption,
+                                reply_markup=Keyboards.menu_kb)
     except Exception as e:
         logger.info(e)
         await state.clear()

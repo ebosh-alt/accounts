@@ -8,6 +8,7 @@ from internal.entities.database.subcategories import Subcategories
 from internal.entities.schemas.Catalog import Catalog
 from .base import Base, BaseDB
 
+
 logger = logging.getLogger(__name__)
 
 
@@ -74,27 +75,29 @@ class Accounts(BaseDB):
             return result
         return False
 
-    async def get_shops(self) -> list[Any]:
-        filters = {Account.view_type: True}
-        data = await self._get_objects(filters=filters)
-        result = []
-        [result.append(i.shop) for i in data if i.shop not in result]
-        return result
+    # async def get_shops(self) -> list[Any]:
+    #     filters = {Account.view_type: True}
+    #     data = await self._get_objects(filters=filters)
+    #     result = []
+    #     [result.append(i.shop) for i in data if i.shop not in result]
+    #     return result
 
+    # TODO: edit logic
     async def get_instance_by_name(self, name: str, subcategory_id: int):
         filters = {Account.name: name, Account.subcategory_id: subcategory_id, Account.view_type: True}
         result: list[Account] = await self._get_objects(filters=filters)
         instance = result
         return instance
 
-    async def get_name_instances_shop(self, subcategory_id: int):
-        filters = {Account.subcategory_id: subcategory_id, Account.view_type: True}
-        request = await self._get_objects(filters=filters)
-        result = []
-        for i in request:
-            if len(i.name) < 65 and i.name not in result:
-                result.append(i.name)
-        return result
+    # async def get_name_instances_shop(self, category_id: int):
+    #     filters = {Account.category_id: category_id, Account.view_type: True}
+    #     request = await self._get_objects(filters=filters)
+    #     result = []
+    #     for i in request:
+    #         if len(i.name) < 65 and i.name not in result:
+    #             result.append(i.name)
+    #     return result
+
 
     async def get_last(self) -> Account:
         filters = {}

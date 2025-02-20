@@ -154,3 +154,16 @@ class BaseDB:
             )
             await session.commit()
             return True
+        
+    # async def f(self):
+    #     # Запрос для получения категорий с хотя бы одним аккаунтом с view_type = True
+    #     async with await self._get_session() as session:
+    #         result = await session.execute(
+    #             select(Category).distinct(
+    #                 ).join(Subcategory, Subcategory.category_id == Category.id
+    #                 ).join(Account, Account.subcategory_id == Subcategory.id
+    #                 ).filter(Account.view_type == True)
+    #         )
+
+    #         categories_with_view_type_true = result.scalars().all()
+    #     return categories_with_view_type_true
