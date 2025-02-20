@@ -68,6 +68,7 @@ async def create_deal_price(message: Message, state: FSMContext):
         # parse_mode=ParseMode.MARKDOWN_V2
     )
 
+### TODO: category subcategory logic
 
 @router.message(ManagerStates.create_deal_price, IsManager())
 async def create_deal_description(message: Message, state: FSMContext):
@@ -173,7 +174,7 @@ async def create_deal_end(message: CallbackQuery, state: FSMContext):
         await deals.new(c_deal)
         deal_bd = await deals.get_last_deal(deal.user_id)
         account = Account(
-            shop=deal.shop,
+            subcategory=deal.subcategory,
             price=deal.price,
             description=deal.description,
             data=deal.data,

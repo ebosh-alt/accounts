@@ -29,39 +29,40 @@ $$
 
         create table categories
         (
-            id   int PRIMARY KEY,
+            id   serial PRIMARY KEY,
             name text
         );
 
         create table subcategories
         (
-            id          int PRIMARY KEY,
+            id          serial PRIMARY KEY,
             name        text,
             category_id int REFERENCES categories (id)
         );
 
         CREATE TABLE deals
         (
-            id         int PRIMARY KEY,
-            user_id    int REFERENCES users (id),
-            seller_id  int REFERENCES sellers (id),
-            price      float,
-            wallet     text,
-            type       int,
-            status     int,
-            created_at date
+            id                  serial PRIMARY KEY,
+            buyer_id            int REFERENCES users (id),
+            seller_id           int REFERENCES sellers (id),
+            price               float,
+            wallet              text,
+            payment_status      int,
+            date                date,
+            guarantor           bool
         );
 
         CREATE TABLE accounts
         (
-            id             int PRIMARY KEY,
+            id             serial PRIMARY KEY,
             name           text,
             price          float,
             description    text,
             data           text,
-            view_type      int,
+            view_type      bool,
             subcategory_id int REFERENCES subcategories (id),
-            deal_id        int REFERENCES deals (id)
+            deal_id        int REFERENCES deals (id),
+            uid            text
         );
 
         CREATE TABLE chats
@@ -73,7 +74,7 @@ $$
 
         create table shops
         (
-            id          int PRIMARY KEY,
+            id          serial PRIMARY KEY,
             name        text,
             description text,
             path_photo  text
@@ -81,7 +82,7 @@ $$
 
         create table acceptable_account_categories
         (
-            id   int PRIMARY KEY,
+            id   serial PRIMARY KEY,
             name text
         );
         

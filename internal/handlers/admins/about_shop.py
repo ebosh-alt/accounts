@@ -12,6 +12,8 @@ from internal.entities.states.states import AdminStates
 router = Router()
 
 
+
+
 @router.callback_query(F.data.in_(["change_name_shop", "change_description_seller"]))
 async def change_name_shop(message: CallbackQuery, state: FSMContext):
     id = message.from_user.id

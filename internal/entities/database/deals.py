@@ -6,6 +6,8 @@ from sqlalchemy import Column, Boolean, BigInteger, ForeignKey, Integer, Float, 
 
 from internal.entities.models import DataDeals
 from .accounts import Accounts
+from .subcategories import Subcategories
+from .categories import Categories
 from .base import Base, BaseDB
 
 logger = logging.getLogger(__name__)
@@ -60,10 +62,15 @@ class Deals(BaseDB):
         result = list()
         async for deal in self:
             accs = await Accounts().get_by_deal_id(deal_id=deal.id)
+            subcats = Subcategories()
+            cats = Categories()
             for account in accs:
+                sc = await subcats.get(account.subcategory_id)
+                c = await cats.get(sc.category_id)
                 result.append(DataDeals(
                     id=deal.id,
-                    shop=account.shop,
+                    category=c.name,
+                    subcategory=sc.name,
                     name=account.name,
                     price=account.price,
                     description=account.description,
@@ -81,11 +88,16 @@ class Deals(BaseDB):
 
         for deal in deals:
             accs = await Accounts().get_by_deal_id(deal_id=deal.id)
+            subcats = Subcategories()
+            cats = Categories()
             for account in accs:
             # print(account.dict())
+                sc = await subcats.get(account.subcategory_id)
+                c = await cats.get(sc.category_id)
                 data_deals = DataDeals(
                     id=deal.id,
-                    shop=account.shop,
+                    category=c.name,
+                    subcategory=sc.name,
                     name=account.name,
                     price=float(account.price),
                     description=account.description,

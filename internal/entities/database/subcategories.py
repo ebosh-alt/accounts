@@ -4,6 +4,7 @@ from sqlalchemy import Column, String, Integer, ForeignKey
 
 from .base import Base, BaseDB
 
+
 logger = logging.getLogger(__name__)
 
 
@@ -51,3 +52,4 @@ class Subcategories(BaseDB):
         result = await self._get_objects(filters)
         if result:
             return result[0]
+

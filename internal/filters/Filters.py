@@ -1,6 +1,6 @@
 from config.config import config
 
-from internal.entities.database import accounts, chats
+from internal.entities.database import accounts, chats, categories
 
 from aiogram.filters import Filter
 from aiogram.fsm.context import FSMContext
@@ -22,12 +22,23 @@ class IsManager(Filter):
         return False
 
 
-class IsShop(Filter):
+class IsCategory(Filter):
     async def __call__(self, message: CallbackQuery, event_from_user: User) -> bool:
-        buttons = await accounts.get_shops()
+        buttons = await categories.get_viewed_categories()
         buttons.append("back_to_choice_account")
         if message.data in buttons:
             return True
+        return False
+
+class IsSubcategory(Filter):
+    async def __call__(self, message: CallbackQuery, event_from_user: User, state: FSMContext) -> bool:
+        data = await state.get_data()
+        shopping_cart = data.get('ShoppingCart')
+        if shopping_cart is not None:
+            buttons = await categories.get_viewed_subcategories_by_category(shopping_cart.category)
+            buttons.append("back_to_choice_account")
+            if message.data in buttons:
+                return True
         return False
 
 
@@ -36,9 +47,13 @@ class IsNameAccount(Filter):
         data = await state.get_data()
         shopping_cart = data.get('ShoppingCart')
         if shopping_cart is not None:
-            buttons = await accounts.get_name_accounts_shop(shopping_cart.shop)
-            if message.data in buttons:
+            acc_names, accs = await categories.get_viewed_accs_by_category_subcategory(shopping_cart.category, shopping_cart.subcategory)
+            if message.data in acc_names:
                 return True
+            if shopping_cart.name in acc_names:
+                return True
+            
+            
         return False
 
 

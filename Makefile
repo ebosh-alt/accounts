@@ -13,3 +13,8 @@ start:
 
 remove:
 	docker compose down db_accounts bot_and_fastapi -v
+
+restart:
+	make remove
+	make test_db
+	python main.py test_data

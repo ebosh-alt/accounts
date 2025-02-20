@@ -59,7 +59,9 @@ class ShopConfig(ConfigBase):
     base_percent: float
     percent_guarantor: float
     limit_price: float
-
+    name: str = ""
+    description: str = ""
+    path_photo: str = "data/default.jpg"
 
 class ExcelConfig(ConfigBase):
     model_config = SettingsConfigDict(env_prefix="excel_")

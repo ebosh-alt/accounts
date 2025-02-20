@@ -8,7 +8,8 @@ from config.config import config
 
 class DataDeals(BaseModel):
     id: int
-    shop: str
+    category: str
+    subcategory: str
     name: str
     price: float | int
     description: str
@@ -18,7 +19,7 @@ class DataDeals(BaseModel):
     payment: int
 
     def len(self):
-        return len(str(self.id) + str(self.shop) + str(self.name) + str(self.price) + str(self.description) + str(
+        return len(str(self.id) + str(self.category)+ str(self.subcategory) + str(self.name) + str(self.price) + str(self.description) + str(
             self.data) + str(self.date) + str(self.guarantor) + str(self.payment))
 
 

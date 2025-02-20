@@ -7,7 +7,7 @@ from config.config import config
 
 from internal.app.app import bot
 from internal.entities.states.StateModels import ShoppingCart
-from internal.entities.database import accounts, deals, Account, Deal
+from internal.entities.database import accounts, deals, Account, Deal, categories
 from internal.entities.states.states import UserStates
 
 logger = logging.getLogger(__name__)
@@ -15,20 +15,25 @@ logger = logging.getLogger(__name__)
 
 async def set_data_shopping_cart(state: FSMContext, **kwargs) -> tuple[ShoppingCart, int, Account] | ShoppingCart:
     data = await state.get_data()
-    shop = kwargs.get('shop')
+    category = kwargs.get('category')
+    subcategory = kwargs.get('subcategory')
     message = kwargs.get('message')
     name = kwargs.get('name')
     guarantor = kwargs.get('guarantor')
     shopping_cart: ShoppingCart | None = data.get("ShoppingCart")
     if shopping_cart is None:
         await state.set_state(UserStates.ShoppingCart)
-        shopping_cart = ShoppingCart(shop=shop)
+        shopping_cart = ShoppingCart(category=category, subcategory=subcategory)
     if name is not None:
         shopping_cart.name = name
-        accs = await accounts.get_account_by_name(name, shopping_cart.shop)
-        shopping_cart.price = accs[0].price
-        shopping_cart.description = accs[0].description
-        return shopping_cart, len(accs), accs[0]
+        logger.info(shopping_cart)
+        acc_names = await categories.get_viewed_accs_by_category_subcategory_acc(shopping_cart.category, shopping_cart.subcategory, name)
+        logger.info(acc_names)
+        shopping_cart.price = acc_names[0].price
+        shopping_cart.description = acc_names[0].description
+        await state.update_data(ShoppingCart=shopping_cart)
+
+        return shopping_cart, len(acc_names), acc_names[0]
     elif guarantor is not None:
         shopping_cart.guarantor = True if guarantor == "yes_guarantor" else False
         if shopping_cart.guarantor:
@@ -37,10 +42,11 @@ async def set_data_shopping_cart(state: FSMContext, **kwargs) -> tuple[ShoppingC
         else:
             shopping_cart.price = float("%.2f" % (shopping_cart.price * (1 + config.shop.base_percent / 100) * shopping_cart.count))
     elif message == "back_to_choice_account":
-        shop = shopping_cart.shop
-        shopping_cart = ShoppingCart(shop=shop)
+        category = shopping_cart.category
+        subcategory = shopping_cart.subcategory
+        shopping_cart = ShoppingCart(category=category, subcategory=subcategory)
     elif message:
-        shopping_cart = ShoppingCart(shop=message)
+        shopping_cart = ShoppingCart(category=message)
     await state.update_data(ShoppingCart=shopping_cart)
     logger.info(f"Shopping Cart: {shopping_cart}")
     return shopping_cart
@@ -49,7 +55,7 @@ async def set_data_shopping_cart(state: FSMContext, **kwargs) -> tuple[ShoppingC
 async def create_deal(user_id: int, message_id: int, state: FSMContext) -> ShoppingCart:
     data = await state.get_data()
     shopping_cart: ShoppingCart = data["ShoppingCart"]
-    list_accounts: list[Account] = await accounts.get_account_by_name(shop=shopping_cart.shop, name=shopping_cart.name)
+    list_accounts: list[Account] =  await categories.get_viewed_accs_by_category_subcategory_acc(shopping_cart.category, shopping_cart.subcategory, shopping_cart.name)
     list_accounts = list_accounts[0:shopping_cart.count]
     await deals.new(
         Deal(

@@ -10,9 +10,9 @@ from config.config import config
 
 
 from internal.app.app import bot
-from internal.filters.Filters import IsShop, IsNameAccount
-from internal.entities.states.StateModels import ShoppingCart
-from internal.entities.database import deals, accounts, sellers
+from internal.filters.Filters import IsCategory, IsSubcategory, IsNameAccount
+from internal.entities.states.StateModels import ShoppingCart, AccountMD
+from internal.entities.database import deals, accounts, sellers, categories
 from internal.entities.models import CreatedOrder, ReceivedOrder
 from service import cryptography
 from service.GetMessage import get_mes, rounding_numbers
@@ -41,52 +41,143 @@ async def menu_shop(message: CallbackQuery, state: FSMContext):
 
 
 @router.callback_query(F.data == "Перейти к выбору категорий", UserStates.ShoppingCart)
-async def choose_shop(message: CallbackQuery):
+async def choose_category(message: CallbackQuery):
     id = message.from_user.id
     await bot.edit_message_text(chat_id=id,
                                 message_id=message.message.message_id,
                                 text=get_mes("shop_user_categories"),
-                                reply_markup=await Keyboards.shop_kb())
+                                reply_markup=await Keyboards.categories_kb())
 
 
-@router.callback_query(IsShop(), UserStates.ShoppingCart)
-async def choose_after_shop_act(message: CallbackQuery, state: FSMContext):
+@router.callback_query(IsCategory(), UserStates.ShoppingCart)
+async def choose_after_category_act(message: CallbackQuery, state: FSMContext):
     id = message.from_user.id
-    await set_data_shopping_cart(state=state, shop=message.data)
+
+    # await set_data_shopping_cart(state=state, category=message.data)
+    shopping_cart: ShoppingCart = ShoppingCart(category=message.data)
+    await state.update_data(ShoppingCart=shopping_cart)
+    logger.info(f"Shopping Cart: {shopping_cart}")
+    
+    await bot.edit_message_text(chat_id=id,
+                                message_id=message.message.message_id,
+                                text=get_mes("shop_user"),
+                                reply_markup=await Keyboards.choice_action_subcategories_account())
+
+
+@router.callback_query(F.data.in_(("Перейти к выбору подкатегорий", "Вернуться к выбору подкатегорий")), UserStates.ShoppingCart)
+async def choose_subcategory(message: CallbackQuery, state: FSMContext):
+    # выбор аккаунта и сохранение выбранного магазина
+    id = message.from_user.id
+    data = await state.get_data()
+    shopping_cart: ShoppingCart = data['ShoppingCart']
+    await bot.edit_message_text(chat_id=id,
+                                message_id=message.message.message_id,
+                                text="Выберите подкатегорию",
+                                reply_markup=await Keyboards.subcategories_kb(category=shopping_cart.category))
+    
+
+@router.callback_query(IsSubcategory(), UserStates.ShoppingCart)
+async def choose_after_subcategory_act(message: CallbackQuery, state: FSMContext):
+    id = message.from_user.id
+
+    data = await state.get_data()
+    shopping_cart: ShoppingCart = data['ShoppingCart']
+    shopping_cart.subcategory = message.data
+    await state.update_data(ShoppingCart=shopping_cart)
+    logger.info(f"Shopping Cart: {shopping_cart}")
+    # await set_data_shopping_cart(state=state, category=message.data, subcategory)
+    
     await bot.edit_message_text(chat_id=id,
                                 message_id=message.message.message_id,
                                 text=get_mes("shop_user"),
                                 reply_markup=await Keyboards.choice_action_name_account())
 
 
-@router.callback_query(F.data.in_(("Перейти к выбору товаров", "Вернуться к выбору товаров")), UserStates.ShoppingCart)
+@router.callback_query(F.data.in_(("Перейти к выбору товаров", "Вернуться к выбору товаров", "<", ">")), UserStates.ShoppingCart)
 async def choice_account(message: CallbackQuery, state: FSMContext):
     # выбор аккаунта и сохранение выбранного магазина
     id = message.from_user.id
+    
     data = await state.get_data()
-    shopping_cart = data["ShoppingCart"]
+    shopping_cart: ShoppingCart = data['ShoppingCart']
+    if "slider_page" in data:
+        slider_page = data["slider_page"]
+    else:
+        slider_page = 0
+    
+    acc_names, accs = await categories.get_viewed_accs_by_category_subcategory(category=shopping_cart.category, subcategory=shopping_cart.subcategory)
+    len_accs = len(accs)
+    
+    if message.data == "Перейти к выбору товаров":
+        slider_page = 0
+    elif message.data == "<":
+        if slider_page - 5 < 0:
+            slider_page = len_accs - 5
+        else:
+            slider_page = (slider_page - 5) % len_accs
+    elif message.data == ">":
+        if slider_page + 5 >= len_accs:
+            slider_page = 0
+        else:
+            slider_page = (slider_page + 5) % len_accs
+    await state.update_data(slider_page=slider_page)
+    
+    ### TODO: slider_logic
+
+    accs_for_text = []
+    logger.info(slider_page)
+    for i in range(slider_page, slider_page+5):
+        if i>=len_accs:
+            break
+        acc_md = AccountMD(
+            category=shopping_cart.category, 
+            subcategory=shopping_cart.subcategory,
+            name=acc_names[i],
+            description=accs[i].description,
+            price_no=rounding_numbers("%.2f" % (accs[i].price * (1 + config.shop.base_percent / 100))),
+            price_yes=rounding_numbers("%.2f" % (accs[i].price * (1 + config.shop.percent_guarantor / 100))),
+            link=f"{config.telegram_bot.link}?start={cryptography.encode(shopping_cart.category + '%' + shopping_cart.subcategory + '%' + acc_names[i])}"
+            )
+        accs_for_text.append(acc_md)
+
+    text=get_mes(
+        "accs_urls",
+        screening=False,
+        accs=accs_for_text,
+    )
+    logger.info(shopping_cart)
     await bot.edit_message_text(chat_id=id,
                                 message_id=message.message.message_id,
-                                text="Выберите товар",
-                                reply_markup=await Keyboards.name_accounts_shop_kb(shop=shopping_cart.shop))
+                                text=text,
+                                reply_markup=Keyboards.name_accounts_slider_kb(),
+                                parse_mode=ParseMode.MARKDOWN_V2
+                                )
 
 
-@router.callback_query(UserStates.ShoppingCart, IsNameAccount())
-async def choice_guarantor(message: CallbackQuery | Message, state: FSMContext, shop: str = None, name: str = None):
+# @router.callback_query(UserStates.ShoppingCart)
+async def choice_guarantor(message: CallbackQuery | Message, state: FSMContext, category: str = None, subcategory: str = None, name: str = None):
     # сохранение имени выбранного аккаунта и выбор количества аккаунтов
     shopping_cart: ShoppingCart
     count_account: int
     id = message.from_user.id
-    logger.info(f"{shop}, {name}")
+    
+    logger.info(f"{category}, {name}")
     if name is None:
         name = message.data
-    shopping_cart, count_account, acc = await set_data_shopping_cart(state, name=name, shop=shop)
+        print(message.data)
+
+    shopping_cart, count_account, acc = await set_data_shopping_cart(state, name=name, category=category, subcategory=subcategory)
+    await state.set_state(UserStates.ShoppingCart)
     price_no = rounding_numbers("%.2f" % (acc.price * (1 + config.shop.base_percent / 100) * shopping_cart.count))
     price_yes = rounding_numbers("%.2f" % (acc.price * (1 + config.shop.percent_guarantor / 100) * shopping_cart.count))
-    link = f"{config.telegram_bot.link}?start={cryptography.encode(shopping_cart.shop + '%' + shopping_cart.name)}"
+    
+    link = f"{config.telegram_bot.link}?start={cryptography.encode(shopping_cart.category + '%' + shopping_cart.subcategory + '%' + shopping_cart.name)}"
+    
     reply_markup = await Keyboards.choice_count_account(count=count_account)
+    
     text = get_mes("shopping_cart_user",
-                   shop=shopping_cart.shop,
+                   category=shopping_cart.category,
+                   subcategory=shopping_cart.subcategory,
                    name=shopping_cart.name,
                    price_no=price_no,
                    price_yes=price_yes,
@@ -95,6 +186,7 @@ async def choice_guarantor(message: CallbackQuery | Message, state: FSMContext, 
                    choice_count=shopping_cart.count,
                    link=link
                    )
+    
     if type(message) is Message:
         await bot.send_message(chat_id=id,
                                text=text,
@@ -115,7 +207,7 @@ async def choice_count_account(message: CallbackQuery, state: FSMContext):
     id = message.from_user.id
     data = await state.get_data()
     shopping_cart: ShoppingCart = data['ShoppingCart']
-    accs = await accounts.get_account_by_name(name=shopping_cart.name, shop=shopping_cart.shop)
+    accs = await categories.get_viewed_accs_by_category_subcategory_acc(shopping_cart.category, shopping_cart.subcategory, shopping_cart.name)
     count_account = len(accs)
     if message.data == "add_account":
         if shopping_cart.count + 1 <= count_account:
@@ -135,7 +227,8 @@ async def choice_count_account(message: CallbackQuery, state: FSMContext):
     await bot.edit_message_text(chat_id=id,
                                 message_id=message.message.message_id,
                                 text=get_mes("shopping_cart_user",
-                                             shop=shopping_cart.shop,
+                                             category=shopping_cart.category,
+                                             subcategory=shopping_cart.subcategory,
                                              name=shopping_cart.name,
                                              price_no=price_no,
                                              price_yes=price_yes,
@@ -152,13 +245,16 @@ async def choice_count_account(message: CallbackQuery, state: FSMContext):
 async def confirm_shopping_cart(message: CallbackQuery, state: FSMContext):
     # переход к оплате или отмена и сохранение с или без гаранта
     id = message.from_user.id
+    data = await state.get_data()
+    logger.info(data.get("ShoppingCart"))
     shopping_cart: ShoppingCart = await set_data_shopping_cart(state, guarantor=message.data)
 
-    link = f"{config.telegram_bot.link}?start={cryptography.encode(shopping_cart.shop + '%' + shopping_cart.name)}"
+    link = f"{config.telegram_bot.link}?start={cryptography.encode(shopping_cart.category + '%' + shopping_cart.subcategory + '%' + shopping_cart.name)}"
     await bot.edit_message_text(chat_id=id,
                                 message_id=message.message.message_id,
                                 text=get_mes("shopping_cart_user",
-                                             shop=shopping_cart.shop,
+                                             category=shopping_cart.category,
+                                             subcategory=shopping_cart.subcategory,
                                              name=shopping_cart.name,
                                              price=rounding_numbers(str(shopping_cart.price)),
                                              description=shopping_cart.description,
