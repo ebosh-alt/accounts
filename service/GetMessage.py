@@ -22,7 +22,7 @@ def get_text(text: str) -> str:
     return text
 
 
-def get_mes(path: str, **kwargs, ):
+def get_mes(path: str, screening: bool = True, **kwargs, ):
     env = Environment(
         loader=PackageLoader(package_name='main', package_path="internal/messages", encoding="utf-8"),
         autoescape=select_autoescape(['html', 'xml'])
@@ -31,8 +31,10 @@ def get_mes(path: str, **kwargs, ):
     if ".md" not in path:
         path = path + '.md'
     tmpl = env.get_template(path)
-    return get_text(tmpl.render(kwargs))
-
+    if screening:
+        return get_text(tmpl.render(kwargs))
+    else:
+        return tmpl.render(kwargs)
 
 def rounding_numbers(number: str):
     while number[-1] == "0":

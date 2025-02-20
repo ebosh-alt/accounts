@@ -6,7 +6,7 @@ from aiogram.types import BotCommand
 
 from config.config import config
 from internal.app.app import bot, dp
-from internal.entities.database import sellers, Seller, shops
+from internal.entities.database import sellers, Seller, shops, categories
 from internal.entities.database.base import create_async_database
 from internal.entities.schemas.Shop import Shop as SchemaShop
 from internal.handlers import routers
@@ -51,7 +51,8 @@ async def run_api():
 
 async def run_test():
     await create_async_database()
-    await create_test_data()
+    # await categories.get(1)
+    # await create_test_data()
     for router in routers:
         dp.include_router(router)
     dp.update.middleware(middleware.Logging())

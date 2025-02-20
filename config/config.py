@@ -1,6 +1,6 @@
 import logging
-from settings.setting import Config
 
+from .settings.setting import Config
 
 logger = logging.getLogger(__name__)
 

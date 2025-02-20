@@ -1,6 +1,7 @@
 from config.config import config
 
-from internal.entities.database import sellers, Seller, users, User, accounts, Account, deals, Deal, subcategories, Subcategory, categories, Category
+from internal.entities.database import sellers, Seller, users, User, accounts, Account, deals, Deal, subcategories, \
+    Subcategory, categories, Category, shops, Shop
 
 import datetime
 
@@ -19,6 +20,11 @@ async def create_seller():
         await users.new(user)
 
 async def create_test_data():
+    await shops.new(Shop(
+        name='',
+        description='',
+        path_photo='',
+    ))
     # Добавление записи в таблицу sellers
     if await sellers.in_(id=config.manager.seller_id):
         pass

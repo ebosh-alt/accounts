@@ -3,7 +3,6 @@ import logging
 from sqlalchemy import Column, String, Integer
 
 from .base import Base, BaseDB
-
 logger = logging.getLogger(__name__)
 
 
