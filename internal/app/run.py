@@ -45,6 +45,7 @@ async def run():
 
 async def run_api():
     await create_async_database()
+    await create_test_data()
     app = create_fastapi()
     await start_fastapi(app)
 
