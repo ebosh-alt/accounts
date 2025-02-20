@@ -1,6 +1,7 @@
 {% for deal in deals %}
 *id сделки:* `{{deal.id}}`
-*Название магазина:* `{{deal.shop}}`
+*Категория:* `{{deal.category}}`
+*Подкатегория:* `{{deal.subcategory}}`
 *Название аккаунта:* `{{deal.name}}`
 *Стоимость:* `{{deal.price}}$`
 *Описание:* `{{deal.description}}`

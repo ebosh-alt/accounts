@@ -1,12 +1,12 @@
-from .acceptable_account_categories import AcceptableAccountCategory, AcceptableAccountCategories
-from .accounts import Account, Accounts
-from .categories import Category, Categories
-from .chats import Chat, Chats
-from .deals import Deal, Deals
-from .sellers import Seller, Sellers
-from .shops import Shop, Shops
-from .subcategories import Subcategory, Subcategories
-from .users import User, Users
+from internal.entities.database.acceptable_account_categories import AcceptableAccountCategory, AcceptableAccountCategories
+from internal.entities.database.accounts import Account, Accounts
+from internal.entities.database.categories import Category, Categories
+from internal.entities.database.chats import Chat, Chats
+from internal.entities.database.deals import Deal, Deals
+from internal.entities.database.sellers import Seller, Sellers
+from internal.entities.database.shops import Shop, Shops
+from internal.entities.database.subcategories import Subcategory, Subcategories
+from internal.entities.database.users import User, Users
 
 users: Users = Users()
 sellers: Sellers = Sellers()
@@ -18,13 +18,13 @@ categories: Categories = Categories()
 subcategories: Subcategories = Subcategories()
 acceptable_account_categories: AcceptableAccountCategories = AcceptableAccountCategories()
 
-__al__ = ("Deal", "deals",
-          "Chat", "chats",
-          "User", "users",
-          "Seller", "sellers",
-          "Account", "accounts",
-          "Category", "categories",
-          "Subcategory", "subcategories",
-          "Shop", "shops",
-          "AcceptableAccountCategory", "acceptable_account_categories"
-          )
+__all__ = ("Deal", "deals",
+           "Chat", "chats",
+           "User", "users",
+           "Seller", "sellers",
+           "Account", "accounts",
+           "Category", "categories",
+           "Subcategory", "subcategories",
+           "Shop", "shops",
+           "AcceptableAccountCategory", "acceptable_account_categories",
+           )

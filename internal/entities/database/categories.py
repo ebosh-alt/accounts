@@ -7,6 +7,7 @@ from .base import Base, BaseDB
 from .subcategories import Subcategory
 from .accounts import Account
 
+
 logger = logging.getLogger(__name__)
 
 
@@ -114,5 +115,6 @@ class Categories(BaseDB):
     async def get_by_name(self, name):
         filters = {Category.name: name}
         result = await self._get_objects(filters)
-        if result:
-            return result[0]
+        if not result:
+            return False
+        return result[0]

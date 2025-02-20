@@ -3,8 +3,6 @@ from typing import List, Optional
 from pydantic import BaseModel
 
 
-### TODO: edit logic
-
 class Account(BaseModel):
     category: Optional[str] = None
     subcategory: Optional[str] = None

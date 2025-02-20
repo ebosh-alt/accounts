@@ -19,7 +19,7 @@ class DataDeals(BaseModel):
     payment: int
 
     def len(self):
-        return len(str(self.id) + str(self.category)+ str(self.subcategory) + str(self.name) + str(self.price) + str(self.description) + str(
+        return len(str(self.id) + str(self.category) + str(self.subcategory) + str(self.name) + str(self.price) + str(self.description) + str(
             self.data) + str(self.date) + str(self.guarantor) + str(self.payment))
 
 
@@ -126,12 +126,10 @@ class ApiPoint:
     balance = "https://my.exnode.ru/api/token/balance"
     get_shop = f"{config.fastapi.host}:{config.fastapi.port}/api/shop/create"
 
-### TODO: edit logic 
 
 class AccountExcel(BaseModel):
     category: Optional[str] = None
     subcategory: Optional[str] = None
-    type_account: Optional[str] = None
     name: Optional[str] = None
     price: Optional[float] = None
     description: Optional[str] = None

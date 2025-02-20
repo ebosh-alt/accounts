@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import logging
 
 from sqlalchemy import Column, Boolean, BigInteger, ForeignKey, Integer, Float, String, DateTime
@@ -69,8 +67,8 @@ class Deals(BaseDB):
                 c = await cats.get(sc.category_id)
                 result.append(DataDeals(
                     id=deal.id,
-                    category=c.name,
-                    subcategory=sc.name,
+                    category=await account.category,
+                    subcategory=await account.subcategory,
                     name=account.name,
                     price=account.price,
                     description=account.description,
@@ -91,13 +89,11 @@ class Deals(BaseDB):
             subcats = Subcategories()
             cats = Categories()
             for account in accs:
-            # print(account.dict())
-                sc = await subcats.get(account.subcategory_id)
-                c = await cats.get(sc.category_id)
+
                 data_deals = DataDeals(
                     id=deal.id,
-                    category=c.name,
-                    subcategory=sc.name,
+                    category=await account.subcategory,
+                    subcategory=await account.subcategory,
                     name=account.name,
                     price=float(account.price),
                     description=account.description,
@@ -106,8 +102,8 @@ class Deals(BaseDB):
                     guarantor=deal.guarantor,
                     payment=deal.payment_status
                 )
-            if data_deals not in result:
-                result.append(data_deals)
+                if data_deals not in result:
+                    result.append(data_deals)
         return result
 
     async def in_(self, id: int) -> Deal | bool:

@@ -76,6 +76,7 @@ class Keyboards:
          "Изменить реквизиты продавца": "change_seller_wallet",
          "Изменить название магазина": "change_name_shop",
          "Изменить описание продавца": "change_description_seller",
+         "Изменить фото магазина": "change_photo_shop",
          "Добавить тип аккаунтов": "add_acc_type",
          "Удалить тип аккаунтов": "delete_acc_type",
          })
@@ -89,6 +90,8 @@ class Keyboards:
             "Изменить реквизиты": "change_wallet",
             "Изменить название магазина": "change_name_shop",
             "Изменить описание продавца": "change_description_seller",
+            "Изменить фото магазина": "change_photo_shop",
+
         }
     )
     manager_menu_load_kb = Builder.create_keyboard(

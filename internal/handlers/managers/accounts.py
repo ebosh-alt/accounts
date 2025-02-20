@@ -1,15 +1,16 @@
+import logging
+
 from aiogram import Router, F
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, FSInputFile, Message
 
 from config.config import config
 from internal.app.app import bot
+from internal.entities.states.states import ManagerStates
 from internal.filters.Filters import IsManager
-from internal.entities.database import accounts
+from service.Excel.excel import Excel
 from service.GetMessage import get_mes
 from service.keyboards import Keyboards
-from internal.entities.states.states import ManagerStates
-import logging
 
 router = Router()
 
@@ -43,7 +44,7 @@ async def new_catalog(message: CallbackQuery, state: FSMContext):
 
 
 @router.callback_query(F.data == "change_catalog")
-async def change_catalog(message: CallbackQuery, state: FSMContext):
+async def change_catalog_rt(message: CallbackQuery, state: FSMContext):
     await state.set_state(ManagerStates().change_catalog)
 
     await bot.edit_message_text(
@@ -55,7 +56,7 @@ async def change_catalog(message: CallbackQuery, state: FSMContext):
 
 
 @router.callback_query(F.data == "delete_from_catalog")
-async def delete_from_catalog(message: CallbackQuery, state: FSMContext):
+async def delete_from_catalog_rt(message: CallbackQuery, state: FSMContext):
     await state.set_state(ManagerStates().delete_from_catalog)
     await bot.edit_message_text(
         chat_id=message.message.chat.id,
@@ -91,11 +92,11 @@ async def load_accs_end(message: Message, state: FSMContext):
         response = None
         match user_state:
             case ManagerStates.replace_catalog:
-                response = await accounts.replace_catalog(file_path)
+                response = Excel.replace_catalog(file_path)
             case ManagerStates.change_catalog:
-                response = await accounts.change_catalog(file_path)
+                response = Excel.change_catalog(file_path)
             case ManagerStates.delete_from_catalog:
-                response = await accounts.delete_from_catalog(file_path)
+                response = Excel.delete_from_catalog(file_path)
         if response:
             if response.status == 200:
                 await bot.send_message(
