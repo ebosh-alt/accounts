@@ -18,3 +18,10 @@ restart:
 	make remove
 	make test_db
 	python main.py test_data
+
+start_prod:
+	docker compose --profile prod up --build -d
+
+restart_prod:
+	make remove
+	make start_prod
