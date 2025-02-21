@@ -2,10 +2,11 @@ import logging
 
 from sqlalchemy import Column, String, Integer, select, BigInteger
 
+
 from .base import Base, BaseDB
 
-from .subcategories import Subcategory
-from .accounts import Account
+from internal.entities.database.subcategories import Subcategory
+from internal.entities.database.accounts import Account
 
 
 logger = logging.getLogger(__name__)

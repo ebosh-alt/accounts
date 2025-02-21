@@ -40,13 +40,13 @@ class Excel:
         er = False
 
         # TODO: add acceptable_types_names
-        acceptable_types_names = await acceptable_account_categories.get(1)
+        acceptable_types_category = await acceptable_account_categories.get_all_name_types()
 
         for instance_md in instances_mds:
             account = await accounts.get_by_uid(instance_md.uid)
 
             if account is False:
-                if instance_md.category:
+                if instance_md.category in acceptable_types_category:
                     subcategory = await subcategories.get_by_name(instance_md.subcategory)
                     category = await categories.get_by_name(instance_md.category)
 
@@ -97,7 +97,7 @@ class Excel:
             account = await accounts.get_by_uid(instance_md.uid)
             if type(account) is Account:
                 if not account.deal_id:
-                    if instance_md.category:
+                    if instance_md.category in acceptable_types_category:
                         subcategory = await subcategories.get(account.subcategory_id)
                         category = await categories.get(subcategory.category_id)
 
