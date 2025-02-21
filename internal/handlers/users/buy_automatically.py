@@ -104,8 +104,14 @@ async def choice_account(message: CallbackQuery, state: FSMContext):
         slider_page = data["slider_page"]
     else:
         slider_page = 0
-    
-    acc_names_not_unique, accs = await categories.get_viewed_accs_by_category_subcategory(category=shopping_cart.category, subcategory=shopping_cart.subcategory)
+    # [""], [Account(),]
+    acc_names_not_unique, accs_not_unique = await categories.get_viewed_accs_by_category_subcategory(category=shopping_cart.category, subcategory=shopping_cart.subcategory)
+    acc_names = []
+    accs = []
+    for i in range(len(acc_names_not_unique)):
+        if acc_names_not_unique[i] not in acc_names:
+            acc_names.append(acc_names_not_unique[i])
+            accs.append(accs_not_unique[i])
     len_accs = len(accs)
     
     if message.data == "Перейти к выбору товаров":
@@ -122,10 +128,7 @@ async def choice_account(message: CallbackQuery, state: FSMContext):
             slider_page = (slider_page + 5) % len_accs
     await state.update_data(slider_page=slider_page)
     
-    acc_names = []
-    for acc_n_u in acc_names_not_unique:
-        if acc_n_u not in acc_names:
-            acc_names.append(acc_n_u)
+
             
     accs_for_text = []
     logger.info(slider_page)
@@ -226,7 +229,7 @@ async def choice_count_account(message: CallbackQuery, state: FSMContext):
             return
     price_no = rounding_numbers("%.2f" % (accs[0].price * (1 + config.shop.base_percent / 100) * shopping_cart.count))
     price_yes = rounding_numbers("%.2f" % (accs[0].price * (1 + config.shop.percent_guarantor / 100) * shopping_cart.count))
-    link = f"{config.telegram_bot.link}?start={cryptography.encode(shopping_cart.shop + '%' + shopping_cart.name)}"
+    link = f"{config.telegram_bot.link}?start={cryptography.encode(shopping_cart.category + '%' + shopping_cart.subcategory + '%' + shopping_cart.name)}"
     await bot.edit_message_text(chat_id=id,
                                 message_id=message.message.message_id,
                                 text=get_mes("shopping_cart_user",
