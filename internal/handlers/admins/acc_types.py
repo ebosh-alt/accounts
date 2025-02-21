@@ -41,8 +41,8 @@ async def add_acc_type_enter(message: Message, state: FSMContext):
         ))
     acceptable_account_names = await acceptable_account_categories.get_all_name_types()
 
-        # cfg.acceptable_account_types.append(message.text)
-        # cfg.save_config()
+    # cfg.acceptable_account_types.append(message.text)
+    # cfg.save_config()
     await state.clear()
     await bot.send_message(chat_id=id,
                            text=get_mes("add_acc_type_success", acc_types=acceptable_account_names),

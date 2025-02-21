@@ -105,7 +105,7 @@ async def choice_account(message: CallbackQuery, state: FSMContext):
     else:
         slider_page = 0
     
-    acc_names, accs = await categories.get_viewed_accs_by_category_subcategory(category=shopping_cart.category, subcategory=shopping_cart.subcategory)
+    acc_names_not_unique, accs = await categories.get_viewed_accs_by_category_subcategory(category=shopping_cart.category, subcategory=shopping_cart.subcategory)
     len_accs = len(accs)
     
     if message.data == "Перейти к выбору товаров":
@@ -122,8 +122,11 @@ async def choice_account(message: CallbackQuery, state: FSMContext):
             slider_page = (slider_page + 5) % len_accs
     await state.update_data(slider_page=slider_page)
     
-    ### TODO: slider_logic
-
+    acc_names = []
+    for acc_n_u in acc_names_not_unique:
+        if acc_n_u not in acc_names:
+            acc_names.append(acc_n_u)
+            
     accs_for_text = []
     logger.info(slider_page)
     for i in range(slider_page, slider_page+5):
