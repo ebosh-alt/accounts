@@ -43,8 +43,8 @@ $$
         CREATE TABLE deals
         (
             id                  serial PRIMARY KEY,
-            buyer_id            int REFERENCES users (id),
-            seller_id           int REFERENCES sellers (id),
+            buyer_id            bigint REFERENCES users (id),
+            seller_id           bigint REFERENCES sellers (id),
             price               float,
             wallet              text,
             payment_status      int,
