@@ -50,3 +50,10 @@ class AcceptableAccountCategories(BaseDB):
         async for acc_type in self:
             result.append(acc_type.name)
         return result
+
+    async def get_by_name(self, name):
+        filters = {AcceptableAccountCategory.name: name}
+        result = await self._get_objects(filters)
+        if not result:
+            return False
+        return result[0]
