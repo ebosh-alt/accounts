@@ -11,7 +11,7 @@ async def create_test_data():
     # Добавление записей в таблицу categories
     for i in range(1, 11):
         category = Category(
-            id=i,
+            # id=i,
             name=f"Category Name {i}",
         )
         await categories.new(category)
@@ -19,7 +19,7 @@ async def create_test_data():
     # Добавление записей в таблицу subcategories
     for i in range(1, 11):
         subcategory = Subcategory(
-            id=i,
+            # id=i,
             name=f"Subcategory Name {i}",
             category_id=i,
         )

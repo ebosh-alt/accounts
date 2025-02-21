@@ -122,7 +122,6 @@ async def choice_account(message: CallbackQuery, state: FSMContext):
             slider_page = (slider_page + 5) % len_accs
     await state.update_data(slider_page=slider_page)
     
-    ### TODO: slider_logic
 
     accs_for_text = []
     logger.info(slider_page)

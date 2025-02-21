@@ -1,5 +1,7 @@
 import logging
-from sqlalchemy import Column, String, Integer, select
+
+from sqlalchemy import Column, String, Integer, select, BigInteger
+
 
 from .base import Base, BaseDB
 
@@ -13,7 +15,7 @@ logger = logging.getLogger(__name__)
 class Category(Base):
     __tablename__ = "categories"
 
-    id = Column(Integer, autoincrement=True, primary_key=True)
+    id = Column(BigInteger, autoincrement=True, primary_key=True)
     name = Column(String)
 
     refs = []

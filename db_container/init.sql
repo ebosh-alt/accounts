@@ -14,13 +14,13 @@ $$
     BEGIN
         CREATE TABLE users
         (
-            id       int PRIMARY KEY,
+            id       bigint PRIMARY KEY,
             username text
         );
 
         CREATE TABLE sellers
         (
-            id       int PRIMARY KEY,
+            id       bigint PRIMARY KEY,
             username text,
             rating   float,
             balance  float,
@@ -67,9 +67,9 @@ $$
 
         CREATE TABLE chats
         (
-            id        int PRIMARY KEY,
-            user_id   int REFERENCES users (id),
-            seller_id int REFERENCES sellers (id)
+            id        bigint PRIMARY KEY,
+            user_id   bigint REFERENCES users (id),
+            seller_id bigint REFERENCES sellers (id)
         );
 
         create table shops

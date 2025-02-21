@@ -7,7 +7,6 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, CallbackQuery, FSInputFile
 
 from internal.app.app import bot
-### TODO: test logic 
 from internal.handlers.users.buy_automatically import choice_guarantor
 from internal.entities.database import users, User, shops
 from service import cryptography
