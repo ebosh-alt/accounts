@@ -30,14 +30,14 @@ async def create_deal_user_id(message: CallbackQuery, state: FSMContext):
 
 
 @router.message(ManagerStates.create_deal_user_id, IsManager())
-async def create_deal_shop(message: Message, state: FSMContext):
+async def create_deal_category(message: Message, state: FSMContext):
     data: dict = await state.get_data()
     deal: Deal_ = data["deal"]
     if message.text.isdigit():
         if await users.in_(id=int(message.text)):
             deal.user_id = int(message.text)
             await state.update_data(deal=deal)
-            await state.set_state(ManagerStates.create_deal_shop)
+            await state.set_state(ManagerStates.create_deal_category)
             text = get_mes("create_deal_data_input", data="Напишите название магазина")
             keyboard = ForceReply(input_field_placeholder=get_mes("create_deal_input_text", data="название магазина"))
         else:
@@ -54,11 +54,25 @@ async def create_deal_shop(message: Message, state: FSMContext):
     )
 
 
-@router.message(ManagerStates.create_deal_shop, IsManager())
+@router.message(ManagerStates.create_deal_category, IsManager())
+async def create_deal_subcategory(message: Message, state: FSMContext):
+    data: dict = await state.get_data()
+    deal: Deal_ = data["deal"]
+    deal.category = message.text
+    await state.update_data(deal=deal)
+    await state.set_state(ManagerStates.create_deal_subcategory)
+    await bot.send_message(
+        chat_id=message.chat.id,
+        text=get_mes("create_deal_data_input", data="Напишите подкатегорию"),
+        reply_markup=ForceReply(input_field_placeholder=get_mes("create_deal_input_text", data="подкатегория")),
+        # parse_mode=ParseMode.MARKDOWN_V2
+    )
+
+@router.message(ManagerStates.create_deal_subcategory, IsManager())
 async def create_deal_price(message: Message, state: FSMContext):
     data: dict = await state.get_data()
     deal: Deal_ = data["deal"]
-    deal.shop = message.text
+    deal.subcategory = message.text
     await state.update_data(deal=deal)
     await state.set_state(ManagerStates.create_deal_price)
     await bot.send_message(
