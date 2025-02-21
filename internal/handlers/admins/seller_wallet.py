@@ -34,7 +34,7 @@ async def change_seller_wallet_1(message: Message, state: FSMContext):
     await sellers.update(seller)
     await bot.send_message(
         chat_id=message.from_user.id,
-        text=get_mes("change_seller_wallet_1", seller=seller),
+        text=get_mes("change_seller_wallet_1", screening=False, seller=seller),
         reply_markup=Keyboards.admin_back_menu_kb,
         # parse_mode=ParseMode.MARKDOWN_V2
     )

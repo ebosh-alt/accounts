@@ -50,7 +50,7 @@ async def change_catalog_rt(message: CallbackQuery, state: FSMContext):
     await bot.edit_message_text(
         chat_id=message.message.chat.id,
         message_id=message.message.message_id,
-        text=get_mes("change_catalog"),
+        text=get_mes("change_catalog", screening=False),
         reply_markup=Keyboards.manager_back_menu_kb,
     )
 
@@ -92,11 +92,11 @@ async def load_accs_end(message: Message, state: FSMContext):
         response = None
         match user_state:
             case ManagerStates.replace_catalog:
-                response = Excel.replace_catalog(file_path)
+                response = await Excel.replace_catalog(file_path)
             case ManagerStates.change_catalog:
-                response = Excel.change_catalog(file_path)
+                response = await Excel.change_catalog(file_path)
             case ManagerStates.delete_from_catalog:
-                response = Excel.delete_from_catalog(file_path)
+                response = await Excel.delete_from_catalog(file_path)
         if response:
             if response.status == 200:
                 await bot.send_message(

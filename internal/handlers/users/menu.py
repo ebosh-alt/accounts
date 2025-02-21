@@ -29,7 +29,7 @@ async def start(message: Message | CallbackQuery, state: FSMContext):
         user = User(id=id, username=message.from_user.username)
         await users.new(user)
     shop = await shops.get(1)
-    caption = get_mes("menu", name_shop=shop.name, description_seller=shop.description)
+    caption = get_mes("menu", screening=False, name_shop=shop.name, description_seller=shop.description)
     photo = FSInputFile(shop.path_photo)
     try:
         if type(message) is CallbackQuery:

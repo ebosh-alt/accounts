@@ -1,6 +1,7 @@
 import logging
 
 from sqlalchemy import Column, Boolean, BigInteger, ForeignKey, Integer, Float, String, DateTime
+from sqlalchemy.util import await_only
 
 from internal.entities.models import DataDeals
 from . import subcategories
@@ -88,12 +89,12 @@ class Deals(BaseDB):
             # subcats = Subcategories()
             # cats = Categories()
             for account in accs:
-                subcategory = await subcategories.get(account.subcategory_id)
-                category = Categories().get(subcategory.category_id)
+                subcategory = await Subcategories().get(account.subcategory_id)
+                category = await Categories().get(subcategory.category_id)
 
                 data_deals = DataDeals(
                     id=deal.id,
-                    category=subcategory.name,
+                    category=category.name,
                     subcategory=subcategory.name,
                     name=account.name,
                     price=float(account.price),
