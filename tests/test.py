@@ -1,17 +1,22 @@
 from config.config import config
 
-from internal.entities.database import sellers, Seller, users, User, accounts, Account, deals, Deal, subcategories, Subcategory, categories, Category, shops, Shop
+from internal.entities.database import sellers, Seller, users, User, accounts, Account, deals, Deal, subcategories, Subcategory, categories, Category, shops, Shop, acceptable_account_categories, AcceptableAccountCategory
 
 import datetime
 
 
 async def create_test_data():
 
+    await acceptable_account_categories.new(AcceptableAccountCategory(
+        name="fb storis"
+    ))
+    await acceptable_account_categories.new(AcceptableAccountCategory(
+        name="fb storis Unique"
+    ))
 
     # Добавление записей в таблицу categories
     for i in range(1, 11):
         category = Category(
-            # id=i,
             name=f"Category Name {i}",
         )
         await categories.new(category)
@@ -19,7 +24,6 @@ async def create_test_data():
     # Добавление записей в таблицу subcategories
     for i in range(1, 11):
         subcategory = Subcategory(
-            # id=i,
             name=f"Subcategory Name {i}",
             category_id=i,
         )

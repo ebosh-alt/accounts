@@ -92,7 +92,7 @@ async def load_accs_end(message: Message, state: FSMContext):
         response = None
         match user_state:
             case ManagerStates.replace_catalog:
-                response = Excel.replace_catalog(file_path)
+                response = await Excel.replace_catalog(file_path)
             case ManagerStates.change_catalog:
                 response = Excel.change_catalog(file_path)
             case ManagerStates.delete_from_catalog:
