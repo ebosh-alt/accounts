@@ -3,7 +3,7 @@ from typing import Any
 
 from sqlalchemy import Column, String, Boolean, FLOAT, Integer, ForeignKey
 
-from internal.entities.database.categories import Categories
+# from internal.entities.database.categories import Categories
 from internal.entities.database.subcategories import Subcategories
 from internal.entities.schemas.Catalog import Catalog
 from .base import Base, BaseDB
@@ -27,16 +27,16 @@ class Account(Base):
 
     refs = []
 
-    @property
-    async def category(self):
-        subcategory = await Subcategories().get(self.subcategory_id)
-        category = await Categories().get(subcategory.category_id)
-        return category.name
+    # @property
+    # async def category(self):
+    #     subcategory = await Subcategories().get(self.subcategory_id)
+    #     category = await Categories().get(subcategory.category_id)
+    #     return category.name
 
-    @property
-    async def subcategory(self):
-        subcategory = await Subcategories().get(self.subcategory_id)
-        return subcategory.name
+    # @property
+    # async def subcategory(self):
+    #     subcategory = await Subcategories().get(self.subcategory_id)
+    #     return subcategory.name
 
     def dict(self):
         return {

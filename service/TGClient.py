@@ -123,7 +123,8 @@ class TGClient_S:
                 users_entity.append(InputUser(user_id=user.id, access_hash=user.access_hash))
             users_entity.append(InputUser(user_id=bot_entity.id, access_hash=bot_entity.access_hash))
             data: Updates = await self.client(CreateChatRequest(users=users_entity, title=title))
-            chat: Chat = data.chats[0]
+            print(data)
+            chat: Chat = data.updates.chats[0]
             chat_id = chat.id
             try:
                 await self.client.edit_admin(

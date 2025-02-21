@@ -8,7 +8,7 @@ from aiogram.types import Message, CallbackQuery, ForceReply
 from internal.app.app import bot
 from internal.filters.Filters import IsManager
 from internal.entities.states.StateModels import Deal as Deal_
-from internal.entities.database import accounts, Account, deals, Deal, users
+from internal.entities.database import accounts, Account, deals, Deal, users, categories, Category, subcategories, Subcategory
 from service.GetMessage import get_mes
 from service.is_float import is_float
 from service.keyboards import Keyboards
@@ -187,8 +187,20 @@ async def create_deal_end(message: CallbackQuery, state: FSMContext):
         )
         await deals.new(c_deal)
         deal_bd = await deals.get_last_deal(deal.user_id)
+        
+        cat = Category(
+            name=deal.category
+        )
+        await categories.new(cat)
+        
+        subcat = Subcategory(
+            name=deal.subcategory,
+            category_id=cat.id,
+        )
+        await subcategories.new(subcat)
+        
         account = Account(
-            subcategory=deal.subcategory,
+            subcategory_id=subcat.id,
             price=deal.price,
             description=deal.description,
             data=deal.data,
@@ -196,7 +208,8 @@ async def create_deal_end(message: CallbackQuery, state: FSMContext):
             name=deal.name,
             deal_id=deal_bd.id,
         )
-        await accounts.new(account=account)
+        await accounts.new(account)
+        
         account = await accounts.get_last()
         await bot.send_message(
             chat_id=deal.user_id,
