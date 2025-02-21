@@ -3,6 +3,7 @@ import logging
 from sqlalchemy import Column, Boolean, BigInteger, ForeignKey, Integer, Float, String, DateTime
 
 from internal.entities.models import DataDeals
+from . import subcategories
 from .accounts import Accounts
 from .subcategories import Subcategories
 from .categories import Categories
@@ -60,15 +61,13 @@ class Deals(BaseDB):
         result = list()
         async for deal in self:
             accs = await Accounts().get_by_deal_id(deal_id=deal.id)
-            subcats = Subcategories()
-            cats = Categories()
             for account in accs:
-                sc = await subcats.get(account.subcategory_id)
-                c = await cats.get(sc.category_id)
+                subcategory = await Subcategories().get(account.subcategory_id)
+                category = await Categories().get(subcategory.category_id)
                 result.append(DataDeals(
                     id=deal.id,
-                    category=await account.category,
-                    subcategory=await account.subcategory,
+                    category=category.name,
+                    subcategory=subcategory.name,
                     name=account.name,
                     price=account.price,
                     description=account.description,
@@ -86,14 +85,16 @@ class Deals(BaseDB):
 
         for deal in deals:
             accs = await Accounts().get_by_deal_id(deal_id=deal.id)
-            subcats = Subcategories()
-            cats = Categories()
+            # subcats = Subcategories()
+            # cats = Categories()
             for account in accs:
+                subcategory = await subcategories.get(account.subcategory_id)
+                category = Categories().get(subcategory.category_id)
 
                 data_deals = DataDeals(
                     id=deal.id,
-                    category=await account.subcategory,
-                    subcategory=await account.subcategory,
+                    category=subcategory.name,
+                    subcategory=subcategory.name,
                     name=account.name,
                     price=float(account.price),
                     description=account.description,
@@ -105,6 +106,7 @@ class Deals(BaseDB):
                 if data_deals not in result:
                     result.append(data_deals)
         return result
+
 
     async def in_(self, id: int) -> Deal | bool:
         result = await self.get(id)

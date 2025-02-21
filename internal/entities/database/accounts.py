@@ -1,13 +1,8 @@
 import logging
-from typing import Any
 
 from sqlalchemy import Column, String, Boolean, FLOAT, Integer, ForeignKey
 
-from internal.entities.database.categories import Categories
-from internal.entities.database.subcategories import Subcategories
-from internal.entities.schemas.Catalog import Catalog
 from .base import Base, BaseDB
-
 
 logger = logging.getLogger(__name__)
 
@@ -26,17 +21,6 @@ class Account(Base):
     uid: str = Column(String, unique=True)
 
     refs = []
-
-    @property
-    async def category(self):
-        subcategory = await Subcategories().get(self.subcategory_id)
-        category = await Categories().get(subcategory.category_id)
-        return category.name
-
-    @property
-    async def subcategory(self):
-        subcategory = await Subcategories().get(self.subcategory_id)
-        return subcategory.name
 
     def dict(self):
         return {
@@ -75,12 +59,6 @@ class Accounts(BaseDB):
             return result
         return False
 
-    # async def get_shops(self) -> list[Any]:
-    #     filters = {Account.view_type: True}
-    #     data = await self._get_objects(filters=filters)
-    #     result = []
-    #     [result.append(i.shop) for i in data if i.shop not in result]
-    #     return result
 
     # TODO: edit logic
     async def get_instance_by_name(self, name: str, subcategory_id: int):
@@ -88,15 +66,6 @@ class Accounts(BaseDB):
         result: list[Account] = await self._get_objects(filters=filters)
         instance = result
         return instance
-
-    # async def get_name_instances_shop(self, category_id: int):
-    #     filters = {Account.category_id: category_id, Account.view_type: True}
-    #     request = await self._get_objects(filters=filters)
-    #     result = []
-    #     for i in request:
-    #         if len(i.name) < 65 and i.name not in result:
-    #             result.append(i.name)
-    #     return result
 
 
     async def get_last(self) -> Account:
@@ -115,40 +84,14 @@ class Accounts(BaseDB):
             return False
         return result[0]
 
-    async def get_unique_instances_with_count(self) -> Catalog:
-        """
-        Получить список уникальных аккаунтов с view_type=True,
-        сгруппированных по (shop, name), а также количество
-        аккаунтов для каждой группы.
-        """
-        # Фильтр для выборки только активных аккаунтов
-        filters = {Account.view_type: True}
-        instances: list[Account] = await self._get_objects(filters=filters)
-
-        # Словарь для группировки аккаунтов
-        grouped_instances = {}
-        for instance in instances:
-            key = (await instance.category, await instance.subcategory, instance.name)  # Уникальный ключ: (shop, name)
-            if key not in grouped_instances:
-                grouped_instances[key] = {
-                    "category": await instance.category,
-                    "subcategory": await instance.subcategory,
-                    "name": instance.name,
-                    "description": instance.description,
-                    "price": instance.price,
-                    "uid": instance.uid,
-                    "count": 0,
-                }
-
-            grouped_instances[key]["count"] += 1
-
-        data = {"accounts": list(grouped_instances.values())}
-        catalog = Catalog(**data)
-        return catalog
-
     async def get_by_uid(self, uid) -> Account | bool:
         filters = {Account.uid: uid}
         result = await self._get_objects(filters)
         if len(result) == 0:
             return False
         return result[0]
+
+    async def get_view(self):
+        filters = {Account.view_type: True}
+        instances: list[Account] = await self._get_objects(filters=filters)
+        return instances
