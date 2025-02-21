@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 if __name__ == "__main__":
     logging.basicConfig(
         level=logging.INFO,
-        # filename="log.logging",
+        filename="log.logging",
         format=u'%(filename)s:%(lineno)d #%(levelname)-3s [%(asctime)s] - %(message)s',
         filemode="w",
         encoding='utf-8')
